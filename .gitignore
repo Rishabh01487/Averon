@@ -1,0 +1,12 @@
+# Environment variables — never commit secrets
+.env
+
+# Node dependencies
+node_modules/
+
+# Runtime data files (local DB)
+data/
+
+# OS files
+.DS_Store
+Thumbs.db

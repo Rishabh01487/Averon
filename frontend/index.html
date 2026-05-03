@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Averon — Family Investment, Reimagined</title>
+<meta name="description" content="Pool capital with your family. Back real ideas. Grow real wealth. Powered by Averon Coin — India's first family investment token."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<canvas id="particleCanvas"></canvas>
+<!-- AUTH -->
+<div class="overlay" id="authOverlay">
+  <div class="auth-box">
+    <div class="auth-logo">Averon</div>
+    <p class="auth-sub">Your family's private investment circle.<br/>Pool money, back ideas, track every rupee.</p>
+    <div class="f-group"><label class="f-lbl">Your Name</label><input class="f-inp" id="authName" type="text" placeholder="Rajan Mehta" maxlength="40"/></div>
+    <div class="f-group"><label class="f-lbl">Family / Group Name</label><input class="f-inp" id="authFamily" type="text" placeholder="Mehta Parivar" maxlength="40"/></div>
+    <div class="auth-notice">You start with <strong>₹0 balance</strong>. Add real money via UPI, Debit Card, or Net Banking to buy Averon Coin. All transactions go through Razorpay — India's trusted payment gateway.</div>
+    <button class="btn btn-white btn-full" onclick="createAccount()">Create Account →</button>
+  </div>
+</div>
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="nav-brand" onclick="navigateTo('home')">Averon</div>
+  <div class="nav-links">
+    <button class="nav-link active" data-view="home">Home</button>
+    <button class="nav-link" data-view="proposals">Proposals</button>
+    <button class="nav-link" data-view="buytoken">Buy Averon Coin</button>
+    <button class="nav-link" data-view="submit">Submit Idea</button>
+    <button class="nav-link" data-view="portfolio">Portfolio</button>
+  </div>
+  <div class="nav-right">
+    <div class="ticker" id="priceTicker">
+      <span class="ticker-lbl">Averon Coin</span>
+      <span class="ticker-price" id="tickerPrice">₹1.00</span>
+      <span id="tickerChange" class="ticker-up">+0.00%</span>
+    </div>
+    <div class="acct-btn" id="acctBtn" onclick="navigateTo('portfolio')">
+      <div><div class="acct-name" id="acctName">—</div><div class="acct-bal" id="acctBal">0 Averon Coin</div></div>
+    </div>
+  </div>
+</nav>
+<div class="toast" id="toast"><span id="toastIco">✓</span><span id="toastMsg">Done</span></div>
+<!-- HOME -->
+<section class="view active" id="viewHome">
+  <div class="hero">
+    <div class="hero-badge"><span class="dot"></span> Razorpay Secured · Real INR · Real Averon Coin</div>
+    <h1 class="hero-title">Your Family's<br/><span>Private Capital</span></h1>
+    <p class="hero-sub">Stop sending money into the void. Pool it, invest it together, and watch every rupee work harder — as a family.</p>
+    <div class="hero-acts">
+      <button class="btn btn-white" onclick="navigateTo('buytoken')">Buy Averon Coin →</button>
+      <button class="btn btn-ghost" onclick="navigateTo('proposals')">Browse Proposals</button>
+    </div>
+  </div>
+  <div class="token-spot">
+    <div class="token-card">
+      <div class="token-hdr"><span class="kbc-pill">Averon Coin</span><span class="token-name-lbl">Live Price</span></div>
+      <div class="token-price" id="tokenPriceBig">₹1.0000</div>
+      <div class="token-change-row"><span id="tokenChangeBig" class="ticker-up">+0.00%</span><span class="change-lbl">vs last update</span></div>
+      <div class="chart-wrap"><canvas id="priceCanvas" width="300" height="70"></canvas></div>
+      <div class="token-stats">
+        <div class="ts"><div class="ts-v" id="tsSold">0</div><div class="ts-l">Averon Coin Sold</div></div>
+        <div class="ts"><div class="ts-v" id="tsMcap">₹0</div><div class="ts-l">Market Cap</div></div>
+        <div class="ts"><div class="ts-v" id="tsHolders">0</div><div class="ts-l">Holders</div></div>
+      </div>
+      <button class="btn btn-white btn-full" onclick="navigateTo('buytoken')">Buy Averon Coin →</button>
+    </div>
+    <div class="steps">
+      <h2 class="sec-title" style="margin-bottom:28px">How it works</h2>
+      <div class="step"><div class="step-n">01</div><div><h3>Buy Averon Coin with real ₹</h3><p>Pay via UPI, debit card, or net banking. Money goes through Razorpay. Averon Coin is credited to your account instantly.</p></div></div>
+      <div class="step"><div class="step-n">02</div><div><h3>Back family proposals</h3><p>Someone wants to open a shop, start a course, buy equipment — invest Averon Coin in their idea. If it funds, they get the money. If not, you get Averon Coin back.</p></div></div>
+      <div class="step"><div class="step-n">03</div><div><h3>Price moves with activity</h3><p>The more Averon Coin is bought and proposals are funded, the higher the price. Early investors benefit most.</p></div></div>
+      <div class="step"><div class="step-n">04</div><div><h3>Sell or refund to bank</h3><p>Averon Coin refunds from failed proposals go back to your wallet. Withdraw to your bank account anytime.</p></div></div>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-ico">📋</div><div class="stat-val" id="statTotal">0</div><div class="stat-lbl">Proposals</div></div>
+    <div class="stat-card"><div class="stat-ico">✓</div><div class="stat-val" id="statFunded">0</div><div class="stat-lbl">Funded</div></div>
+    <div class="stat-card"><div class="stat-ico">⏳</div><div class="stat-val" id="statActive">0</div><div class="stat-lbl">Active</div></div>
+    <div class="stat-card"><div class="stat-ico">◎</div><div class="stat-val" id="statKbc">0 Averon Coin</div><div class="stat-lbl">Total Invested</div></div>
+  </div>
+  <div class="section">
+    <div class="sec-hdr"><h2 class="sec-title">Live Proposals</h2><button class="btn btn-ghost btn-sm" onclick="navigateTo('proposals')">See all →</button></div>
+    <div class="proposals-grid" id="featuredGrid"><div class="load-state"><div class="spinner"></div></div></div>
+  </div>
+</section>
+<!-- PROPOSALS -->
+<section class="view" id="viewProposals">
+  <div class="page-hdr"><h1 class="page-title">All Proposals</h1><p class="page-sub">Click any proposal to invest Averon Coin or check funding progress.</p></div>
+  <div class="filters">
+    <button class="f-btn active" onclick="filterP('all',this)">All</button>
+    <button class="f-btn" onclick="filterP('active',this)">Active</button>
+    <button class="f-btn" onclick="filterP('funded',this)">Funded</button>
+    <button class="f-btn" onclick="filterP('expired',this)">Expired</button>
+    <select class="f-sel" id="catFilter" onchange="filterCat()">
+      <option value="all">All Categories</option>
+      <option>Business</option><option>Education</option><option>Tech</option>
+      <option>Health</option><option>Agriculture</option><option>Real Estate</option><option>Other</option>
+    </select>
+  </div>
+  <div class="proposals-grid" id="proposalsGrid"><div class="load-state"><div class="spinner"></div></div></div>
+</section>
+<!-- BUY KUBER COIN -->
+<section class="view" id="viewBuytoken">
+  <div class="page-hdr"><h1 class="page-title">Buy Averon Coin</h1><p class="page-sub">Real money. Real Averon Coin. Secured by Razorpay.</p></div>
+  <div id="rzpStatus" class="rzp-status rzp-off" style="margin:0 32px 20px">⚠ Payment gateway not configured. Add your Razorpay keys to .env to go live.</div>
+  <div class="buy-layout">
+    <div class="glass">
+      <div class="buy-hdr">
+        <div><div class="buy-price-lbl">Averon Coin Current Price</div><div class="buy-price-now" id="buyPriceNow">₹1.0000</div></div>
+        <span class="kbc-pill">Averon Coin</span>
+      </div>
+      <div class="f-group">
+        <label class="f-lbl">Amount (INR ₹)</label>
+        <div class="inp-wrap"><input class="f-inp" type="number" id="buyInr" placeholder="e.g. 500" min="10" step="1" oninput="calcBuy()"/><span class="inp-suf">₹</span></div>
+        <div class="bal-hint">Balance: <strong id="inrHint">₹0.00</strong> · Min ₹10</div>
+      </div>
+      <div class="swap-ico">↓</div>
+      <div class="f-group">
+        <label class="f-lbl">You Receive (Averon Coin)</label>
+        <div class="inp-wrap"><input class="f-inp" type="number" id="kbcReceive" placeholder="0.0000" readonly/><span class="inp-suf">KC</span></div>
+      </div>
+      <div class="buy-inf"><span>Price impact</span><span id="priceImpact">~0.00%</span></div>
+      <div class="buy-inf"><span>After-purchase price</span><span id="afterPrice">₹1.00</span></div>
+      <button class="btn btn-white btn-full" id="buyBtn" onclick="startBuy()">Buy Averon Coin via Razorpay →</button>
+    </div>
+    <div>
+      <div class="glass" style="margin-bottom:16px">
+        <div class="tips-title" style="margin-bottom:16px">Your Wallet</div>
+        <div class="w-row"><span>INR Balance</span><span class="w-val" id="wInr">₹0.00</span></div>
+        <div class="w-row"><span>Averon Coin Balance</span><span class="w-val" id="wKbc">0.0000 Averon Coin</span></div>
+        <div class="w-row"><span>Averon Coin Value (₹)</span><span class="w-val" id="wKbcVal">₹0.00</span></div>
+        <div class="t-div"></div>
+        <div class="w-row"><span>Total Portfolio</span><span class="w-val" id="wTotal">₹0.00</span></div>
+      </div>
+      <div class="glass">
+        <div class="tips-title">Averon Coin Price Drivers</div>
+        <div class="t-div"></div>
+        <ul class="tips-list">
+          <li>More Averon Coin purchased → price rises</li>
+          <li>Funded proposals → +4% price boost</li>
+          <li>Failed proposals → slight price dip</li>
+          <li>Auto micro-fluctuation every 15s</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="sec-hdr"><h2 class="sec-title">Transaction History</h2></div>
+    <div class="tx-list" id="txList"><div class="empty-state"><div class="empty-ico">◎</div><div class="empty-title">No transactions yet</div></div></div>
+  </div>
+</section>
+<!-- SUBMIT -->
+<section class="view" id="viewSubmit">
+  <div class="page-hdr"><h1 class="page-title">Submit a Proposal</h1><p class="page-sub">Put your idea on the table. Let the family decide.</p></div>
+  <div class="form-wrap">
+    <div class="glass">
+      <div class="f-group"><label class="f-lbl">Title *</label><input class="f-inp" type="text" id="propTitle" placeholder="e.g. Open a bakery in Sector 12" maxlength="100"/></div>
+      <div class="f-row">
+        <div class="f-group"><label class="f-lbl">Category</label><select class="f-sel2" id="propCat"><option>Business</option><option>Education</option><option>Tech</option><option>Health</option><option>Agriculture</option><option>Real Estate</option><option>Other</option></select></div>
+        <div class="f-group"><label class="f-lbl">Duration (days)</label><input class="f-inp" type="number" id="propDays" value="30" min="1" max="365"/></div>
+      </div>
+      <div class="f-group"><label class="f-lbl">Goal (Averon Coin) * <span style="font-size:11px;color:var(--txt3);text-transform:none;letter-spacing:0" id="kbcHint"></span></label><input class="f-inp" type="number" id="propGoal" placeholder="e.g. 1000" min="1" oninput="updateHint()"/></div>
+      <div class="f-group"><label class="f-lbl">Description *</label><textarea class="f-inp" id="propDesc" rows="6" style="resize:vertical;min-height:120px" placeholder="What's the idea? How will the money be used? What's the expected outcome?"></textarea></div>
+      <div class="f-info">Goal is set in Averon Coin. At current price, <strong id="kbcInr">set a goal above</strong>. If funded before deadline, the proposer receives all Averon Coin. If not, investors are refunded.</div>
+      <button class="btn btn-white btn-full" onclick="submitProposal()">Submit Proposal →</button>
+    </div>
+    <div class="tips-box glass">
+      <div class="tips-title">What makes a strong proposal</div>
+      <div class="t-div"></div>
+      <ul class="tips-list">
+        <li>Clear problem you're solving</li>
+        <li>Exact breakdown of how money is used</li>
+        <li>Realistic Averon Coin goal (not overblown)</li>
+        <li>Timeline with milestones</li>
+        <li>Expected return for investors</li>
+      </ul>
+      <div class="t-div"></div>
+      <div class="tips-title">How funds are protected</div>
+      <div class="t-div"></div>
+      <ul class="tips-list">
+        <li>Averon Coin locked until goal is reached</li>
+        <li>Only proposer can withdraw on success</li>
+        <li>Investors auto-refunded if deadline passes</li>
+      </ul>
+    </div>
+  </div>
+</section>
+<!-- PORTFOLIO -->
+<section class="view" id="viewPortfolio">
+  <div class="page-hdr"><h1 class="page-title">My Portfolio</h1><p class="page-sub">Your investments, proposals, and real-time P&amp;L.</p></div>
+  <div class="port-sum" id="portSum"></div>
+  <div class="port-tabs">
+    <button class="tab-btn active" onclick="switchTab('tabProposals',this)">My Proposals</button>
+    <button class="tab-btn" onclick="switchTab('tabInvestments',this)">My Investments</button>
+    <button class="tab-btn" onclick="switchTab('tabRefunds',this)">Refunds</button>
+  </div>
+  <div class="tab-content active" id="tabProposals"><div class="proposals-grid" id="myPropsGrid"></div></div>
+  <div class="tab-content" id="tabInvestments"><div class="proposals-grid" id="myInvGrid"></div></div>
+  <div class="tab-content" id="tabRefunds"><div class="proposals-grid" id="myRefGrid"></div></div>
+</section>
+<!-- MODAL -->
+<div class="modal-overlay" id="propModal" onclick="closeModal(event)">
+  <div class="modal-box"><button class="modal-close" onclick="closePropModal()">✕</button><div id="modalContent"></div></div>
+</div>
+<footer class="footer">
+  <div class="foot-brand">Averon</div>
+  <p class="foot-txt">Payments secured by Razorpay · Averon Coin · Your family's private capital</p>
+</footer>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
