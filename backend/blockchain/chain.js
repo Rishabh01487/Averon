@@ -242,3 +242,61 @@ class Blockchain {
   getBlockByHash(hash) {
     return this.chain.find(b => b.hash === hash) || null;
   }
+
+  getBlocks(start = 0, limit = 20) {
+    return this.chain.slice(start, start + limit);
+  }
+
+  getRecentBlocks(limit = 20) {
+    return [...this.chain].reverse().slice(0, limit);
+  }
+
+  getPendingCount() {
+    return this.pendingTransactions.length;
+  }
+
+  // ── Validation ─────────────────────────────────────────────────────────────
+
+  isChainValid() {
+    return validateChain(this.chain);
+  }
+
+  // ── Info / Stats ───────────────────────────────────────────────────────────
+
+  getInfo() {
+    const stats = getChainStats(this.chain);
+    return {
+      ...stats,
+      difficulty: this.difficulty,
+      miningReward: this.miningReward,
+      pendingTransactions: this.pendingTransactions.length,
+      version: C.PLATFORM_VERSION,
+    };
+  }
+
+  /**
+   * Get Merkle proof for a transaction in a specific block.
+   */
+  getMerkleProof(blockIndex, txHash) {
+    const block = this.getBlock(blockIndex);
+    if (!block) return null;
+    return block.getMerkleProof(txHash);
+  }
+
+  /**
+   * Get total minted supply.
+   */
+  getTotalSupply() {
+    let supply = 0;
+    for (const block of this.chain) {
+      for (const tx of block.transactions) {
+        if (tx.type === C.TX_TYPES.MINT || tx.type === C.TX_TYPES.REWARD) {
+          supply += tx.amount;
+        }
+      }
+    }
+    return parseFloat(supply.toFixed(8));
+  }
+}
+
+module.exports = { Blockchain, Transaction, Block, MerkleTree };
