@@ -118,3 +118,7 @@ class Block {
    */
   validateTimestamp(previousBlockTimestamp) {
     // Must be after previous block
+    if (this.timestamp <= previousBlockTimestamp) return false;
+    // Must not be too far in the future
+    if (this.timestamp > Date.now() + C.BLOCKCHAIN.MAX_FUTURE_BLOCK_TIME_MS) return false;
+    return true;
