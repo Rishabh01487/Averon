@@ -30,3 +30,7 @@ class Transaction {
       to: this.to,
       amount: this.amount,
       type: this.type,
+      data: this.data,
+      timestamp: this.timestamp,
+      nonce: this.nonce,
+      fee: this.fee,
