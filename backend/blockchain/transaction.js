@@ -102,3 +102,7 @@ class Transaction {
   }
 
   toJSON() {
+    return {
+      hash: this.hash,
+      from: this.from,
+      to: this.to,
