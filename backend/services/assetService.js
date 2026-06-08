@@ -170,3 +170,7 @@ class AssetService {
     }
 
     // Update funded amount
+    const newFunded = parseFloat((asset.funded_amount + totalCost).toFixed(8));
+    this.db.run('UPDATE assets SET funded_amount = ?, updated_at = ? WHERE id = ?', [newFunded, Date.now(), assetId]);
+
+    this.db.run('INSERT INTO activity_log (user_id, action, details, tx_hash, block_index, amount, created_at) VALUES (?,?,?,?,?,?,?)',
