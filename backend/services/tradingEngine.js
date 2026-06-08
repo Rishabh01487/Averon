@@ -86,3 +86,6 @@ class TradingEngine {
 
         const tradeAmount = Math.min(buy.remaining, sell.remaining);
         const tradePrice = sell.price; // Seller's price (maker gets their price)
+        const totalValue = parseFloat((tradeAmount * tradePrice).toFixed(4));
+
+        if (tradeAmount <= 0) continue;
