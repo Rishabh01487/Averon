@@ -234,3 +234,7 @@ function createSchema() {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     buy_order_id INTEGER,
     sell_order_id INTEGER,
+    buyer_id TEXT NOT NULL,
+    seller_id TEXT NOT NULL,
+    amount REAL NOT NULL,
+    price REAL NOT NULL,
