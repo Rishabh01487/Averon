@@ -146,3 +146,7 @@ app.post('/api/auth/login', authLimiter, validate('login'), async (req, res) => 
 
   const valid = await verifyPassword(password, user.password_hash);
   if (!valid) {
+    const attempts = user.login_attempts + 1;
+    if (attempts >= C.AUTH.MAX_LOGIN_ATTEMPTS) {
+      DB.run('UPDATE users SET login_attempts = ?, locked_until = ? WHERE id = ?',
+        [attempts, Date.now() + C.AUTH.LOCKOUT_DURATION_MS, user.id]);
