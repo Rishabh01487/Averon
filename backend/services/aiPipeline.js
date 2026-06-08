@@ -205,3 +205,8 @@ Respond ONLY with this JSON (no markdown):
 function analyzeWithFallback(asset, documents, docInfo) {
   const p = PROFILES[asset.category] || PROFILES['Other'];
   const quality = docInfo.quality || 50;
+
+  const baseRisk = p.risk[0] + Math.random() * (p.risk[1] - p.risk[0]);
+  const qualityAdj = (quality / 100) * -15;
+  const ratioAdj = asset.raise_amount > p.avg ? 10 : -5;
+  const riskScore = Math.round(Math.min(95, Math.max(5, baseRisk + qualityAdj + ratioAdj)));
