@@ -254,3 +254,7 @@ class AssetService {
           }
 
           this.transition(asset.id, C.ASSET_STATUS.CLOSED, 'system', `Expired — ${refundResult.refundCount} refunds processed`);
+          results.push({ type: 'expired', assetId: asset.id, ...refundResult });
+        }
+      }
+    }
