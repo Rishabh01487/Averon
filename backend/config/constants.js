@@ -74,3 +74,7 @@ module.exports = {
     FUNDED: 'funded',
     PAYOUT_PENDING: 'payout_pending',
     COMPLETED: 'completed',
+    EXPIRED: 'expired',
+    REFUNDING: 'refunding',
+    CLOSED: 'closed',
+  },
