@@ -458,3 +458,7 @@ app.post('/api/admin/unfreeze/:userId', authenticate, requireRole(C.ROLES.ADMIN)
   DB.run('UPDATE users SET is_frozen = 0 WHERE id = ?', [req.params.userId]);
   logAudit('ACCOUNT_UNFROZEN', { targetUser: req.params.userId }, { userId: req.user.userId });
   res.json({ success: true });
+});
+
+app.post('/api/admin/config', authenticate, requireRole(C.ROLES.ADMIN), (req, res) => {
+  const { key, value } = req.body;
