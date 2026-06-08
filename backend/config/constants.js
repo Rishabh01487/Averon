@@ -26,3 +26,6 @@ module.exports = {
     GENERAL: { windowMs: 60 * 1000, max: 100 },      // 100 req/min
     AUTH: { windowMs: 60 * 1000, max: 10 },            // 10 req/min
     FINANCIAL: { windowMs: 1000, max: 5 },             // 5 req/sec
+    UPLOAD: { windowMs: 60 * 1000, max: 10 },          // 10 uploads/min
+    ADMIN: { windowMs: 60 * 1000, max: 200 },          // 200 req/min
+  },
