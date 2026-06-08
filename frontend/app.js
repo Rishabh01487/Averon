@@ -10,3 +10,7 @@ let state = { user: null, accessToken: null, refreshToken: null, currentPage: 'h
 async function api(path, opts = {}) {
   const headers = { 'Content-Type': 'application/json', ...opts.headers };
   if (state.accessToken) headers['Authorization'] = `Bearer ${state.accessToken}`;
+  delete opts.headers;
+
+  try {
+    const res = await fetch(API + path, { headers, ...opts });
