@@ -382,3 +382,6 @@ async function loadBuyPage() {
 function initBuyPage() {
   $('buyAmountInr')?.addEventListener('input', () => {
     const inr = parseFloat($('buyAmountInr').value) || 0;
+    const price = parseFloat(state.config?.price) || 1;
+    $('buyEstimate').textContent = `${(inr / price).toFixed(4)} AC`;
+  });
