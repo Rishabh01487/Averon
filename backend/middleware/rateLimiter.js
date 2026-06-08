@@ -26,3 +26,6 @@ function createRateLimiter(config) {
     const windowStart = now - windowMs;
 
     let entries = windows.get(key) || [];
+    entries = entries.filter(t => t > windowStart);
+    entries.push(now);
+    windows.set(key, entries);
