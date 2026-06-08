@@ -110,3 +110,7 @@ function selectChain(currentChain, candidateChain) {
   }
 
   // If same length, keep current (no unnecessary switch)
+  return { winner: 'current', reason: 'Current chain is valid and at least as long' };
+}
+
+/**
