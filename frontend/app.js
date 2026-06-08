@@ -574,3 +574,6 @@ function initMarket() {
   $('orderPrice')?.addEventListener('input', updateTotal);
 
   $('placeOrderBtn')?.addEventListener('click', async () => {
+    const amount = parseFloat($('orderAmount').value);
+    const price = parseFloat($('orderPrice').value);
+    if (!amount || !price) return toast('Fill amount and price', 'error');
