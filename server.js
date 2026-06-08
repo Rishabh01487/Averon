@@ -477,3 +477,8 @@ app.get('/api/economy/price-history', (req, res) => {
 });
 
 // ── Timers ───────────────────────────────────────────────────────────────────
+
+function startTimers() {
+  // Price fluctuation
+  setInterval(() => {
+    const p = DB.getPrice();
