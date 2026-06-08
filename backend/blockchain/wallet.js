@@ -58,3 +58,6 @@ class WalletManager {
   constructor(dataDir) {
     this.dataDir = dataDir;
     this.walletsPath = path.join(dataDir, 'wallets.json');
+    this.wallets = {};
+    this.load();
+  }
