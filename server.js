@@ -174,3 +174,6 @@ app.post('/api/auth/login', authLimiter, validate('login'), async (req, res) => 
 app.post('/api/auth/refresh', (req, res) => {
   const { refreshToken } = req.body;
   if (!refreshToken) return res.status(400).json({ error: 'Refresh token required' });
+
+  const payload = verifyRefreshToken(refreshToken);
+  if (!payload) return res.status(401).json({ error: 'Invalid refresh token' });
