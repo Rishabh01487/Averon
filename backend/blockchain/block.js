@@ -106,3 +106,7 @@ class Block {
   getMerkleProof(txHash) {
     const tree = MerkleTree.fromTransactions(this.transactions);
     const index = this.transactions.findIndex(tx => {
+      const h = typeof tx === 'string' ? tx : (tx.hash || '');
+      return h === txHash;
+    });
+    if (index === -1) return null;
