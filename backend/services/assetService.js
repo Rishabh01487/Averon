@@ -194,3 +194,7 @@ class AssetService {
   }
 
   // ── Fully Funded Processing ──────────────────────────────────────────────
+
+  processFullyFunded(assetId) {
+    this.transition(assetId, C.ASSET_STATUS.FUNDED, 'system', 'All tokens sold');
+    this.transition(assetId, C.ASSET_STATUS.PAYOUT_PENDING, 'system', 'Processing payout');
