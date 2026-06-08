@@ -25,3 +25,8 @@ function computeEntryHash(entry, prevHash) {
  */
 function logAudit(action, details = {}, options = {}) {
   if (!_db) return;
+
+  const entry = {
+    user_id: options.userId || '',
+    action,
+    resource_type: options.resourceType || '',
