@@ -66,3 +66,7 @@ async function analyzeAsset(asset, documents, dbModule) {
 
   // Compile final result
   const confidence = Math.max(0, Math.min(100, analysis.confidence - (stage4.fraudFlags?.length || 0) * 10));
+  const verified = analysis.verified && confidence >= C.AI.MIN_CONFIDENCE_FOR_LISTING && !stage4.hasCriticalFraud;
+
+  return {
+    verified,
