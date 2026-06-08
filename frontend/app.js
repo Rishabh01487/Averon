@@ -334,3 +334,7 @@ async function viewAsset(id) {
             <span class="asset-status status-${a.status}">${a.status.replace(/_/g,' ')}</span>
           </div>
           <div class="asset-category">${a.category} · Listed by ${a.owner_name}</div>
+          <p style="margin:12px 0;color:var(--text-secondary);font-size:14px">${a.description || 'No description'}</p>
+          <div class="ai-stat-grid">
+            <div class="ai-stat"><div class="val">₹${formatNum(a.raise_amount)}</div><div class="label">Raise Amount</div></div>
+            <div class="ai-stat"><div class="val">${a.token_count || 0}</div><div class="label">Total Tokens</div></div>
