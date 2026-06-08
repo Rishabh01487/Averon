@@ -1,0 +1,4 @@
+// ══════════════════════════════════════════════════════════════════════════════
+// AVERON AUDIT MIDDLEWARE — Tamper-proof audit logging
+// Every audit entry is hash-chained to the previous, making it immutable.
+// ══════════════════════════════════════════════════════════════════════════════
