@@ -10,3 +10,7 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${C.AI.GEMINI_MODEL}:generateContent`;
 
 // ── CATEGORY PROFILES (for fallback) ─────────────────────────────────────────
+
+const PROFILES = {
+  'Stocks & Shares':    { avg: 50000, risk: [15,45] },
+  'Land & Real Estate': { avg: 500000, risk: [10,35] },
