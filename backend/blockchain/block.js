@@ -190,3 +190,7 @@ class Block {
     block.miner = json.miner || '';
     block.merkleRoot = json.merkleRoot || block.computeMerkleRoot();
     block.hash = json.hash || block.calculateHash();
+    block.size = json.size || 0;
+    return block;
+  }
+}
