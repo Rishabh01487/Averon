@@ -14,3 +14,7 @@ class Blockchain {
   constructor(dataDir) {
     this.dataDir = dataDir;
     this.chainPath = path.join(dataDir, 'chain.json');
+    this.chain = [];
+    this.pendingTransactions = [];
+    this.difficulty = C.BLOCKCHAIN.DIFFICULTY;
+    this.miningReward = C.BLOCKCHAIN.MINING_REWARD;
