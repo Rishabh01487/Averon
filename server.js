@@ -294,3 +294,7 @@ app.post('/api/assets/:assetId/documents', authenticate, uploadLimiter, upload.a
     DB.run('INSERT INTO asset_documents (asset_id, filename, original_name, mimetype, size, filepath, doc_hash, uploaded_at) VALUES (?,?,?,?,?,?,?,?)',
       [assetId, file.filename, file.originalname, file.mimetype, file.size, newPath, docHash, Date.now()]);
     docs.push({ filename: file.filename, original_name: file.originalname, mimetype: file.mimetype, size: file.size });
+  }
+
+  // Transition to documents_uploaded if in draft
+  if (asset.status === C.ASSET_STATUS.DRAFT) {
