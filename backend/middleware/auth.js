@@ -37,3 +37,8 @@ function signJWT(payload, secret, expiresIn) {
   } else {
     expSeconds = expiresIn || 900;
   }
+
+  const fullPayload = { ...payload, iat: now, exp: now + expSeconds };
+  const headerB64 = base64url(JSON.stringify(header));
+  const payloadB64 = base64url(JSON.stringify(fullPayload));
+  const signature = crypto.createHmac('sha256', secret)
