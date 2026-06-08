@@ -30,3 +30,7 @@ class TradingEngine {
     if (openCount >= C.TRADING.MAX_OPEN_ORDERS_PER_USER) throw new Error('Maximum open orders reached');
 
     // Validate
+    if (amount < C.TRADING.MIN_ORDER_AMOUNT) throw new Error(`Minimum: ${C.TRADING.MIN_ORDER_AMOUNT} AC`);
+
+    // For sell orders, verify balance
+    if (side === 'sell') {
