@@ -258,3 +258,7 @@ class Blockchain {
   // ── Validation ─────────────────────────────────────────────────────────────
 
   isChainValid() {
+    return validateChain(this.chain);
+  }
+
+  // ── Info / Stats ───────────────────────────────────────────────────────────
