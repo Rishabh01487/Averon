@@ -42,3 +42,7 @@ class Block {
       nonce: this.nonce,
       difficulty: this.difficulty,
       miner: this.miner,
+      txCount: this.transactions.length,
+    });
+    return crypto.createHash('sha256').update(payload).digest('hex');
+  }
