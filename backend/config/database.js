@@ -254,3 +254,7 @@ function createSchema() {
     total_supply REAL DEFAULT 0,
     circulating_supply REAL DEFAULT 0,
     total_raised_inr REAL DEFAULT 0,
+    total_assets_funded INTEGER DEFAULT 0,
+    total_fees_collected REAL DEFAULT 0,
+    total_trades INTEGER DEFAULT 0,
+    total_volume REAL DEFAULT 0,
