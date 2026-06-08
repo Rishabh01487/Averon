@@ -38,3 +38,7 @@ async function api(path, opts = {}) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || data.details?.map(d => d.message).join(', ') || `HTTP ${res.status}`);
     return data;
+  } catch (e) {
+    if (e.message !== 'Failed to fetch') toast(e.message, 'error');
+    throw e;
+  }
