@@ -278,3 +278,7 @@ function createSchema() {
 
   // ── Fees ─────────────────────────────────────────────────────────────────
   db.run(`CREATE TABLE IF NOT EXISTS fee_ledger (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT,
+    fee_type TEXT NOT NULL,
+    amount REAL NOT NULL,
