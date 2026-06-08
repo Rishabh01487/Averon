@@ -218,3 +218,7 @@ body {
 
 .drop-zone { border: 2px dashed var(--border); border-radius: var(--radius); padding: 40px; text-align: center; cursor: pointer; transition: var(--transition); }
 .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: var(--accent-dim); }
+.drop-icon { font-size: 36px; margin-bottom: 8px; }
+.file-list { margin: 16px 0; display: flex; flex-direction: column; gap: 8px; }
+.file-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--bg-input); border-radius: var(--radius-sm); font-size: 13px; }
+.file-remove { cursor: pointer; color: var(--red); font-size: 16px; }
