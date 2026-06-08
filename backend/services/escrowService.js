@@ -10,3 +10,7 @@ class EscrowService {
     this.db = db;
     this.blockchain = blockchain;
     this.walletManager = walletManager;
+  }
+
+  /**
+   * Create an escrow account for an asset.
