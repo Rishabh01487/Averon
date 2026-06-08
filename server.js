@@ -241,3 +241,7 @@ app.post('/api/buy-coins', authenticate, financialLimiter, validate('buyCoins'),
 
   DB.run('INSERT INTO activity_log (user_id, action, details, tx_hash, block_index, amount, created_at) VALUES (?,?,?,?,?,?,?)',
     [userId, 'MINT', `Minted ${coinAmount.toFixed(4)} AC for ₹${amountInr}`, mintTx.hash, block?.index || 0, coinAmount, Date.now()]);
+
+  eventBus.emit(EVENTS.COINS_MINTED, { userId, amount: coinAmount, inr: amountInr });
+  eventBus.emit(EVENTS.BLOCK_MINED, { blockIndex: block?.index });
+  eventBus.emit(EVENTS.PRICE_UPDATED, { price: newPrice });
