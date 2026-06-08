@@ -178,3 +178,7 @@ module.exports = {
 
   // ── Roles ──────────────────────────────────────────────────────────────────
   ROLES: {
+    USER: 'user',
+    ADMIN: 'admin',
+    AUDITOR: 'auditor',
+  },
