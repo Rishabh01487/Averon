@@ -90,3 +90,7 @@ function createSchema() {
   // ── Assets ───────────────────────────────────────────────────────────────
   db.run(`CREATE TABLE IF NOT EXISTS assets (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    owner_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT DEFAULT '',
+    category TEXT NOT NULL,
