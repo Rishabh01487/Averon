@@ -181,3 +181,8 @@ async function enterApp() {
   // Start price polling
   setInterval(pollPrice, 10000);
 }
+
+function populateCategories() {
+  const sel = $('assetCategory');
+  const filter = $('assetFilterCategory');
+  for (const cat of state.categories) {
