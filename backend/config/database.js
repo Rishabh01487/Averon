@@ -158,3 +158,7 @@ function createSchema() {
     changed_by TEXT DEFAULT '',
     reason TEXT DEFAULT '',
     created_at INTEGER NOT NULL,
+    FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE CASCADE
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS asset_valuations (
