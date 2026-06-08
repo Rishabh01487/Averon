@@ -33,3 +33,8 @@ async function initDatabase() {
   createSchema();
   seedDefaults();
   persist();
+
+  // Auto-persist every 3 seconds
+  _persistTimer = setInterval(persist, 3000);
+
+  return db;
