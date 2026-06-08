@@ -14,3 +14,7 @@ class TradingEngine {
     this.lastPriceCheck = Date.now();
     this.priceAtCheckpoint = db.getPrice();
   }
+
+  // ── Place Orders ─────────────────────────────────────────────────────────
+
+  placeOrder(userId, side, type, amount, price = null) {
