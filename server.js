@@ -33,3 +33,8 @@ const { eventBus, EVENTS } = require('./backend/services/eventBus');
 // ══════════════════════════════════════════════════════════════════════════════
 // INITIALIZATION
 // ══════════════════════════════════════════════════════════════════════════════
+
+const app = express();
+app.use(express.json({ limit: '5mb' }));
+app.use(sanitizeBody);
+app.use(generalLimiter);
