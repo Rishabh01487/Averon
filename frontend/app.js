@@ -6,3 +6,7 @@ const API = '';
 let state = { user: null, accessToken: null, refreshToken: null, currentPage: 'home', config: null, currentAssetId: null, selectedFiles: [], orderSide: 'buy', categories: [] };
 
 // ── HELPERS ──────────────────────────────────────────────────────────────────
+
+async function api(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json', ...opts.headers };
+  if (state.accessToken) headers['Authorization'] = `Bearer ${state.accessToken}`;
