@@ -14,3 +14,7 @@ if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR, { recursive: true });
 
 let db = null;
 let _persistTimer = null;
+
+// ── INITIALIZATION ───────────────────────────────────────────────────────────
+
+async function initDatabase() {
