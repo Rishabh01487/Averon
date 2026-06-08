@@ -114,3 +114,7 @@ function createSchema() {
     funded_at INTEGER DEFAULT 0,
     
     payout_status TEXT DEFAULT 'none',
+    payout_amount_inr REAL DEFAULT 0,
+    payout_tx_hash TEXT DEFAULT '',
+    
+    escrow_address TEXT DEFAULT '',
