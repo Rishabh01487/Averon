@@ -638,3 +638,7 @@ window.viewBlock = async (index) => {
         </div>`).join('')}`;
   } catch {}
 };
+
+function initExplorer() {
+  $('explorerSearchBtn')?.addEventListener('click', async () => {
+    const q = $('explorerSearch').value.trim();
