@@ -286,3 +286,7 @@ class AssetService {
       owner_org: owner?.organization || '',
       statusHistory: history,
       escrow: escrow ? { address: escrow.address, balance: escrow.balance, status: escrow.status } : null,
+    };
+  }
+
+  listAssets(filters = {}) {
