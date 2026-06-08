@@ -121,3 +121,8 @@ module.exports = {
     WITHDRAWAL_FEE_AC: 0.5,          // 0.5 AC withdrawal fee
     MIN_TRADE_AMOUNT: 0.01,          // Minimum trade: 0.01 AC
   },
+
+  // ── Investment Limits ──────────────────────────────────────────────────────
+  LIMITS: {
+    MIN_INVESTMENT_INR: 10,
+    MAX_SINGLE_RAISE_INR: 10000000,  // 1 crore
