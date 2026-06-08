@@ -434,3 +434,7 @@ function run(sql, params = []) {
     const changes = db.getRowsModified();
     const lastRow = queryOne('SELECT last_insert_rowid() as id');
     return { changes, lastId: lastRow?.id || 0 };
+  } catch (e) {
+    console.error('SQL Run Error:', e.message, '\n  SQL:', sql, '\n  Params:', params);
+    return { changes: 0, lastId: 0 };
+  }
