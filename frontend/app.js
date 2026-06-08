@@ -438,3 +438,7 @@ function renderFileList() {
       <span class="file-remove" onclick="removeFile(${i})">✕</span>
     </div>`).join('');
   $('uploadDocsBtn').disabled = state.selectedFiles.length === 0;
+}
+window.removeFile = (i) => { state.selectedFiles.splice(i, 1); renderFileList(); };
+
+function setWizardStep(step) {
