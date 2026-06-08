@@ -54,3 +54,7 @@ body {
                     radial-gradient(ellipse at 70% 50%, rgba(16,185,129,0.06) 0%, transparent 60%);
 }
 .auth-overlay.hidden { display: none; }
+
+.auth-container {
+  width: 420px; max-width: 95vw; padding: 48px 40px;
+  background: var(--bg-card); border: 1px solid var(--border);
