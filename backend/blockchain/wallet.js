@@ -70,3 +70,7 @@ class WalletManager {
           this.wallets[userId] = Wallet.fromKeys(userId, w.publicKey, w.privateKey);
         }
       }
+    } catch (e) {
+      console.error('Wallet load error:', e.message);
+      this.wallets = {};
+    }
