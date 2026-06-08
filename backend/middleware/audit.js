@@ -74,3 +74,7 @@ function auditMiddleware(req, res, next) {
           ip: req.ip || '',
           userAgent: req.headers['user-agent'] || '',
           method: req.method,
+          path: req.path,
+          responseCode: res.statusCode,
+        });
+      }
