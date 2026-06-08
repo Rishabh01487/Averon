@@ -18,3 +18,7 @@ function initAudit(database) {
 function computeEntryHash(entry, prevHash) {
   const data = `${prevHash}:${entry.user_id}:${entry.action}:${entry.resource_type}:${entry.resource_id}:${entry.created_at}:${JSON.stringify(entry.details)}`;
   return crypto.createHash('sha256').update(data).digest('hex');
+}
+
+/**
+ * Log an audit entry with tamper-proof hash chain.
