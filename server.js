@@ -38,3 +38,7 @@ const app = express();
 app.use(express.json({ limit: '5mb' }));
 app.use(sanitizeBody);
 app.use(generalLimiter);
+app.use(auditMiddleware);
+app.use(express.static(path.join(__dirname, 'frontend')));
+
+const DATA_DIR = path.join(__dirname, 'data');
