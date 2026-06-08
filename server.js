@@ -346,3 +346,6 @@ app.post('/api/assets/:id/confirm', authenticate, (req, res) => {
   try {
     const assetId = parseInt(req.params.id);
     const result = assetService.tokenizeAsset(assetId, req.user.userId, req.body.aiResult || {});
+    res.json({ success: true, ...result, asset: assetService.getAsset(assetId) });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
