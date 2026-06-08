@@ -278,3 +278,7 @@ class Blockchain {
    * Get Merkle proof for a transaction in a specific block.
    */
   getMerkleProof(blockIndex, txHash) {
+    const block = this.getBlock(blockIndex);
+    if (!block) return null;
+    return block.getMerkleProof(txHash);
+  }
