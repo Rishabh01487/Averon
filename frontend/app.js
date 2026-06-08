@@ -197,3 +197,8 @@ async function pollPrice() {
     $('livePrice').textContent = parseFloat(data.price).toFixed(2);
   } catch {}
 }
+
+async function loadNotifications() {
+  try {
+    const data = await api('/api/notifications');
+    const badge = $('notifCount');
