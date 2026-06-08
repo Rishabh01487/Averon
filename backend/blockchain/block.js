@@ -162,3 +162,7 @@ class Block {
     if (this.transactions.length > C.BLOCKCHAIN.MAX_TRANSACTIONS_PER_BLOCK) errors.push('Too many transactions');
 
     return { valid: errors.length === 0, errors };
+  }
+
+  toJSON() {
+    return {
