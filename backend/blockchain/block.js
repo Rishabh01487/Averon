@@ -73,3 +73,8 @@ class Block {
   calculateSize() {
     return Buffer.byteLength(JSON.stringify(this.toJSON()), 'utf8');
   }
+
+  /**
+   * Validate all transactions in this block.
+   */
+  validateTransactions() {
