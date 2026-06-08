@@ -245,3 +245,8 @@ app.post('/api/buy-coins', authenticate, financialLimiter, validate('buyCoins'),
   eventBus.emit(EVENTS.COINS_MINTED, { userId, amount: coinAmount, inr: amountInr });
   eventBus.emit(EVENTS.BLOCK_MINED, { blockIndex: block?.index });
   eventBus.emit(EVENTS.PRICE_UPDATED, { price: newPrice });
+
+  res.json({ success: true, coins: coinAmount, newBalance, newPrice, txHash: mintTx.hash, blockIndex: block?.index });
+});
+
+// ── Assets ───────────────────────────────────────────────────────────────────
