@@ -45,3 +45,8 @@ const rules = {
   pattern: (regex) => (val) => typeof val === 'string' && regex.test(val),
   alphanumeric: (val) => typeof val === 'string' && /^[a-zA-Z0-9_]+$/.test(val),
 };
+
+// ── Schema Definitions ──────────────────────────────────────────────────────
+
+const schemas = {
+  register: {
