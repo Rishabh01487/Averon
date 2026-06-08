@@ -50,3 +50,7 @@ class AssetService {
 
     const deadline = Date.now() + (days || C.LIMITS.DEFAULT_LISTING_DAYS) * 864e5;
     const now = Date.now();
+
+    const { lastId } = this.db.run(
+      'INSERT INTO assets (owner_id, title, description, category, raise_amount, deadline, status, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?)',
+      [userId, title, description || '', category, parseFloat(raiseAmount), deadline, C.ASSET_STATUS.DRAFT, now, now]
