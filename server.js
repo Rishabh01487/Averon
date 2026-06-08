@@ -354,3 +354,7 @@ app.post('/api/assets/:id/tokens/buy', authenticate, financialLimiter, validate(
   try {
     const result = assetService.buyTokens(parseInt(req.params.id), req.user.userId, parseInt(req.body.count) || 1);
     eventBus.emit(EVENTS.TOKEN_PURCHASED, result);
+    if (result.funded) eventBus.emit(EVENTS.ASSET_FUNDED, { assetId: parseInt(req.params.id) });
+    res.json(result);
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
