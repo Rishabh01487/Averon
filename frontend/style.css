@@ -210,3 +210,7 @@ body {
 .wizard-step.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
 .wizard-step.done { border-color: var(--green); color: var(--green); }
 .step-num { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: var(--border); border-radius: 50%; font-size: 12px; font-weight: 700; }
+.wizard-step.active .step-num { background: var(--accent); color: white; }
+.wizard-step.done .step-num { background: var(--green); color: white; }
+.wiz-panel { display: none; padding: 32px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); }
+.wiz-panel.active { display: block; animation: fadeIn 0.3s; }
