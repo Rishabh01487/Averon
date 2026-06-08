@@ -297,3 +297,8 @@ class AssetService {
     if (filters.category) { sql += ' AND category = ?'; params.push(filters.category); }
     if (filters.ownerId) { sql += ' AND owner_id = ?'; params.push(filters.ownerId); }
     if (filters.excludeStatus) { sql += ' AND status != ?'; params.push(filters.excludeStatus); }
+
+    sql += ' ORDER BY created_at DESC';
+    if (filters.limit) { sql += ' LIMIT ?'; params.push(filters.limit); }
+
+    let assets = this.db.query(sql, params);
