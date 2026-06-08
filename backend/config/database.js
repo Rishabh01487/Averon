@@ -106,3 +106,7 @@ function createSchema() {
     ai_raw_response TEXT DEFAULT '',
     ai_analyzed_at INTEGER DEFAULT 0,
     
+    total_value REAL DEFAULT 0,
+    raise_amount REAL NOT NULL,
+    token_count INTEGER DEFAULT 0,
+    token_price REAL DEFAULT 0,
