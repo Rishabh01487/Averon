@@ -386,3 +386,7 @@ app.delete('/api/market/order/:id', authenticate, (req, res) => {
 // ── Portfolio ────────────────────────────────────────────────────────────────
 
 app.get('/api/portfolio', authenticate, (req, res) => {
+  const userId = req.user.userId;
+  const wallet = DB.queryOne('SELECT address FROM wallets WHERE user_id = ?', [userId]);
+  const balance = wallet ? blockchain.getBalance(wallet.address) : 0;
+  const price = DB.getPrice();
