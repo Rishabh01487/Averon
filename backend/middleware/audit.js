@@ -106,3 +106,7 @@ function verifyAuditChain() {
     }
     prevHash = entry.entry_hash;
   }
+
+  return {
+    valid: corrupted.length === 0,
+    entries: entries.length,
