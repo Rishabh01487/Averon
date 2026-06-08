@@ -118,3 +118,7 @@ class MerkleTree {
       return crypto.createHash('sha256').update(JSON.stringify(tx)).digest('hex');
     });
     return new MerkleTree(hashes);
+  }
+
+  toJSON() {
+    return {
