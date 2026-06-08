@@ -90,3 +90,7 @@ async function analyzeAsset(asset, documents, dbModule) {
 function processDocuments(documents) {
   const result = {
     totalFiles: documents.length,
+    totalSize: 0,
+    types: {},
+    hasImages: false,
+    hasPdf: false,
