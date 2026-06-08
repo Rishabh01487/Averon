@@ -193,3 +193,8 @@ app.get('/api/account', authenticate, (req, res) => {
   const wallet = DB.queryOne('SELECT address FROM wallets WHERE user_id = ?', [user.id]);
   const balance = wallet ? blockchain.getBalance(wallet.address) : 0;
   DB.run('UPDATE users SET averon_balance = ? WHERE id = ?', [balance, user.id]);
+
+  res.json({
+    id: user.id, name: user.name, email: user.email, role: user.role,
+    walletAddress: wallet?.address, balance, inrSpent: user.inr_spent,
+    createdAt: user.created_at,
