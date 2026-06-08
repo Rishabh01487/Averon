@@ -74,3 +74,7 @@ function loadSession() {
   try {
     const s = JSON.parse(localStorage.getItem('averon_session'));
     if (s?.accessToken) {
+      state.user = s.user;
+      state.accessToken = s.accessToken;
+      state.refreshToken = s.refreshToken;
+      return true;
