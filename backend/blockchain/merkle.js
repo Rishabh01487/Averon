@@ -82,3 +82,6 @@ class MerkleTree {
           position: isRight ? 'left' : 'right',
         });
       }
+
+      idx = Math.floor(idx / 2);
+    }
