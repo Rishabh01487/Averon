@@ -222,3 +222,7 @@ app.post('/api/buy-coins', authenticate, financialLimiter, validate('buyCoins'),
   if (!wallet) return res.status(404).json({ error: 'Wallet not found' });
 
   const price = DB.getPrice();
+  const coinAmount = parseFloat((amountInr / price).toFixed(8));
+
+  // Blockchain MINT
+  const mintTx = new Transaction('SYSTEM', wallet.address, coinAmount, C.TX_TYPES.MINT, { inr: amountInr, price });
