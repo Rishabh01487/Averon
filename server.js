@@ -394,3 +394,6 @@ app.get('/api/portfolio', authenticate, (req, res) => {
   const tokens = DB.query(`SELECT t.*, a.title as asset_title, a.category, a.status as asset_status 
     FROM asset_tokens t JOIN assets a ON t.asset_id = a.id WHERE t.owner_id = ?`, [userId]);
   const myAssets = DB.query('SELECT * FROM assets WHERE owner_id = ? ORDER BY created_at DESC', [userId]);
+  const myOrders = DB.query('SELECT * FROM coin_orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 50', [userId]);
+  const activity = DB.query('SELECT * FROM activity_log WHERE user_id = ? ORDER BY created_at DESC LIMIT 50', [userId]);
+  const notifications = DB.query('SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 20', [userId]);
