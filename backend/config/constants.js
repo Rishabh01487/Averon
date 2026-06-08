@@ -14,3 +14,7 @@ module.exports = {
   AUTH: {
     JWT_ACCESS_EXPIRY: '15m',
     JWT_REFRESH_EXPIRY: '7d',
+    BCRYPT_SALT_ROUNDS: 12,
+    MAX_LOGIN_ATTEMPTS: 5,
+    LOCKOUT_DURATION_MS: 15 * 60 * 1000, // 15 minutes
+    PASSWORD_MIN_LENGTH: 8,
