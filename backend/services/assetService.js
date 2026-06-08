@@ -86,3 +86,7 @@ class AssetService {
     // Create tokens
     for (let i = 1; i <= tokenCount; i++) {
       this.db.run('INSERT INTO asset_tokens (asset_id, token_index, price) VALUES (?,?,?)', [assetId, i, tokenPriceAC]);
+    }
+
+    // Create escrow
+    this.escrow.createEscrow(assetId);
