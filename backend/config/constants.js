@@ -54,3 +54,7 @@ module.exports = {
     REFUND: 'REFUND',
     FEE: 'FEE',
     ASSET_CREATE: 'ASSET_CREATE',
+    ASSET_VERIFY: 'ASSET_VERIFY',
+    ASSET_CLOSE: 'ASSET_CLOSE',
+    TRADE: 'TRADE',
+    REWARD: 'REWARD',
