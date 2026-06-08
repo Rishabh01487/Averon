@@ -522,3 +522,5 @@ module.exports = {
   initDatabase, persist,
   query, queryOne, run, runTransaction,
   getConfig, setConfig,
+  getPrice, setPrice, updateEconomy, incrementEconomy, getEconomy, getDashboardStats,
+};
