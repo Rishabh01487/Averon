@@ -282,3 +282,7 @@ function drawPriceChart(prices) {
 
   // Gradient fill
   const lastY = h - ((prices[prices.length - 1] - min) / range) * h;
+  ctx.lineTo(w, h);
+  ctx.lineTo(0, h);
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0, 0, 0, h);
