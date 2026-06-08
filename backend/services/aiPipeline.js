@@ -162,3 +162,7 @@ async function analyzeWithGemini(asset, documents, docInfo) {
   }
 
   parts.push({ text: `You are an expert asset valuation AI for the Averon blockchain tokenization platform.
+
+ASSET: "${asset.title}" | Category: ${asset.category} | Raise: ₹${asset.raise_amount}
+Description: ${asset.description || 'None'}
+Documents: ${documents.length} file(s), ${(docInfo.totalSize / 1024).toFixed(0)}KB total
