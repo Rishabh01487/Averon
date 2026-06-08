@@ -114,3 +114,7 @@ module.exports = {
   ],
 
   // ── Fees ───────────────────────────────────────────────────────────────────
+  FEES: {
+    TRADING_FEE_PERCENT: 0.1,        // 0.1% per trade
+    LISTING_FEE_AC: 1.0,             // 1 AC to list an asset
+    CAPITAL_RAISE_FEE_PERCENT: 1.0,  // 1% of raised amount
