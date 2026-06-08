@@ -234,3 +234,7 @@ class AssetService {
   checkDeadlines() {
     const active = this.db.query(`SELECT * FROM assets WHERE status IN ('${C.ASSET_STATUS.ACTIVE}', '${C.ASSET_STATUS.FUNDING}')`);
     const now = Date.now();
+    const results = [];
+
+    for (const asset of active) {
+      if (asset.deadline && now > asset.deadline) {
