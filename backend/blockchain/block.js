@@ -178,3 +178,7 @@ class Block {
       size: this.size,
       transactionCount: this.transactions.length,
       transactions: this.transactions.map(tx => tx.toJSON ? tx.toJSON() : tx),
+    };
+  }
+
+  static fromJSON(json) {
