@@ -90,3 +90,7 @@ body {
 .field-row { display: flex; gap: 16px; }
 .field-row .field { flex: 1; }
 .select-sm { padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 13px; }
+
+/* ═══ BUTTONS ═══ */
+.btn-primary {
+  padding: 12px 24px; background: var(--accent); color: white; border: none;
