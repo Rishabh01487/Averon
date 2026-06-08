@@ -194,3 +194,5 @@ class Block {
     return block;
   }
 }
+
+module.exports = { Block };
