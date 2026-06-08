@@ -273,3 +273,8 @@ class Blockchain {
       version: C.PLATFORM_VERSION,
     };
   }
+
+  /**
+   * Get Merkle proof for a transaction in a specific block.
+   */
+  getMerkleProof(blockIndex, txHash) {
