@@ -46,3 +46,7 @@ function createRateLimiter(config) {
         windowMs,
       });
     }
+
+    next();
+  };
+}
