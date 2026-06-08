@@ -146,3 +146,7 @@ class AssetService {
     const investTx = new Transaction(walletData.address, asset.escrow_address || `ESCROW_${assetId}`, totalCost, C.TX_TYPES.INVEST, {
       assetId, tokenCount: count, pricePerToken: asset.token_price,
     });
+    wallet.sign(investTx);
+    this.blockchain.addTransaction(investTx);
+
+    const block = this.blockchain.minePendingTransactions(this.walletManager.getSystemWallet().address);
