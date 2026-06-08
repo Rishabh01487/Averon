@@ -62,3 +62,7 @@ function createSchema() {
     kyc_status TEXT DEFAULT 'none',
     kyc_data TEXT DEFAULT '{}',
     created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS sessions (
