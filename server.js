@@ -470,3 +470,7 @@ app.post('/api/admin/config', authenticate, requireRole(C.ROLES.ADMIN), (req, re
 // ── Economy ──────────────────────────────────────────────────────────────────
 
 app.get('/api/economy', (req, res) => res.json(DB.getDashboardStats()));
+app.get('/api/economy/price-history', (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit) || 100, 500);
+  const history = DB.query('SELECT price, volume, recorded_at FROM price_history ORDER BY recorded_at DESC LIMIT ?', [limit]);
+  res.json(history.reverse());
