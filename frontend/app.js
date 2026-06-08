@@ -518,3 +518,7 @@ window.goToLaunch = (aiResult) => {
   state.aiResult = aiResult;
   $('launchSummary').innerHTML = `
     <div class="ai-stat-grid">
+      <div class="ai-stat"><div class="val">${aiResult.suggestedTokens}</div><div class="label">Tokens</div></div>
+      <div class="ai-stat"><div class="val">₹${formatNum(aiResult.tokenPriceInr)}</div><div class="label">Per Token (INR)</div></div>
+      <div class="ai-stat"><div class="val">${aiResult.riskLevel}</div><div class="label">Risk Level</div></div>
+    </div>
