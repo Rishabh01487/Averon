@@ -174,3 +174,7 @@ module.exports = {
     MIN_CONFIDENCE_FOR_LISTING: 50,
     FRAUD_ALERT_THRESHOLD: 40,
     TEMPERATURE: 0.3,
+  },
+
+  // ── Roles ──────────────────────────────────────────────────────────────────
+  ROLES: {
