@@ -46,3 +46,7 @@ function logAudit(action, details = {}, options = {}) {
 
   _db.run(
     `INSERT INTO audit_log (user_id, action, resource_type, resource_id, details, ip_address, user_agent, request_method, request_path, response_code, prev_hash, entry_hash, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+    [entry.user_id, entry.action, entry.resource_type, entry.resource_id, entry.details,
+     entry.ip_address, entry.user_agent, entry.request_method, entry.request_path,
+     entry.response_code, entry.prev_hash, entry.entry_hash, entry.created_at]
+  );
