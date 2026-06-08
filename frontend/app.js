@@ -258,3 +258,7 @@ async function loadDashboard() {
       </div>`).join('') || '<div class="empty-state">No activity yet</div>';
   } catch {}
 }
+
+function drawPriceChart(prices) {
+  const canvas = $('priceChart');
+  if (!canvas) return;
