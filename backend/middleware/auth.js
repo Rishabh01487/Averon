@@ -170,3 +170,7 @@ function requireAdmin(req, res, next) {
 
 function createSession(db, userId, refreshToken, req) {
   const { run } = db;
+  const sessionId = crypto.randomUUID();
+  const expiresAt = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days
+  const deviceInfo = req.headers['user-agent'] || '';
+  const ip = req.ip || req.connection?.remoteAddress || '';
