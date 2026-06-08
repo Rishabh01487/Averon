@@ -274,3 +274,7 @@ function createSchema() {
     close REAL DEFAULT 0,
     interval TEXT DEFAULT '1m',
     recorded_at INTEGER NOT NULL
+  )`);
+
+  // ── Fees ─────────────────────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS fee_ledger (
