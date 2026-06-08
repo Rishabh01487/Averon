@@ -318,3 +318,6 @@ app.post('/api/assets/:id/analyze', authenticate, (req, res) => {
     try {
       const result = await analyzeAsset(
         { title: asset.title, description: asset.description, category: asset.category, raise_amount: asset.raise_amount },
+        docs.map(d => ({ ...d, path: d.filepath })),
+        DB
+      );
