@@ -86,3 +86,111 @@
           <button id="logoutBtn" class="btn-ghost btn-sm">Logout</button>
         </div>
       </div>
+    </nav>
+
+    <!-- ═══ PAGES ═══ -->
+    <main class="main-content">
+
+      <!-- ── DASHBOARD ── -->
+      <section id="page-home" class="page active">
+        <div class="dashboard-grid">
+          <div class="stat-card hero-stat">
+            <div class="stat-icon">💰</div>
+            <div class="stat-value" id="statPrice">₹1.00</div>
+            <div class="stat-label">Averon Coin Price</div>
+            <canvas id="priceChart" width="300" height="80"></canvas>
+          </div>
+          <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-value" id="statSupply">0</div><div class="stat-label">Total Supply</div></div>
+          <div class="stat-card"><div class="stat-icon">🏢</div><div class="stat-value" id="statAssets">0</div><div class="stat-label">Total Assets</div></div>
+          <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value" id="statFunded">0</div><div class="stat-label">Assets Funded</div></div>
+          <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-value" id="statUsers">0</div><div class="stat-label">Registered Users</div></div>
+          <div class="stat-card"><div class="stat-icon">📈</div><div class="stat-value" id="statTrades">0</div><div class="stat-label">Total Trades</div></div>
+          <div class="stat-card"><div class="stat-icon">⛓</div><div class="stat-value" id="statBlocks">0</div><div class="stat-label">Blocks Mined</div></div>
+          <div class="stat-card"><div class="stat-icon">🔒</div><div class="stat-value" id="statTVL">₹0</div><div class="stat-label">Total Value Locked</div></div>
+        </div>
+        <div class="section-header"><h2>Recent Activity</h2></div>
+        <div id="activityFeed" class="activity-feed"></div>
+      </section>
+
+      <!-- ── ASSETS ── -->
+      <section id="page-assets" class="page">
+        <div class="page-header">
+          <h1>Tokenized Assets</h1>
+          <div class="filter-row">
+            <select id="assetFilterCategory" class="select-sm"><option value="all">All Categories</option></select>
+            <select id="assetFilterStatus" class="select-sm"><option value="all">All Status</option><option value="active">Active</option><option value="funding">Funding</option><option value="funded">Funded</option></select>
+          </div>
+        </div>
+        <div id="assetGrid" class="asset-grid"></div>
+      </section>
+
+      <!-- ── BUY COIN ── -->
+      <section id="page-buy" class="page">
+        <div class="centered-card">
+          <h1>Buy Averon Coin</h1>
+          <p class="subtitle">Purchase AC tokens directly from the platform. Coins are minted to your blockchain wallet.</p>
+          <div class="buy-info">
+            <div class="info-row"><span>Current Price</span><span id="buyPrice" class="val">₹1.00</span></div>
+            <div class="info-row"><span>Your Balance</span><span id="buyBalance" class="val">0 AC</span></div>
+          </div>
+          <div class="field">
+            <label>Amount (INR)</label>
+            <input type="number" id="buyAmountInr" placeholder="Enter amount in ₹" min="10" step="10">
+          </div>
+          <div class="conversion-display">
+            <span>You'll receive:</span>
+            <span id="buyEstimate" class="estimate">0 AC</span>
+          </div>
+          <button id="buyCoinsBtn" class="btn-primary btn-full">Buy Averon Coin →</button>
+          <div id="buyResult" class="result-box hidden"></div>
+        </div>
+      </section>
+
+      <!-- ── TOKENIZE ── -->
+      <section id="page-tokenize" class="page">
+        <div class="wizard-container">
+          <div class="wizard-steps">
+            <div class="wizard-step active" data-step="1"><span class="step-num">1</span>Create Asset</div>
+            <div class="wizard-step" data-step="2"><span class="step-num">2</span>Upload Docs</div>
+            <div class="wizard-step" data-step="3"><span class="step-num">3</span>AI Analysis</div>
+            <div class="wizard-step" data-step="4"><span class="step-num">4</span>Launch</div>
+          </div>
+
+          <!-- Step 1 -->
+          <div id="wizStep1" class="wiz-panel active">
+            <h2>Describe Your Asset</h2>
+            <p class="subtitle">Tell us about the real-world asset you want to tokenize for capital raising.</p>
+            <div class="field"><label>Asset Title</label><input type="text" id="assetTitle" placeholder="e.g., Premium Agricultural Land — 2.5 acres Nagpur"></div>
+            <div class="field"><label>Category</label><select id="assetCategory"><option value="">Select category...</option></select></div>
+            <div class="field"><label>Description (min 20 chars)</label><textarea id="assetDescription" rows="4" placeholder="Describe the asset, its value, history, and why you're raising capital..."></textarea></div>
+            <div class="field-row">
+              <div class="field"><label>Raise Amount (₹)</label><input type="number" id="assetRaise" placeholder="50000" min="100"></div>
+              <div class="field"><label>Listing Duration (days)</label><input type="number" id="assetDays" placeholder="30" min="1" max="365" value="30"></div>
+            </div>
+            <button id="createAssetBtn" class="btn-primary">Create Asset & Continue →</button>
+          </div>
+
+          <!-- Step 2 -->
+          <div id="wizStep2" class="wiz-panel">
+            <h2>Upload Documents</h2>
+            <p class="subtitle">Upload ownership proof, certificates, invoices, or images of the asset.</p>
+            <div id="dropZone" class="drop-zone">
+              <div class="drop-icon">📁</div>
+              <p>Drag & drop files here or click to browse</p>
+              <small>Images, PDFs — Max 10MB each, up to 10 files</small>
+              <input type="file" id="fileInput" multiple accept="image/*,.pdf" style="display:none">
+            </div>
+            <div id="fileList" class="file-list"></div>
+            <button id="uploadDocsBtn" class="btn-primary" disabled>Upload Documents →</button>
+          </div>
+
+          <!-- Step 3 -->
+          <div id="wizStep3" class="wiz-panel">
+            <h2>AI Analysis</h2>
+            <p class="subtitle">Our AI pipeline analyzes your documents for legitimacy, valuation, and risk.</p>
+            <button id="startAnalysisBtn" class="btn-primary btn-full">Start AI Analysis →</button>
+            <div id="aiProgress" class="ai-progress hidden">
+              <div class="ai-spinner"></div>
+              <p id="aiStatusText">Analyzing documents...</p>
+            </div>
+            <div id="aiResult" class="ai-result hidden"></div>
