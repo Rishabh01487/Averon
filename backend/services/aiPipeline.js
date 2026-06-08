@@ -110,3 +110,6 @@ function processDocuments(documents) {
     (result.hasImages ? 25 : 0) +
     (result.hasPdf ? 20 : 0)
   ));
+
+  return result;
+}
