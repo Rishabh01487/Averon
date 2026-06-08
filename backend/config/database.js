@@ -470,3 +470,7 @@ function getPrice() {
 
 function setPrice(newPrice) {
   newPrice = Math.max(C.PRICE.MIN_PRICE, Math.min(C.PRICE.MAX_PRICE, newPrice));
+  run('UPDATE economy SET price = ?, market_cap = price * circulating_supply, updated_at = ? WHERE id = 1', [newPrice, Date.now()]);
+  run('INSERT INTO price_history (price, high, low, open, close, recorded_at) VALUES (?,?,?,?,?,?)',
+    [newPrice, newPrice, newPrice, newPrice, newPrice, Date.now()]);
+}
