@@ -126,3 +126,7 @@ class Block {
 
   /**
    * Validate the block's hash meets difficulty requirement.
+   */
+  validateHash() {
+    const target = '0'.repeat(this.difficulty);
+    const recalculated = this.calculateHash();
