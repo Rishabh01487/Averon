@@ -98,3 +98,7 @@ class AssetService {
     // Transition: verified → compliance_review → active (auto-pass for now)
     this.transition(assetId, C.ASSET_STATUS.COMPLIANCE_REVIEW, 'system', 'Auto compliance check');
     this.db.run('UPDATE assets SET compliance_status = "passed", compliance_checked_at = ? WHERE id = ?', [Date.now(), assetId]);
+    this.transition(assetId, C.ASSET_STATUS.ACTIVE, 'system', 'Compliance passed');
+
+    // Record on blockchain
+    const wallet = this.walletManager.getWallet(userId);
