@@ -98,3 +98,7 @@ class TradingEngine {
         // Execute trade
         const buyerWallet = this.db.queryOne('SELECT address FROM wallets WHERE user_id = ?', [buy.user_id]);
         const sellerWallet = this.db.queryOne('SELECT address FROM wallets WHERE user_id = ?', [sell.user_id]);
+
+        // Transfer coins: Escrow (sell order hold) → Buyer
+        const buyer = this.db.queryOne('SELECT * FROM users WHERE id = ?', [buy.user_id]);
+        this.db.run('UPDATE users SET averon_balance = averon_balance + ? WHERE id = ?',
