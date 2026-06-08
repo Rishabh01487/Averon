@@ -150,3 +150,7 @@ class Blockchain {
     }
 
     // Add to chain
+    this.chain.push(newBlock);
+
+    // Remove mined transactions from pending pool
+    const minedHashes = new Set(txsToMine.map(tx => tx.hash));
