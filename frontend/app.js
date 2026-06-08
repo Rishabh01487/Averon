@@ -389,3 +389,8 @@ function initBuyPage() {
   $('buyCoinsBtn')?.addEventListener('click', async () => {
     const amountInr = parseFloat($('buyAmountInr').value);
     if (!amountInr || amountInr < 10) return toast('Minimum ₹10', 'error');
+
+    $('buyCoinsBtn').disabled = true;
+    try {
+      const result = await api('/api/buy-coins', { method: 'POST', body: JSON.stringify({ amountInr }) });
+      $('buyResult').innerHTML = `✅ Minted <strong>${result.coins.toFixed(4)} AC</strong> for ₹${amountInr}<br>Balance: ${result.newBalance.toFixed(4)} AC · New Price: ₹${result.newPrice.toFixed(4)}<br><span style="font-family:var(--mono);font-size:11px">TX: ${result.txHash.substring(0,24)}... · Block #${result.blockIndex}</span>`;
