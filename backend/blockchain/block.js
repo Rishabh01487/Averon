@@ -90,3 +90,7 @@ class Block {
       }
     }
     return { valid: errors.length === 0, errors };
+  }
+
+  /**
+   * Verify the Merkle root matches the transactions.
