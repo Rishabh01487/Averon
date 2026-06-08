@@ -2,3 +2,7 @@
   "name": "averon",
   "version": "3.0.0",
   "description": "Averon — Blockchain Asset Tokenization Platform with AI Analysis",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
