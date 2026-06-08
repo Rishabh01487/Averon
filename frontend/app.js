@@ -690,3 +690,7 @@ async function loadPortfolio() {
 
     // Token holdings
     $('myTokens').innerHTML = data.tokens?.length ? data.tokens.reduce((acc, t) => {
+      if (!acc.map[t.asset_id]) { acc.map[t.asset_id] = { title: t.asset_title, category: t.category, count: 0, value: 0, status: t.asset_status }; }
+      acc.map[t.asset_id].count++;
+      acc.map[t.asset_id].value += t.price;
+      return acc;
