@@ -122,3 +122,7 @@ class AssetService {
 
     return { tokenCount, tokenPriceInr, tokenPriceAC, txHash, blockIndex: blockIdx };
   }
+
+  // ── Buy Tokens ───────────────────────────────────────────────────────────
+
+  buyTokens(assetId, userId, count) {
