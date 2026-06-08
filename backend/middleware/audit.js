@@ -150,3 +150,6 @@ function sanitizeBodyForAudit(body) {
     if (typeof val === 'string' && val.length > 500) {
       sanitized[key] = val.substring(0, 500) + '...[truncated]';
     }
+  }
+  return sanitized;
+}
