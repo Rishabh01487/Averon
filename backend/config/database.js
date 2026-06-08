@@ -286,3 +286,7 @@ function createSchema() {
     reference_type TEXT DEFAULT '',
     tx_hash TEXT DEFAULT '',
     created_at INTEGER NOT NULL
+  )`);
+
+  // ── Notifications ────────────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS notifications (
