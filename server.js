@@ -326,3 +326,7 @@ app.post('/api/assets/:id/analyze', authenticate, (req, res) => {
       DB.run(`UPDATE assets SET ai_verified=?, ai_valuation=?, ai_risk_score=?, ai_risk_level=?, ai_confidence=?, ai_analysis_summary=?, ai_concerns=?, ai_raw_response=?, ai_analyzed_at=?, total_value=?, status=?, updated_at=? WHERE id=?`,
         [result.verified ? 1 : 0, result.estimatedValue, result.riskScore, result.riskLevel, result.confidence,
          result.analysis, result.concerns, result.raw || '', Date.now(), result.estimatedValue, newStatus, Date.now(), assetId]);
+
+      // Store valuation record
+      DB.run('INSERT INTO asset_valuations (asset_id, valuation, risk_score, confidence, source, details, created_at) VALUES (?,?,?,?,?,?,?)',
+        [assetId, result.estimatedValue, result.riskScore, result.confidence, result.source, JSON.stringify(result.stages || []), Date.now()]);
