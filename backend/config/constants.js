@@ -46,3 +46,7 @@ module.exports = {
 
   // ── Transaction Types ──────────────────────────────────────────────────────
   TX_TYPES: {
+    MINT: 'MINT',
+    TRANSFER: 'TRANSFER',
+    INVEST: 'INVEST',
+    DIVEST: 'DIVEST',
