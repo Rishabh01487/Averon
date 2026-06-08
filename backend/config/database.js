@@ -122,3 +122,7 @@ function createSchema() {
     
     tx_hash TEXT DEFAULT '',
     block_index INTEGER DEFAULT 0,
+    
+    compliance_status TEXT DEFAULT 'pending',
+    compliance_notes TEXT DEFAULT '',
+    compliance_checked_at INTEGER DEFAULT 0,
