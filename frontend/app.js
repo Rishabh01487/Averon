@@ -666,3 +666,7 @@ function initExplorer() {
     } catch {
       // Try as address
       try {
+        const addr = await api(`/api/blockchain/address/${q}`);
+        $('explorerResult').classList.remove('hidden');
+        $('explorerResult').innerHTML = `
+          <h3>Address</h3>
