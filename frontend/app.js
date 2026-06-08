@@ -78,3 +78,7 @@ function loadSession() {
       state.accessToken = s.accessToken;
       state.refreshToken = s.refreshToken;
       return true;
+    }
+  } catch {}
+  return false;
+}
