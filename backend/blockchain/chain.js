@@ -38,3 +38,7 @@ class Blockchain {
     genesis.miner = 'GENESIS';
     genesis.difficulty = this.difficulty;
     genesis.mine(this.difficulty);
+    genesis.transactions[0].blockIndex = 0;
+
+    this.chain.push(genesis);
+    this.save();
