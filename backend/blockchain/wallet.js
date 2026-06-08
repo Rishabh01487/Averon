@@ -126,3 +126,6 @@ class WalletManager {
   getPublicInfo(userId) {
     const w = this.wallets[userId];
     if (!w) return null;
+    return { userId: w.userId, address: w.address, publicKey: w.publicKey };
+  }
+}
