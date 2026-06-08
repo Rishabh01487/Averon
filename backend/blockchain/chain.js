@@ -174,3 +174,7 @@ class Blockchain {
       for (const tx of block.transactions) {
         if (tx.to === address) balance += tx.amount;
         if (tx.from === address) balance -= (tx.amount + (tx.fee || 0));
+      }
+    }
+
+    // Also account for pending outgoing
