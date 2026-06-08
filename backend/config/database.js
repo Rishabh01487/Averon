@@ -406,3 +406,7 @@ function persist() {
 }
 
 // ── QUERY HELPERS ────────────────────────────────────────────────────────────
+
+function query(sql, params = []) {
+  if (!db) return [];
+  try {
