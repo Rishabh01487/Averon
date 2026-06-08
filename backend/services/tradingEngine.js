@@ -21,3 +21,8 @@ class TradingEngine {
     const user = this.db.queryOne('SELECT * FROM users WHERE id = ?', [userId]);
     if (!user) throw new Error('User not found');
     if (user.is_frozen) throw new Error('Account is frozen');
+
+    // Check circuit breaker
+    if (this.circuitBreakerTripped) throw new Error('Trading halted — circuit breaker active');
+
+    // Check open order limit
