@@ -314,3 +314,7 @@ body {
 .link { color: var(--accent); cursor: pointer; text-decoration: underline; }
 
 /* ═══ RESPONSIVE ═══ */
+@media (max-width: 900px) {
+  .market-layout { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+  .hero-stat { grid-column: span 1; }
