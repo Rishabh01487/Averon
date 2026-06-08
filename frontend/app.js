@@ -714,3 +714,7 @@ async function loadPortfolio() {
         </div>
         <div class="asset-meta"><div>₹${formatNum(a.raise_amount)}</div><div>${a.token_count || 0} tokens</div></div>
       </div>`).join('') : '<div class="empty-state">No assets listed. <span class="link" onclick="navigateTo(\'tokenize\')">Tokenize an asset →</span></div>';
+
+    // Orders
+    $('myOrders').innerHTML = data.myOrders?.filter(o => o.status === 'open').map(o => `
+      <div class="order-item">
