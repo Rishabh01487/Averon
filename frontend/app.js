@@ -525,3 +525,8 @@ window.goToLaunch = (aiResult) => {
     <p style="margin-top:16px;color:var(--text-secondary);font-size:14px">Confirming will create tokens on the Averon blockchain and open the asset for investment.</p>`;
   setWizardStep(4);
 };
+
+async function confirmLaunch() {
+  if (!state.currentAssetId) return;
+  $('confirmLaunchBtn').disabled = true;
+  try {
