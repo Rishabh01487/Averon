@@ -94,3 +94,7 @@ function validateChain(chain) {
 }
 
 /**
+ * Chain selection rule — longest valid chain wins.
+ * Used when resolving forks.
+ */
+function selectChain(currentChain, candidateChain) {
