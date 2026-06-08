@@ -25,3 +25,8 @@ class Wallet {
     const ripemd = crypto.createHash('ripemd160').update(hash).digest('hex');
     return '0x' + ripemd;
   }
+
+  sign(transaction) {
+    if (typeof transaction.sign === 'function') {
+      transaction.sign(this.privateKey);
+      transaction.setSignerPublicKey(this.publicKey);
