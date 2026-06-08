@@ -134,3 +134,7 @@ class Block {
   }
 
   /**
+   * Full block validation.
+   */
+  validate(previousBlock) {
+    const errors = [];
