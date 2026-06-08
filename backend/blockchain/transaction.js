@@ -54,3 +54,7 @@ class Transaction {
    * Set the signer's public key (for verification).
    */
   setSignerPublicKey(publicKeyPem) {
+    this.signerPublicKey = publicKeyPem;
+  }
+
+  /**
