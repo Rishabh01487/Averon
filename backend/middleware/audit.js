@@ -38,3 +38,7 @@ function logAudit(action, details = {}, options = {}) {
     request_path: options.path || '',
     response_code: options.responseCode || 0,
     created_at: Date.now(),
+  };
+
+  entry.prev_hash = _lastHash;
+  entry.entry_hash = computeEntryHash(entry, _lastHash);
