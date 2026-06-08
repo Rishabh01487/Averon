@@ -226,3 +226,6 @@ function createSchema() {
     expires_at INTEGER DEFAULT 0,
     fee_paid REAL DEFAULT 0,
     created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`);
