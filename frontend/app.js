@@ -154,3 +154,7 @@ function initAuth() {
 
 async function enterApp() {
   $('authOverlay').classList.add('hidden');
+  $('mainApp').classList.remove('hidden');
+  $('userName').textContent = state.user?.name || '';
+
+  // Load config
