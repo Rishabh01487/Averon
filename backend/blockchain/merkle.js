@@ -69,3 +69,8 @@ class MerkleTree {
       const layer = this.layers[i];
       const isRight = idx % 2 === 1;
       const siblingIdx = isRight ? idx - 1 : idx + 1;
+
+      if (siblingIdx < layer.length) {
+        proof.push({
+          hash: layer[siblingIdx],
+          position: isRight ? 'left' : 'right',
