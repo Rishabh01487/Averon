@@ -46,3 +46,7 @@ class AssetService {
 
     // Validate raise amount
     if (raiseAmount < C.LIMITS.MIN_RAISE_AMOUNT) throw new Error(`Minimum raise: ₹${C.LIMITS.MIN_RAISE_AMOUNT}`);
+    if (raiseAmount > C.LIMITS.MAX_RAISE_AMOUNT) throw new Error(`Maximum raise: ₹${C.LIMITS.MAX_RAISE_AMOUNT.toLocaleString()}`);
+
+    const deadline = Date.now() + (days || C.LIMITS.DEFAULT_LISTING_DAYS) * 864e5;
+    const now = Date.now();
