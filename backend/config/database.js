@@ -402,3 +402,7 @@ function persist() {
     fs.writeFileSync(DB_PATH, Buffer.from(data));
   } catch (e) {
     console.error('DB persist error:', e.message);
+  }
+}
+
+// ── QUERY HELPERS ────────────────────────────────────────────────────────────
