@@ -410,3 +410,6 @@ app.get('/api/blockchain/info', (req, res) => res.json(blockchain.getInfo()));
 
 app.get('/api/blockchain/blocks', (req, res) => {
   const limit = Math.min(parseInt(req.query.limit) || 20, 50);
+  const blocks = blockchain.getRecentBlocks(limit).map(b => b.toJSON());
+  res.json({ blocks, total: blockchain.chain.length });
+});
