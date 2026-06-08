@@ -230,3 +230,7 @@ class TradingEngine {
   getRecentTrades(limit = 30) {
     return this.db.query(
       `SELECT t.*, b.name as buyer_name, s.name as seller_name 
+       FROM coin_trades t JOIN users b ON t.buyer_id = b.id JOIN users s ON t.seller_id = s.id 
+       ORDER BY t.created_at DESC LIMIT ?`, [limit]
+    );
+  }
