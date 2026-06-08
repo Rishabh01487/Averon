@@ -186,3 +186,7 @@ body {
 .asset-meta { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 12px; }
 .asset-meta .label { color: var(--text-muted); }
 .asset-meta .val { font-weight: 600; font-family: var(--mono); }
+.progress-bar { height: 6px; background: var(--bg-input); border-radius: 3px; overflow: hidden; margin-top: 12px; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--green)); border-radius: 3px; transition: width 0.5s; }
+
+/* ═══ BUY COIN ═══ */
