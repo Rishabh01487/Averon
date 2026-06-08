@@ -674,3 +674,7 @@ function initExplorer() {
           <p style="font-size:18px;font-weight:700">Balance: ${addr.balance.toFixed(4)} AC</p>
           <h4 style="margin-top:16px">${addr.transactions.length} Transactions</h4>
           ${addr.transactions.slice(0, 20).map(tx => `<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;display:flex;justify-content:space-between"><span style="color:${tx.direction === 'in' ? 'var(--green)' : 'var(--red)'}">${tx.direction === 'in' ? '+' : '-'}${tx.amount.toFixed(4)} AC</span><span style="color:var(--text-muted)">${tx.type}</span></div>`).join('')}`;
+      } catch { toast('Not found', 'error'); }
+    }
+  });
+}
