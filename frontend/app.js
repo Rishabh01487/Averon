@@ -22,3 +22,7 @@ async function api(path, opts = {}) {
         body: JSON.stringify({ refreshToken: state.refreshToken }),
       });
       if (refreshed.ok) {
+        const tokens = await refreshed.json();
+        state.accessToken = tokens.accessToken;
+        state.refreshToken = tokens.refreshToken;
+        saveSession();
