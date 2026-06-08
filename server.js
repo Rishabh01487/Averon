@@ -138,3 +138,6 @@ app.post('/api/auth/login', authLimiter, validate('login'), async (req, res) => 
 
   // Check lockout
   if (user.locked_until && user.locked_until > Date.now()) {
+    const remaining = Math.ceil((user.locked_until - Date.now()) / 60000);
+    return res.status(423).json({ error: `Account locked. Try again in ${remaining} minutes.`, code: 'ACCOUNT_LOCKED' });
+  }
