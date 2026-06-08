@@ -397,3 +397,8 @@ app.get('/api/portfolio', authenticate, (req, res) => {
   const myOrders = DB.query('SELECT * FROM coin_orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 50', [userId]);
   const activity = DB.query('SELECT * FROM activity_log WHERE user_id = ? ORDER BY created_at DESC LIMIT 50', [userId]);
   const notifications = DB.query('SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 20', [userId]);
+
+  res.json({
+    balance, walletAddress: wallet?.address, coinValue: parseFloat((balance * price).toFixed(2)),
+    tokens, myAssets, myOrders, activity, notifications, price,
+  });
