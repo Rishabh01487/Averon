@@ -141,3 +141,8 @@ module.exports = {
     MIN_TOKEN_PRICE_INR: 10,
     MAX_TOKEN_PRICE_INR: 100000,
   },
+
+  // ── Trading ────────────────────────────────────────────────────────────────
+  TRADING: {
+    ORDER_TYPES: ['market', 'limit'],
+    ORDER_SIDES: ['buy', 'sell'],
