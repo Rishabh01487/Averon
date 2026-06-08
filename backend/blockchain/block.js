@@ -10,3 +10,7 @@ const C = require('../config/constants');
 class Block {
   constructor(index, previousHash, transactions = [], timestamp = Date.now()) {
     this.version = 1;
+    this.index = index;
+    this.previousHash = previousHash;
+    this.timestamp = timestamp;
+    this.transactions = transactions;
