@@ -246,3 +246,7 @@ class Blockchain {
   getBlocks(start = 0, limit = 20) {
     return this.chain.slice(start, start + limit);
   }
+
+  getRecentBlocks(limit = 20) {
+    return [...this.chain].reverse().slice(0, limit);
+  }
