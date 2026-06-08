@@ -74,3 +74,7 @@ function createSchema() {
     is_revoked INTEGER DEFAULT 0,
     expires_at INTEGER NOT NULL,
     created_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`);
+
+  // ── Wallets ──────────────────────────────────────────────────────────────
