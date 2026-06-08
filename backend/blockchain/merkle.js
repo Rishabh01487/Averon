@@ -54,3 +54,7 @@ class MerkleTree {
   getRoot() {
     return this.root;
   }
+
+  /**
+   * Generate a Merkle proof for a leaf at given index.
+   * Returns an array of { hash, position } pairs needed to reconstruct the root.
