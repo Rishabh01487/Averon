@@ -98,3 +98,7 @@ function validate(schemaName) {
     const errors = [];
     for (const [field, fieldRules] of Object.entries(schema)) {
       const value = req.body[field];
+      for (const { rule, msg } of fieldRules) {
+        // Skip non-required fields that are undefined
+        if (value === undefined && rule !== rules.required) continue;
+        if (rule === rules.required && !rule(value)) {
