@@ -598,3 +598,7 @@ async function loadExplorer() {
       <span class="chain-stat">Pending: ${info.pendingTransactions}</span>`;
 
     const data = await api('/api/blockchain/blocks?limit=20');
+    $('blockList').innerHTML = (data.blocks || []).map(b => `
+      <div class="block-card" onclick="viewBlock(${b.index})">
+        <span class="block-index">#${b.index}</span>
+        <span class="block-hash">${b.hash.substring(0, 20)}...</span>
