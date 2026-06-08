@@ -14,3 +14,7 @@ function sanitizeString(str) {
     .replace(/on\w+=/gi, '')     // Strip event handlers
     .trim();
 }
+
+function sanitizeObject(obj) {
+  if (!obj || typeof obj !== 'object') return obj;
+  const sanitized = {};
