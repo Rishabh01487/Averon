@@ -22,3 +22,7 @@ class MerkleTree {
   hashPair(a, b) {
     // Sort to ensure consistent ordering
     const sorted = [a, b].sort();
+    return crypto.createHash('sha256').update(sorted[0] + sorted[1]).digest('hex');
+  }
+
+  build() {
