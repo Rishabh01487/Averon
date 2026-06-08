@@ -50,3 +50,7 @@ function validateChain(chain) {
   // Validate genesis block
   const genesis = chain[0];
   if (genesis.index !== 0) return { valid: false, error: 'Genesis block must have index 0', block: 0 };
+  if (genesis.previousHash !== '0') return { valid: false, error: 'Genesis previous hash must be "0"', block: 0 };
+
+  // Validate each subsequent block
+  for (let i = 1; i < chain.length; i++) {
