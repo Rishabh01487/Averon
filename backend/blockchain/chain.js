@@ -290,3 +290,7 @@ class Blockchain {
     let supply = 0;
     for (const block of this.chain) {
       for (const tx of block.transactions) {
+        if (tx.type === C.TX_TYPES.MINT || tx.type === C.TX_TYPES.REWARD) {
+          supply += tx.amount;
+        }
+      }
