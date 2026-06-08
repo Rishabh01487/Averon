@@ -66,3 +66,7 @@ function validateChain(chain) {
     if (currentBlock.previousHash !== previousBlock.hash) {
       return { valid: false, error: 'Previous hash mismatch', block: i };
     }
+
+    // Hash integrity
+    const recalculated = currentBlock.calculateHash();
+    if (currentBlock.hash !== recalculated) {
