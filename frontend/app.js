@@ -210,3 +210,111 @@ async function loadNotifications() {
 // ── NAVIGATION ───────────────────────────────────────────────────────────────
 
 function initNav() {
+  $$('.nav-link').forEach(link => {
+    link.addEventListener('click', () => navigateTo(link.dataset.page));
+  });
+  $('logoutBtn').addEventListener('click', logout);
+  $('notifBell').addEventListener('click', () => { navigateTo('portfolio'); api('/api/notifications/read', { method: 'POST' }); $('notifCount').classList.add('hidden'); });
+}
+
+function navigateTo(page) {
+  state.currentPage = page;
+  $$('.page').forEach(p => p.classList.remove('active'));
+  $$('.nav-link').forEach(l => l.classList.remove('active'));
+  const pageEl = $(`page-${page}`);
+  if (pageEl) pageEl.classList.add('active');
+  const navEl = document.querySelector(`.nav-link[data-page="${page}"]`);
+  if (navEl) navEl.classList.add('active');
+
+  // Load page data
+  const loaders = { home: loadDashboard, assets: loadAssets, buy: loadBuyPage, market: loadMarket, explorer: loadExplorer, portfolio: loadPortfolio };
+  if (loaders[page]) loaders[page]();
+}
+
+// ── DASHBOARD ────────────────────────────────────────────────────────────────
+
+async function loadDashboard() {
+  try {
+    const data = await api('/api/dashboard');
+    $('statPrice').textContent = `₹${parseFloat(data.price).toFixed(2)}`;
+    $('statSupply').textContent = formatNum(data.totalSupply || data.circulatingSupply);
+    $('statAssets').textContent = data.assets?.total || 0;
+    $('statFunded').textContent = data.assets?.funded || 0;
+    $('statUsers').textContent = data.userCount || 0;
+    $('statTrades').textContent = data.totalTrades || 0;
+    $('statBlocks').textContent = data.blockchain?.blocks || 0;
+    $('statTVL').textContent = `₹${formatNum(data.tvl)}`;
+
+    // Price chart
+    if (data.priceHistory?.length > 1) drawPriceChart(data.priceHistory);
+
+    // Activity
+    const feed = $('activityFeed');
+    feed.innerHTML = (data.recentActivity || []).slice(0, 15).map(a => `
+      <div class="activity-item">
+        <span class="activity-action">${a.action}</span>
+        <span class="activity-details">${a.details || ''}</span>
+        <span class="activity-time">${timeAgo(a.created_at)}</span>
+      </div>`).join('') || '<div class="empty-state">No activity yet</div>';
+  } catch {}
+}
+
+function drawPriceChart(prices) {
+  const canvas = $('priceChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const min = Math.min(...prices) * 0.98;
+  const max = Math.max(...prices) * 1.02;
+  const range = max - min || 1;
+
+  ctx.beginPath();
+  ctx.strokeStyle = '#6366f1';
+  ctx.lineWidth = 2;
+  for (let i = 0; i < prices.length; i++) {
+    const x = (i / (prices.length - 1)) * w;
+    const y = h - ((prices[i] - min) / range) * h;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Gradient fill
+  const lastY = h - ((prices[prices.length - 1] - min) / range) * h;
+  ctx.lineTo(w, h);
+  ctx.lineTo(0, h);
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, 'rgba(99, 102, 241, 0.3)');
+  grad.addColorStop(1, 'rgba(99, 102, 241, 0)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+}
+
+// ── ASSETS ───────────────────────────────────────────────────────────────────
+
+async function loadAssets() {
+  try {
+    const params = new URLSearchParams();
+    const cat = $('assetFilterCategory')?.value;
+    const status = $('assetFilterStatus')?.value;
+    if (cat && cat !== 'all') params.set('category', cat);
+    if (status && status !== 'all') params.set('status', status);
+
+    const assets = await api(`/api/assets?${params}`);
+    const grid = $('assetGrid');
+    grid.innerHTML = assets.map(a => `
+      <div class="asset-card" onclick="viewAsset(${a.id})">
+        <div class="asset-card-header">
+          <div class="asset-title">${a.title}</div>
+          <span class="asset-status status-${a.status}">${a.status.replace(/_/g, ' ')}</span>
+        </div>
+        <div class="asset-category">${a.category}</div>
+        <div class="asset-meta">
+          <div><span class="label">Raise:</span> <span class="val">₹${formatNum(a.raise_amount)}</span></div>
+          <div><span class="label">Tokens:</span> <span class="val">${a.tokens_sold || 0}/${a.token_count || 0}</span></div>
+        </div>
+        ${a.token_count ? `<div class="progress-bar"><div class="progress-fill" style="width:${a.progress}%"></div></div>` : ''}
+      </div>`).join('') || '<div class="empty-state">No assets listed yet. <span class="link" onclick="navigateTo(\'tokenize\')">Tokenize your first asset →</span></div>';
+  } catch {}
