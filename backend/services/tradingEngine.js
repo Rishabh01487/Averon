@@ -142,3 +142,7 @@ class TradingEngine {
         this.db.incrementEconomy('total_volume', tradeAmount);
 
         trades.push({ buyerId: buy.user_id, sellerId: sell.user_id, amount: tradeAmount, price: tradePrice, totalValue, txHash: tradeTx.hash });
+
+        buy.filled = newBuyFilled;
+        buy.remaining = newBuyRemaining;
+        sell.filled = newSellFilled;
