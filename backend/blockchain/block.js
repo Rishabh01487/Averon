@@ -50,3 +50,7 @@ class Block {
   /**
    * Mine this block — find a nonce that produces a hash starting with `difficulty` zeros.
    */
+  mine(difficulty) {
+    this.difficulty = difficulty || this.difficulty;
+    const target = '0'.repeat(this.difficulty);
+    const startTime = Date.now();
