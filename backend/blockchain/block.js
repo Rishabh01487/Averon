@@ -58,3 +58,7 @@ class Block {
     while (!this.hash.startsWith(target)) {
       this.nonce++;
       this.hash = this.calculateHash();
+
+      // Safety: prevent infinite loop (max 10 million attempts)
+      if (this.nonce > 10000000) {
+        throw new Error('Mining exceeded maximum attempts');
