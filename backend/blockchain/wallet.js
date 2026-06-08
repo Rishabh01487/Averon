@@ -86,3 +86,7 @@ class WalletManager {
 
   createWallet(userId) {
     if (this.wallets[userId]) return this.wallets[userId];
+    const wallet = new Wallet(userId);
+    this.wallets[userId] = wallet;
+    this.save();
+    return wallet;
