@@ -418,3 +418,7 @@ app.get('/api/blockchain/block/:index', (req, res) => {
   const block = blockchain.getBlock(parseInt(req.params.index));
   if (!block) return res.status(404).json({ error: 'Block not found' });
   res.json(block.toJSON());
+});
+
+app.get('/api/blockchain/tx/:hash', (req, res) => {
+  const tx = blockchain.findTransaction(req.params.hash);
