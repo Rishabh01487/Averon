@@ -322,3 +322,7 @@ async function loadAssets() {
 
 async function viewAsset(id) {
   try {
+    const a = await api(`/api/assets/${id}`);
+    // Show in a modal-like explorer result on the assets page
+    const grid = $('assetGrid');
+    grid.innerHTML = `
