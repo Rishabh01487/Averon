@@ -153,3 +153,5 @@ function sanitizeBodyForAudit(body) {
   }
   return sanitized;
 }
+
+module.exports = { initAudit, logAudit, auditMiddleware, verifyAuditChain };
