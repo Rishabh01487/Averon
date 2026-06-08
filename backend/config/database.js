@@ -430,3 +430,7 @@ function queryOne(sql, params = []) {
 function run(sql, params = []) {
   if (!db) return { changes: 0, lastId: 0 };
   try {
+    db.run(sql, params);
+    const changes = db.getRowsModified();
+    const lastRow = queryOne('SELECT last_insert_rowid() as id');
+    return { changes, lastId: lastRow?.id || 0 };
