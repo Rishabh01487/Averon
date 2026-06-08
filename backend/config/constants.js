@@ -150,3 +150,7 @@ module.exports = {
     CIRCUIT_BREAKER_PERCENT: 10,     // Halt if price moves 10% in 1 hour
     CIRCUIT_BREAKER_WINDOW_MS: 60 * 60 * 1000,
     MAX_OPEN_ORDERS_PER_USER: 50,
+    MIN_ORDER_AMOUNT: 0.01,
+  },
+
+  // ── Price Engine ───────────────────────────────────────────────────────────
