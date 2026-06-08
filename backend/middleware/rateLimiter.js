@@ -78,3 +78,7 @@ function createUserRateLimiter(config) {
     next();
   };
 }
+
+// Pre-built limiters
+const generalLimiter = createRateLimiter(C.RATE_LIMITS.GENERAL);
+const authLimiter = createRateLimiter(C.RATE_LIMITS.AUTH);
