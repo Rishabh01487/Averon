@@ -126,3 +126,7 @@ class MerkleTree {
       leafCount: this.leaves.length,
       depth: this.layers.length,
     };
+  }
+}
+
+module.exports = { MerkleTree };
