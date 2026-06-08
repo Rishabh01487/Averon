@@ -146,3 +146,6 @@ function createSchema() {
     doc_type TEXT DEFAULT 'unknown',
     doc_hash TEXT DEFAULT '',
     is_verified INTEGER DEFAULT 0,
+    uploaded_at INTEGER NOT NULL,
+    FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE CASCADE
+  )`);
