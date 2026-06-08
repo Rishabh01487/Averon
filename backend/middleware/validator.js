@@ -18,3 +18,7 @@ function sanitizeString(str) {
 function sanitizeObject(obj) {
   if (!obj || typeof obj !== 'object') return obj;
   const sanitized = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (typeof value === 'string') {
+      sanitized[key] = sanitizeString(value);
+    } else if (typeof value === 'object' && value !== null) {
