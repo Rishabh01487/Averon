@@ -314,3 +314,5 @@ class AssetService {
     });
   }
 }
+
+module.exports = { AssetService };
