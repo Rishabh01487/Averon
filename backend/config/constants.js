@@ -38,3 +38,7 @@ module.exports = {
     MIN_DIFFICULTY: 1,
     MAX_DIFFICULTY: 6,
     MINING_REWARD: 0.1,
+    MAX_TRANSACTIONS_PER_BLOCK: 100,
+    GENESIS_TIMESTAMP: 1717200000000,    // Fixed genesis time
+    MAX_BLOCK_SIZE_BYTES: 1024 * 1024,   // 1MB
+    MAX_FUTURE_BLOCK_TIME_MS: 2 * 60 * 1000, // 2 min future tolerance
