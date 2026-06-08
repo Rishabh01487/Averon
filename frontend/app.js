@@ -225,3 +225,8 @@ function navigateTo(page) {
   if (pageEl) pageEl.classList.add('active');
   const navEl = document.querySelector(`.nav-link[data-page="${page}"]`);
   if (navEl) navEl.classList.add('active');
+
+  // Load page data
+  const loaders = { home: loadDashboard, assets: loadAssets, buy: loadBuyPage, market: loadMarket, explorer: loadExplorer, portfolio: loadPortfolio };
+  if (loaders[page]) loaders[page]();
+}
