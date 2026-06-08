@@ -682,3 +682,7 @@ function initExplorer() {
 // ── PORTFOLIO ────────────────────────────────────────────────────────────────
 
 async function loadPortfolio() {
+  try {
+    const data = await api('/api/portfolio');
+    $('portfolioValue').textContent = `₹${formatNum(data.coinValue)}`;
+    $('portfolioWallet').textContent = data.walletAddress || '—';
