@@ -246,3 +246,7 @@ async function loadDashboard() {
     $('statTVL').textContent = `₹${formatNum(data.tvl)}`;
 
     // Price chart
+    if (data.priceHistory?.length > 1) drawPriceChart(data.priceHistory);
+
+    // Activity
+    const feed = $('activityFeed');
