@@ -114,3 +114,7 @@ function initAuth() {
       const data = await api('/api/auth/login', {
         method: 'POST',
         body: JSON.stringify({ email: $('loginEmail').value, password: $('loginPassword').value }),
+      });
+      state.user = data.user;
+      state.accessToken = data.accessToken;
+      state.refreshToken = data.refreshToken;
