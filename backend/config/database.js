@@ -410,3 +410,7 @@ function persist() {
 function query(sql, params = []) {
   if (!db) return [];
   try {
+    const stmt = db.prepare(sql);
+    if (params.length) stmt.bind(params);
+    const results = [];
+    while (stmt.step()) results.push(stmt.getAsObject());
