@@ -158,3 +158,7 @@ app.post('/api/auth/login', authLimiter, validate('login'), async (req, res) => 
 
   // Reset attempts on success
   DB.run('UPDATE users SET login_attempts = 0, locked_until = 0, last_login = ? WHERE id = ?', [Date.now(), user.id]);
+
+  const tokens = generateTokens(user);
+  const wallet = DB.queryOne('SELECT address FROM wallets WHERE user_id = ?', [user.id]);
+  const balance = wallet ? blockchain.getBalance(wallet.address) : 0;
