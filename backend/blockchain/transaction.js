@@ -78,3 +78,7 @@ class Transaction {
       return false;
     }
   }
+
+  /**
+   * Validate business rules for this transaction type.
+   */
