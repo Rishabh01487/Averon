@@ -166,3 +166,7 @@ class TradingEngine {
 
   cancelOrder(orderId, userId) {
     const order = this.db.queryOne('SELECT * FROM coin_orders WHERE id = ? AND user_id = ? AND status = "open"', [orderId, userId]);
+    if (!order) throw new Error('Order not found or not cancellable');
+
+    // Return locked coins for sell orders
+    if (order.side === 'sell' && order.remaining > 0) {
