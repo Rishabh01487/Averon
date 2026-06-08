@@ -86,3 +86,6 @@ function validateChain(chain) {
 
     // Timestamp ordering
     if (currentBlock.timestamp <= previousBlock.timestamp) {
+      return { valid: false, error: 'Timestamp must be after previous block', block: i };
+    }
+  }
