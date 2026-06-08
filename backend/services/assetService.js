@@ -133,3 +133,8 @@ class AssetService {
 
     const walletData = this.db.queryOne('SELECT * FROM wallets WHERE user_id = ?', [userId]);
     if (!walletData) throw new Error('Wallet not found');
+
+    const available = this.db.query('SELECT * FROM asset_tokens WHERE asset_id = ? AND owner_id IS NULL ORDER BY token_index LIMIT ?', [assetId, count]);
+    if (available.length < count) throw new Error(`Only ${available.length} tokens available`);
+
+    const totalCost = parseFloat((asset.token_price * count).toFixed(8));
