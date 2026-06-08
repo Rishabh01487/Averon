@@ -58,3 +58,7 @@ const schemas = {
 
   login: {
     email: [{ rule: rules.required, msg: 'Email is required' }, { rule: rules.email, msg: 'Invalid email format' }],
+    password: [{ rule: rules.required, msg: 'Password is required' }],
+  },
+
+  createAsset: {
