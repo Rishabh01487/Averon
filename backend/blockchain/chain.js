@@ -122,3 +122,7 @@ class Blockchain {
     });
     rewardTx.status = 'confirmed';
     txsToMine.push(rewardTx);
+
+    // Create new block
+    const previousBlock = this.getLatestBlock();
+    const newBlock = new Block(
