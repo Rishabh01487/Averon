@@ -6,3 +6,7 @@ const crypto = require('crypto');
 const C = require('../config/constants');
 
 // ── JWT Implementation (zero-dependency) ─────────────────────────────────────
+// We implement JWT from scratch using Node's crypto module.
+// This avoids the `jsonwebtoken` dependency while maintaining full JWT spec.
+
+const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
