@@ -114,3 +114,7 @@ class Blockchain {
     if (this.pendingTransactions.length === 0) return null;
 
     // Select transactions for this block (up to max)
+    const txsToMine = this.pendingTransactions.slice(0, C.BLOCKCHAIN.MAX_TRANSACTIONS_PER_BLOCK);
+
+    // Add mining reward
+    const rewardTx = new Transaction('SYSTEM', minerAddress, this.miningReward, C.TX_TYPES.REWARD, {
