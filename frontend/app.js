@@ -190,3 +190,7 @@ function populateCategories() {
     filter.innerHTML += `<option value="${cat}">${cat}</option>`;
   }
 }
+
+async function pollPrice() {
+  try {
+    const data = await api('/api/economy');
