@@ -362,3 +362,7 @@ app.post('/api/assets/:id/tokens/buy', authenticate, financialLimiter, validate(
 // ── Marketplace ──────────────────────────────────────────────────────────────
 
 app.get('/api/market/orderbook', (req, res) => {
+  const book = tradingEngine.getOrderBook();
+  const trades = tradingEngine.getRecentTrades(30);
+  res.json({ ...book, recentTrades: trades });
+});
