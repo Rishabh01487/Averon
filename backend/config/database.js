@@ -202,3 +202,7 @@ function createSchema() {
 
   db.run(`CREATE TABLE IF NOT EXISTS escrow_transactions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    escrow_id INTEGER NOT NULL,
+    type TEXT NOT NULL,
+    user_id TEXT,
+    amount REAL NOT NULL,
