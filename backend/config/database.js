@@ -50,3 +50,7 @@ function createSchema() {
     password_hash TEXT,
     name TEXT NOT NULL,
     organization TEXT DEFAULT '',
+    role TEXT DEFAULT '${C.ROLES.USER}',
+    wallet_address TEXT UNIQUE,
+    averon_balance REAL DEFAULT 0,
+    inr_spent REAL DEFAULT 0,
