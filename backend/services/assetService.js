@@ -37,3 +37,8 @@ class AssetService {
   }
 
   // ── Create Asset ─────────────────────────────────────────────────────────
+
+  createAsset(userId, data) {
+    const { title, description, category, raiseAmount, days } = data;
+
+    // Validate category
