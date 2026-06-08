@@ -118,3 +118,7 @@ class Transaction {
       confirmations: this.confirmations,
     };
   }
+
+  static fromJSON(json) {
+    const tx = new Transaction(json.from, json.to, json.amount, json.type, json.data);
+    tx.timestamp = json.timestamp;
