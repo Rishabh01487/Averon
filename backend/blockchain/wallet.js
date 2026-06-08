@@ -110,3 +110,7 @@ class WalletManager {
 
   getPlatformFeeWallet() {
     if (!this.wallets['__PLATFORM_FEE__']) {
+      this.wallets['__PLATFORM_FEE__'] = new Wallet('__PLATFORM_FEE__');
+      this.save();
+    }
+    return this.wallets['__PLATFORM_FEE__'];
