@@ -106,3 +106,7 @@ module.exports = {
     'Equipment',
     'Invoices & Bills',
     'Vehicles',
+    'Precious Metals',
+    'Commodities',
+    'Infrastructure',
+    'Energy',
