@@ -142,3 +142,7 @@ class EscrowService {
         [token.owner_id, 'REFUND', 'Investment Refunded',
          `Your investment of ${refundAmount.toFixed(4)} AC in "${this.db.queryOne('SELECT title FROM assets WHERE id = ?', [assetId])?.title}" has been refunded.`,
          Date.now()]);
+    }
+
+    this.db.run('UPDATE escrow_accounts SET balance = 0, total_refunded = total_refunded + ?, status = "refunded" WHERE id = ?',
+      [totalRefunded, escrow.id]);
