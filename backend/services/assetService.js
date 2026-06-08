@@ -110,3 +110,7 @@ class AssetService {
         assetId, title: asset.title, tokens: tokenCount, raiseAmount: asset.raise_amount,
       });
       wallet.sign(assetTx);
+      this.blockchain.addTransaction(assetTx);
+      const block = this.blockchain.minePendingTransactions(this.walletManager.getSystemWallet().address);
+      txHash = assetTx.hash;
+      blockIdx = block?.index || 0;
