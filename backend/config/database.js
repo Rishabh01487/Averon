@@ -302,3 +302,7 @@ function createSchema() {
   )`);
 
   // ── Audit Log ────────────────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS audit_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT DEFAULT '',
+    action TEXT NOT NULL,
