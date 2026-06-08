@@ -474,3 +474,7 @@ async function uploadDocuments() {
 
   const formData = new FormData();
   for (const file of state.selectedFiles) formData.append('documents', file);
+
+  $('uploadDocsBtn').disabled = true;
+  try {
+    const res = await fetch(`/api/assets/${state.currentAssetId}/documents`, {
