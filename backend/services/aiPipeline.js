@@ -14,3 +14,7 @@ const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${C.
 const PROFILES = {
   'Stocks & Shares':    { avg: 50000, risk: [15,45] },
   'Land & Real Estate': { avg: 500000, risk: [10,35] },
+  'Agricultural Goods': { avg: 20000, risk: [25,55] },
+  'Shop Inventory':     { avg: 30000, risk: [30,60] },
+  'Equipment':          { avg: 40000, risk: [20,50] },
+  'Invoices & Bills':   { avg: 15000, risk: [20,45] },
