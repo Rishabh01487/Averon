@@ -98,3 +98,7 @@ class WalletManager {
 
   getWalletByAddress(address) {
     return Object.values(this.wallets).find(w => w.address === address) || null;
+  }
+
+  getSystemWallet() {
+    if (!this.wallets['__SYSTEM__']) {
