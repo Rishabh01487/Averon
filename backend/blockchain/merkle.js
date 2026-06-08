@@ -85,3 +85,8 @@ class MerkleTree {
 
       idx = Math.floor(idx / 2);
     }
+
+    return proof;
+  }
+
+  /**
