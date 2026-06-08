@@ -66,3 +66,7 @@ function verifyJWT(token, secret) {
     return payload;
   } catch {
     return null;
+  }
+}
+
+// ── Password Hashing (PBKDF2 — zero-dependency bcrypt alternative) ───────────
