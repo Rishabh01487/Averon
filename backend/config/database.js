@@ -394,3 +394,7 @@ function seedDefaults() {
 }
 
 // ── PERSISTENCE ──────────────────────────────────────────────────────────────
+
+function persist() {
+  if (!db) return;
+  try {
