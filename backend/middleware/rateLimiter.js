@@ -74,3 +74,7 @@ function createUserRateLimiter(config) {
         retryAfter: Math.ceil(windowMs / 1000),
       });
     }
+
+    next();
+  };
+}
