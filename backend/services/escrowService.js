@@ -38,3 +38,6 @@ class EscrowService {
 
     this.db.run('UPDATE escrow_accounts SET balance = ?, total_received = ? WHERE id = ?',
       [newBalance, newReceived, escrow.id]);
+
+    this.db.run('INSERT INTO escrow_transactions (escrow_id, type, user_id, amount, tx_hash, created_at) VALUES (?,?,?,?,?,?)',
+      [escrow.id, 'LOCK', userId, amount, txHash, Date.now()]);
