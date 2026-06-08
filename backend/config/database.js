@@ -18,3 +18,7 @@ let _persistTimer = null;
 // ── INITIALIZATION ───────────────────────────────────────────────────────────
 
 async function initDatabase() {
+  const SQL = await initSqlJs();
+
+  if (fs.existsSync(DB_PATH)) {
+    const buffer = fs.readFileSync(DB_PATH);
