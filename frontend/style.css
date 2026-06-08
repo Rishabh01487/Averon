@@ -290,3 +290,7 @@ body {
 .token-hold-card { padding: 16px; background: var(--bg-input); border-radius: var(--radius-sm); border: 1px solid var(--border); }
 .token-hold-title { font-weight: 600; margin-bottom: 4px; }
 .token-hold-meta { font-size: 12px; color: var(--text-secondary); font-family: var(--mono); }
+
+.my-orders .order-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg-input); border-radius: var(--radius-sm); margin-bottom: 8px; }
+.tx-history .tx-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 13px; }
+.tx-action { font-weight: 600; color: var(--accent); font-family: var(--mono); font-size: 11px; min-width: 120px; }
