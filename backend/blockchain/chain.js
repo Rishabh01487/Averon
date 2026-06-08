@@ -205,3 +205,8 @@ class Blockchain {
     }
     return txs.reverse().slice(0, limit);
   }
+
+  /**
+   * Find a transaction by hash across the entire chain.
+   */
+  findTransaction(hash) {
