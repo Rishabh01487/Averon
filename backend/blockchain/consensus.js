@@ -78,3 +78,7 @@ function validateChain(chain) {
     if (!currentBlock.hash.startsWith(target)) {
       return { valid: false, error: 'Hash does not meet difficulty requirement', block: i };
     }
+
+    // Merkle root
+    if (typeof currentBlock.verifyMerkleRoot === 'function' && !currentBlock.verifyMerkleRoot()) {
+      return { valid: false, error: 'Merkle root mismatch', block: i };
