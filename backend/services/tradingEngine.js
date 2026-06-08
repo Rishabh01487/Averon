@@ -170,3 +170,7 @@ class TradingEngine {
 
     // Return locked coins for sell orders
     if (order.side === 'sell' && order.remaining > 0) {
+      this.db.run('UPDATE users SET averon_balance = averon_balance + ? WHERE id = ?', [order.remaining, userId]);
+    }
+
+    this.db.run('UPDATE coin_orders SET status = "cancelled", updated_at = ? WHERE id = ?', [Date.now(), orderId]);
