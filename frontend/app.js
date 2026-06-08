@@ -42,3 +42,7 @@ async function api(path, opts = {}) {
     if (e.message !== 'Failed to fetch') toast(e.message, 'error');
     throw e;
   }
+}
+
+function $(id) { return document.getElementById(id); }
+function $$(sel) { return document.querySelectorAll(sel); }
