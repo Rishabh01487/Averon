@@ -138,3 +138,7 @@ function authenticate(req, res, next) {
   // Attach user info to request
   req.user = payload;
   next();
+}
+
+function optionalAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
