@@ -18,3 +18,6 @@ class TradingEngine {
   // ── Place Orders ─────────────────────────────────────────────────────────
 
   placeOrder(userId, side, type, amount, price = null) {
+    const user = this.db.queryOne('SELECT * FROM users WHERE id = ?', [userId]);
+    if (!user) throw new Error('User not found');
+    if (user.is_frozen) throw new Error('Account is frozen');
