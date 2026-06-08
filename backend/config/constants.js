@@ -186,3 +186,7 @@ module.exports = {
   // ── Audit Actions ──────────────────────────────────────────────────────────
   AUDIT_ACTIONS: [
     'LOGIN', 'LOGOUT', 'REGISTER', 'PASSWORD_CHANGE',
+    'ACCOUNT_CREATED', 'ACCOUNT_FROZEN', 'ACCOUNT_UNFROZEN',
+    'MINT', 'TRANSFER', 'TRADE',
+    'ASSET_CREATED', 'ASSET_UPDATED', 'ASSET_DELETED',
+    'AI_ANALYSIS_STARTED', 'AI_ANALYSIS_COMPLETED',
