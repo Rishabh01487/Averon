@@ -130,3 +130,7 @@ body {
 #userName { color: var(--text-secondary); }
 
 .hidden { display: none !important; }
+.main-content { padding: 24px; max-width: 1400px; margin: 0 auto; }
+
+/* ═══ PAGES ═══ */
+.page { display: none; animation: fadeIn 0.3s; }
