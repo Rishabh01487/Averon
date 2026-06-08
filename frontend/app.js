@@ -746,3 +746,7 @@ document.addEventListener('change', (e) => {
 });
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', () => {
+  initAuth();
+  initNav();
