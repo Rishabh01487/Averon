@@ -494,3 +494,6 @@ function getDashboardStats() {
     SUM(CASE WHEN status = '${C.ASSET_STATUS.ACTIVE}' OR status = '${C.ASSET_STATUS.FUNDING}' THEN 1 ELSE 0 END) as active,
     SUM(CASE WHEN status = '${C.ASSET_STATUS.FUNDED}' OR status = '${C.ASSET_STATUS.COMPLETED}' THEN 1 ELSE 0 END) as funded,
     SUM(CASE WHEN status IN ('${C.ASSET_STATUS.DRAFT}','${C.ASSET_STATUS.DOCUMENTS_UPLOADED}','${C.ASSET_STATUS.AI_ANALYZING}','${C.ASSET_STATUS.VERIFIED}','${C.ASSET_STATUS.COMPLIANCE_REVIEW}') THEN 1 ELSE 0 END) as pending
+    FROM assets`) || {};
+  const userCount = queryOne('SELECT COUNT(*) as c FROM users')?.c || 0;
+  const priceHistory = query('SELECT price FROM price_history ORDER BY recorded_at DESC LIMIT 200').reverse();
