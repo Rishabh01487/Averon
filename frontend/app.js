@@ -630,3 +630,7 @@ window.viewBlock = async (index) => {
         <div style="padding:8px 12px;background:var(--bg-input);border-radius:6px;margin-bottom:6px;font-size:12px">
           <div style="display:flex;justify-content:space-between">
             <span style="font-weight:600;color:var(--accent)">${tx.type}</span>
+            <span style="font-family:var(--mono)">${tx.amount.toFixed(4)} AC</span>
+          </div>
+          <div style="color:var(--text-muted);margin-top:4px;font-family:var(--mono);font-size:10px">
+            ${tx.from?.substring(0,16)}... → ${tx.to?.substring(0,16)}... · ${tx.hash?.substring(0,16)}...
