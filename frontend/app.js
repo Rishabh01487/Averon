@@ -242,3 +242,7 @@ async function loadDashboard() {
     $('statFunded').textContent = data.assets?.funded || 0;
     $('statUsers').textContent = data.userCount || 0;
     $('statTrades').textContent = data.totalTrades || 0;
+    $('statBlocks').textContent = data.blockchain?.blocks || 0;
+    $('statTVL').textContent = `₹${formatNum(data.tvl)}`;
+
+    // Price chart
