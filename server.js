@@ -522,3 +522,7 @@ function startTimers() {
     console.log(`  🌐 http://localhost:${PORT}`);
     console.log(`  ⛓  ${blockchain.chain.length} blocks | Difficulty ${blockchain.difficulty}`);
     console.log(`  💾 SQLite (WASM) | 🔑 ${systemWallet.address.substring(0, 16)}...`);
+    console.log(`  📊 ${stats.userCount} users | ${stats.assets.total} assets | ${(stats.totalSupply || 0).toFixed(0)} AC supply`);
+    console.log(`  🔒 JWT Auth | Rate Limiting | Tamper-proof Audit\n`);
+  });
+})();
