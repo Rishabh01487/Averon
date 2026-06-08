@@ -210,3 +210,7 @@ async function loadNotifications() {
 // ── NAVIGATION ───────────────────────────────────────────────────────────────
 
 function initNav() {
+  $$('.nav-link').forEach(link => {
+    link.addEventListener('click', () => navigateTo(link.dataset.page));
+  });
+  $('logoutBtn').addEventListener('click', logout);
