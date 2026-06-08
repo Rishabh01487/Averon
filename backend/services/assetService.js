@@ -58,3 +58,7 @@ class AssetService {
 
     // Log status change
     this.db.run('INSERT INTO asset_status_history (asset_id, old_status, new_status, changed_by, reason, created_at) VALUES (?,?,?,?,?,?)',
+      [lastId, null, C.ASSET_STATUS.DRAFT, userId, 'Asset created', now]);
+
+    this.db.run('INSERT INTO activity_log (user_id, action, details, amount, created_at) VALUES (?,?,?,?,?)',
+      [userId, 'ASSET_CREATED', `"${title}" — ₹${raiseAmount} raise`, parseFloat(raiseAmount), now]);
