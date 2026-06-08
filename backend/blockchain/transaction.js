@@ -14,3 +14,7 @@ class Transaction {
     this.type = type;               // TX_TYPES constant
     this.data = data;               // Additional payload
     this.timestamp = Date.now();
+    this.nonce = crypto.randomInt(0, 2 ** 32); // Unique per tx
+    this.fee = 0;                   // Fee deducted (set by fee service)
+    this.signature = '';            // ECDSA signature
+    this.signerPublicKey = '';      // PEM public key of signer
