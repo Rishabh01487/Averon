@@ -249,3 +249,7 @@ function checkFraudIndicators(asset, analysis, duplicateResult) {
   if (analysis.confidence < C.AI.FRAUD_ALERT_THRESHOLD) {
     flags.push(`Very low AI confidence (${analysis.confidence}%)`);
   }
+
+  if (analysis.riskScore > 85) {
+    flags.push('Extremely high risk score');
+  }
