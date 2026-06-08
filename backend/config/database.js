@@ -70,3 +70,7 @@ function createSchema() {
     user_id TEXT NOT NULL,
     refresh_token TEXT NOT NULL,
     device_info TEXT DEFAULT '',
+    ip_address TEXT DEFAULT '',
+    is_revoked INTEGER DEFAULT 0,
+    expires_at INTEGER NOT NULL,
+    created_at INTEGER NOT NULL,
