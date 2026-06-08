@@ -114,3 +114,7 @@ class Transaction {
       fee: this.fee,
       signature: this.signature ? this.signature.substring(0, 32) + '...' : '',
       status: this.status,
+      blockIndex: this.blockIndex,
+      confirmations: this.confirmations,
+    };
+  }
