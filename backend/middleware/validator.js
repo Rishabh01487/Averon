@@ -38,3 +38,7 @@ const rules = {
   number: (val) => typeof val === 'number' && !isNaN(val),
   email: (val) => typeof val === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
   minLength: (min) => (val) => typeof val === 'string' && val.length >= min,
+  maxLength: (max) => (val) => typeof val === 'string' && val.length <= max,
+  min: (min) => (val) => typeof val === 'number' && val >= min,
+  max: (max) => (val) => typeof val === 'number' && val <= max,
+  oneOf: (values) => (val) => values.includes(val),
