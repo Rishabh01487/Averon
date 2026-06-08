@@ -241,3 +241,7 @@ function checkFraudIndicators(asset, analysis, duplicateResult) {
     flags.push(`Duplicate documents detected (also used in asset #${duplicateResult.duplicates[0]?.existingAssetId})`);
     hasCriticalFraud = true;
   }
+
+  if (asset.raise_amount > (analysis.estimatedValue || 0) * 2) {
+    flags.push('Raise amount is more than 2x estimated value');
+  }
