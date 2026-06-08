@@ -158,3 +158,6 @@ class Blockchain {
 
     // Adjust difficulty
     this.difficulty = adjustDifficulty(this.chain);
+
+    // Persist
+    this.save();
