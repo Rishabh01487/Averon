@@ -90,3 +90,6 @@ function logout() {
   localStorage.removeItem('averon_session');
   $('authOverlay').classList.remove('hidden');
   $('mainApp').classList.add('hidden');
+}
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
