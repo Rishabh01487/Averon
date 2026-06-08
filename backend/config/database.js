@@ -486,3 +486,7 @@ function incrementEconomy(field, amount) {
 function getEconomy() {
   return queryOne('SELECT * FROM economy WHERE id = 1');
 }
+
+function getDashboardStats() {
+  const eco = getEconomy() || {};
+  const assetStats = queryOne(`SELECT 
