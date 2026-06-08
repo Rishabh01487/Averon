@@ -286,3 +286,7 @@ app.post('/api/assets/:assetId/documents', authenticate, uploadLimiter, upload.a
   for (const file of (req.files || [])) {
     const newPath = path.join(assetDir, file.filename);
     if (file.path !== newPath) try { fs.renameSync(file.path, newPath); } catch {}
+
+    // Hash the document for duplicate detection
+    let docHash = '';
+    try { docHash = crypto.createHash('sha256').update(fs.readFileSync(newPath)).digest('hex'); } catch {}
