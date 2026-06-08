@@ -390,3 +390,7 @@ app.get('/api/portfolio', authenticate, (req, res) => {
   const wallet = DB.queryOne('SELECT address FROM wallets WHERE user_id = ?', [userId]);
   const balance = wallet ? blockchain.getBalance(wallet.address) : 0;
   const price = DB.getPrice();
+
+  const tokens = DB.query(`SELECT t.*, a.title as asset_title, a.category, a.status as asset_status 
+    FROM asset_tokens t JOIN assets a ON t.asset_id = a.id WHERE t.owner_id = ?`, [userId]);
+  const myAssets = DB.query('SELECT * FROM assets WHERE owner_id = ? ORDER BY created_at DESC', [userId]);
