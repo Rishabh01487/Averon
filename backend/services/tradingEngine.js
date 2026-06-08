@@ -50,3 +50,7 @@ class TradingEngine {
       } else {
         const bestBuy = this.db.queryOne('SELECT price FROM coin_orders WHERE status = "open" AND side = "buy" ORDER BY price DESC LIMIT 1');
         price = bestBuy ? bestBuy.price : this.db.getPrice();
+      }
+    }
+
+    const now = Date.now();
