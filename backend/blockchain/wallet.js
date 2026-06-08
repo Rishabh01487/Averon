@@ -102,3 +102,7 @@ class WalletManager {
 
   getSystemWallet() {
     if (!this.wallets['__SYSTEM__']) {
+      this.wallets['__SYSTEM__'] = new Wallet('__SYSTEM__');
+      this.save();
+    }
+    return this.wallets['__SYSTEM__'];
