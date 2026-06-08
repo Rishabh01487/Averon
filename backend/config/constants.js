@@ -22,3 +22,7 @@ module.exports = {
   },
 
   // ── Rate Limiting ──────────────────────────────────────────────────────────
+  RATE_LIMITS: {
+    GENERAL: { windowMs: 60 * 1000, max: 100 },      // 100 req/min
+    AUTH: { windowMs: 60 * 1000, max: 10 },            // 10 req/min
+    FINANCIAL: { windowMs: 1000, max: 5 },             // 5 req/sec
