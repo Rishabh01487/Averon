@@ -30,3 +30,7 @@ const PROFILES = {
 
 async function analyzeAsset(asset, documents, dbModule) {
   const stages = [];
+  const startTime = Date.now();
+
+  // Stage 1: Document Ingestion & Classification
+  const stage1 = processDocuments(documents);
