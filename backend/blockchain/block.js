@@ -122,3 +122,7 @@ class Block {
     // Must not be too far in the future
     if (this.timestamp > Date.now() + C.BLOCKCHAIN.MAX_FUTURE_BLOCK_TIME_MS) return false;
     return true;
+  }
+
+  /**
+   * Validate the block's hash meets difficulty requirement.
