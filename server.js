@@ -22,3 +22,7 @@ const { initAudit, logAudit, auditMiddleware, verifyAuditChain } = require('./ba
 // ── Blockchain ───────────────────────────────────────────────────────────────
 const { Blockchain, Transaction } = require('./backend/blockchain/chain');
 const { WalletManager } = require('./backend/blockchain/wallet');
+
+// ── Services ─────────────────────────────────────────────────────────────────
+const { analyzeAsset } = require('./backend/services/aiPipeline');
+const { EscrowService } = require('./backend/services/escrowService');
