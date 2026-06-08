@@ -41,3 +41,8 @@ async function initDatabase() {
 }
 
 // ── SCHEMA ───────────────────────────────────────────────────────────────────
+
+function createSchema() {
+  // ── Users & Auth ─────────────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS users (
+    id TEXT PRIMARY KEY,
