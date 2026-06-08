@@ -114,3 +114,7 @@ class EscrowService {
     const tokens = this.db.query('SELECT DISTINCT owner_id, COUNT(*) as count, SUM(price) as total FROM asset_tokens WHERE asset_id = ? AND owner_id IS NOT NULL GROUP BY owner_id', [assetId]);
 
     let totalRefunded = 0;
+    const refunds = [];
+
+    for (const token of tokens) {
+      const wallet = this.db.queryOne('SELECT address FROM wallets WHERE user_id = ?', [token.owner_id]);
