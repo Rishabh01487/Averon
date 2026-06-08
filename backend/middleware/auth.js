@@ -34,3 +34,6 @@ function signJWT(payload, secret, expiresIn) {
     } else {
       expSeconds = 900; // 15min default
     }
+  } else {
+    expSeconds = expiresIn || 900;
+  }
