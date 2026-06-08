@@ -122,3 +122,6 @@ function initAuth() {
       enterApp();
     } catch (e) {
       $('authError').textContent = e.message;
+      $('authError').classList.remove('hidden');
+    }
+  });
