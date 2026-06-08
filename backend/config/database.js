@@ -450,3 +450,7 @@ function runTransaction(fn) {
   } catch (e) {
     db.run('ROLLBACK');
     throw e;
+  }
+}
+
+function getConfig(key) {
