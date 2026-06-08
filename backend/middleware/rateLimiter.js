@@ -70,3 +70,7 @@ function createUserRateLimiter(config) {
     if (entries.length > max) {
       return res.status(429).json({
         error: 'Too many requests for this action',
+        code: 'USER_RATE_LIMIT_EXCEEDED',
+        retryAfter: Math.ceil(windowMs / 1000),
+      });
+    }
