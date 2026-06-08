@@ -342,3 +342,7 @@ function createSchema() {
 
   // ── Indexes ──────────────────────────────────────────────────────────────
   db.run(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_users_wallet ON users(wallet_address)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(refresh_token)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_assets_owner ON assets(owner_id)`);
