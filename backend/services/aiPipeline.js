@@ -230,3 +230,7 @@ function analyzeWithFallback(asset, documents, docInfo) {
     concerns: concerns.join('. '), confidence, source: 'fallback', raw: null,
   };
 }
+
+// ── Stage 4: Fraud Detection ─────────────────────────────────────────────────
+
+function checkFraudIndicators(asset, analysis, duplicateResult) {
