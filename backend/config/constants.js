@@ -58,3 +58,7 @@ module.exports = {
     ASSET_CLOSE: 'ASSET_CLOSE',
     TRADE: 'TRADE',
     REWARD: 'REWARD',
+  },
+
+  // ── Asset Status State Machine ─────────────────────────────────────────────
+  ASSET_STATUS: {
