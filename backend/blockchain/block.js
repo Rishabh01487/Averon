@@ -14,3 +14,6 @@ class Block {
     this.previousHash = previousHash;
     this.timestamp = timestamp;
     this.transactions = transactions;
+    this.nonce = 0;
+    this.difficulty = C.BLOCKCHAIN.DIFFICULTY;
+    this.miner = '';
