@@ -70,3 +70,7 @@ function validateChain(chain) {
     // Hash integrity
     const recalculated = currentBlock.calculateHash();
     if (currentBlock.hash !== recalculated) {
+      return { valid: false, error: 'Hash tampering detected', block: i };
+    }
+
+    // Difficulty
