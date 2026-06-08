@@ -378,3 +378,7 @@ function seedDefaults() {
 
   // Default system configs
   const defaults = [
+    ['trading_fee_percent', String(C.FEES.TRADING_FEE_PERCENT), 'Trading fee percentage'],
+    ['listing_fee_ac', String(C.FEES.LISTING_FEE_AC), 'Asset listing fee in AC'],
+    ['capital_raise_fee_percent', String(C.FEES.CAPITAL_RAISE_FEE_PERCENT), 'Capital raise fee percentage'],
+    ['circuit_breaker_enabled', 'true', 'Enable trading circuit breaker'],
