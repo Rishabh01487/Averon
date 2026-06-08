@@ -14,3 +14,7 @@ function adjustDifficulty(chain) {
   const interval = C.BLOCKCHAIN.DIFFICULTY_ADJUSTMENT_INTERVAL;
   const lastBlock = chain[chain.length - 1];
   const currentDifficulty = lastBlock.difficulty || C.BLOCKCHAIN.DIFFICULTY;
+
+  // Only adjust at interval boundaries
+  if (chain.length < interval || chain.length % interval !== 0) {
+    return currentDifficulty;
