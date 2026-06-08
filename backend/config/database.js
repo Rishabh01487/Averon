@@ -374,3 +374,7 @@ function seedDefaults() {
     run('INSERT INTO economy (id, price, updated_at) VALUES (1, ?, ?)', [C.PRICE.INITIAL_PRICE, Date.now()]);
     run('INSERT INTO price_history (price, high, low, open, close, recorded_at) VALUES (?, ?, ?, ?, ?, ?)',
       [C.PRICE.INITIAL_PRICE, C.PRICE.INITIAL_PRICE, C.PRICE.INITIAL_PRICE, C.PRICE.INITIAL_PRICE, C.PRICE.INITIAL_PRICE, Date.now()]);
+  }
+
+  // Default system configs
+  const defaults = [
