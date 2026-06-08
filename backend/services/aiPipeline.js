@@ -262,3 +262,10 @@ function checkFraudIndicators(asset, analysis, duplicateResult) {
 function calculateTokenization(raiseAmount, analysis) {
   const riskFactor = 1 + (analysis.riskScore || 50) / 200; // Higher risk = more tokens
   const idealPrice = Math.max(C.LIMITS.MIN_TOKEN_PRICE_INR, Math.min(C.LIMITS.MAX_TOKEN_PRICE_INR, raiseAmount / (15 * riskFactor)));
+  const suggestedTokens = Math.max(C.LIMITS.MIN_TOKEN_COUNT, Math.min(C.LIMITS.MAX_TOKEN_COUNT, Math.round(raiseAmount / idealPrice)));
+  const tokenPriceInr = parseFloat((raiseAmount / suggestedTokens).toFixed(2));
+
+  return { suggestedTokens, tokenPriceInr, idealPrice: parseFloat(idealPrice.toFixed(2)) };
+}
+
+module.exports = { analyzeAsset };
