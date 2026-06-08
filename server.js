@@ -422,3 +422,6 @@ app.get('/api/blockchain/block/:index', (req, res) => {
 
 app.get('/api/blockchain/tx/:hash', (req, res) => {
   const tx = blockchain.findTransaction(req.params.hash);
+  if (!tx) return res.status(404).json({ error: 'Transaction not found' });
+  res.json(tx);
+});
