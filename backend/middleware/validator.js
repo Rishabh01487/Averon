@@ -118,3 +118,7 @@ function validate(schemaName) {
         code: 'VALIDATION_ERROR',
         details: errors,
       });
+    }
+
+    next();
+  };
