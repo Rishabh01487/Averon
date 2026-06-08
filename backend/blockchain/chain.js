@@ -238,3 +238,7 @@ class Blockchain {
     if (index < 0 || index >= this.chain.length) return null;
     return this.chain[index];
   }
+
+  getBlockByHash(hash) {
+    return this.chain.find(b => b.hash === hash) || null;
+  }
