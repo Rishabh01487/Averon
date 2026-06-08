@@ -146,3 +146,7 @@ function getChainStats(chain) {
     latestTime: latest.timestamp,
     latestHash: latest.hash,
     currentDifficulty: latest.difficulty || C.BLOCKCHAIN.DIFFICULTY,
+    averageDifficulty: parseFloat(avgDifficulty.toFixed(2)),
+    averageBlockTime: avgBlockTime,
+    chainAge: Date.now() - genesis.timestamp,
+    totalSize: chain.reduce((s, b) => s + (b.size || 0), 0),
