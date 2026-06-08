@@ -78,3 +78,7 @@ class WalletManager {
 
   save() {
     const data = {};
+    for (const [userId, wallet] of Object.entries(this.wallets)) {
+      data[userId] = wallet.toJSON();
+    }
+    fs.writeFileSync(this.walletsPath, JSON.stringify(data, null, 2));
