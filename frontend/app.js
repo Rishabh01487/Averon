@@ -678,3 +678,7 @@ function initExplorer() {
     }
   });
 }
+
+// ── PORTFOLIO ────────────────────────────────────────────────────────────────
+
+async function loadPortfolio() {
