@@ -698,3 +698,7 @@ async function loadPortfolio() {
       if (!acc[t.asset_id]) acc[t.asset_id] = { title: t.asset_title, count: 0, value: 0, status: t.asset_status };
       acc[t.asset_id].count++;
       acc[t.asset_id].value += t.price;
+      return acc;
+    }, {})).map(([id, t]) => `
+      <div class="token-hold-card">
+        <div class="token-hold-title">${t.title}</div>
