@@ -62,3 +62,7 @@ async function analyzeAsset(asset, documents, dbModule) {
 
   // Stage 5: Tokenization recommendation
   const tokenRec = calculateTokenization(asset.raise_amount, analysis);
+  stages.push({ stage: 'Tokenization', ...tokenRec });
+
+  // Compile final result
+  const confidence = Math.max(0, Math.min(100, analysis.confidence - (stage4.fraudFlags?.length || 0) * 10));
