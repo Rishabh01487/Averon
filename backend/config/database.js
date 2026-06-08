@@ -242,3 +242,7 @@ function createSchema() {
     buyer_fee REAL DEFAULT 0,
     seller_fee REAL DEFAULT 0,
     tx_hash TEXT DEFAULT '',
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (buyer_id) REFERENCES users(id),
+    FOREIGN KEY (seller_id) REFERENCES users(id)
+  )`);
