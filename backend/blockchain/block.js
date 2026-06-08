@@ -86,3 +86,7 @@ class Block {
       }
       const ruleCheck = tx.validateRules();
       if (!ruleCheck.valid) {
+        errors.push({ txIndex: i, hash: tx.hash, errors: ruleCheck.errors });
+      }
+    }
+    return { valid: errors.length === 0, errors };
