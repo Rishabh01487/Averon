@@ -102,3 +102,7 @@ module.exports = {
     'Stocks & Shares',
     'Land & Real Estate',
     'Agricultural Goods',
+    'Shop Inventory',
+    'Equipment',
+    'Invoices & Bills',
+    'Vehicles',
