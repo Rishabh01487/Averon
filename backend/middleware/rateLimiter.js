@@ -54,3 +54,6 @@ function createRateLimiter(config) {
 // Per-user rate limiter (uses userId from auth instead of IP)
 function createUserRateLimiter(config) {
   const { windowMs, max } = config;
+
+  return (req, res, next) => {
+    if (!req.user) return next(); // Skip if no user (will be caught by auth middleware)
