@@ -126,3 +126,7 @@ body {
 .notif-bell { position: relative; cursor: pointer; font-size: 18px; }
 .notif-badge { position: absolute; top: -6px; right: -8px; font-size: 10px; background: var(--red); color: white; padding: 1px 5px; border-radius: 10px; }
 .notif-badge.hidden { display: none; }
+.user-menu { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+#userName { color: var(--text-secondary); }
+
+.hidden { display: none !important; }
