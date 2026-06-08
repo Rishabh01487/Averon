@@ -570,3 +570,7 @@ function initMarket() {
     const price = parseFloat($('orderPrice')?.value) || 0;
     $('orderTotal').textContent = (amt * price).toFixed(2);
   };
+  $('orderAmount')?.addEventListener('input', updateTotal);
+  $('orderPrice')?.addEventListener('input', updateTotal);
+
+  $('placeOrderBtn')?.addEventListener('click', async () => {
