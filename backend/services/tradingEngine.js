@@ -41,3 +41,8 @@ class TradingEngine {
       // Lock the coins (deduct from available balance)
       this.db.run('UPDATE users SET averon_balance = averon_balance - ? WHERE id = ?', [amount, userId]);
     }
+
+    // For market orders, use best available price
+    if (type === 'market') {
+      if (side === 'buy') {
+        const bestSell = this.db.queryOne('SELECT price FROM coin_orders WHERE status = "open" AND side = "sell" ORDER BY price ASC LIMIT 1');
