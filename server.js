@@ -206,3 +206,7 @@ app.get('/api/notifications', authenticate, (req, res) => {
   const unread = DB.queryOne('SELECT COUNT(*) as c FROM notifications WHERE user_id = ? AND is_read = 0', [req.user.userId])?.c || 0;
   res.json({ notifications: notifs, unread });
 });
+
+app.post('/api/notifications/read', authenticate, (req, res) => {
+  DB.run('UPDATE notifications SET is_read = 1 WHERE user_id = ?', [req.user.userId]);
+  res.json({ success: true });
