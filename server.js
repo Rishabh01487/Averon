@@ -202,3 +202,7 @@ app.get('/api/account', authenticate, (req, res) => {
 });
 
 app.get('/api/notifications', authenticate, (req, res) => {
+  const notifs = DB.query('SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 50', [req.user.userId]);
+  const unread = DB.queryOne('SELECT COUNT(*) as c FROM notifications WHERE user_id = ? AND is_read = 0', [req.user.userId])?.c || 0;
+  res.json({ notifications: notifs, unread });
+});
