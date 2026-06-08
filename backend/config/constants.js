@@ -2,3 +2,7 @@
 // AVERON SYSTEM CONSTANTS
 // Central configuration for the entire platform.
 // ══════════════════════════════════════════════════════════════════════════════
+
+module.exports = {
+  // ── Platform ───────────────────────────────────────────────────────────────
+  PLATFORM_NAME: 'Averon',
