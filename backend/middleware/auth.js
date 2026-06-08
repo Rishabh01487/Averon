@@ -70,3 +70,7 @@ function verifyJWT(token, secret) {
 }
 
 // ── Password Hashing (PBKDF2 — zero-dependency bcrypt alternative) ───────────
+// PBKDF2 with SHA-512, 100k iterations — OWASP recommended.
+
+const HASH_ITERATIONS = 100000;
+const HASH_KEYLEN = 64;
