@@ -510,3 +510,19 @@ function startTimers() {
   escrowService = new EscrowService(DB, blockchain, walletManager);
   assetService = new AssetService(DB, blockchain, walletManager, escrowService);
   tradingEngine = new TradingEngine(DB, blockchain, walletManager);
+
+  startTimers();
+
+  const PORT = process.env.PORT || 4200;
+  app.listen(PORT, () => {
+    const stats = DB.getDashboardStats();
+    console.log(`\n  ╔══════════════════════════════════════════════════╗`);
+    console.log(`  ║  AVERON v${C.PLATFORM_VERSION} — Enterprise Asset Tokenization   ║`);
+    console.log(`  ╚══════════════════════════════════════════════════╝`);
+    console.log(`  🌐 http://localhost:${PORT}`);
+    console.log(`  ⛓  ${blockchain.chain.length} blocks | Difficulty ${blockchain.difficulty}`);
+    console.log(`  💾 SQLite (WASM) | 🔑 ${systemWallet.address.substring(0, 16)}...`);
+    console.log(`  📊 ${stats.userCount} users | ${stats.assets.total} assets | ${(stats.totalSupply || 0).toFixed(0)} AC supply`);
+    console.log(`  🔒 JWT Auth | Rate Limiting | Tamper-proof Audit\n`);
+  });
+})();
