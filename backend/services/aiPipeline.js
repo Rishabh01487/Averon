@@ -186,3 +186,7 @@ Respond ONLY with this JSON (no markdown):
   let text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
   text = text.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
   const r = JSON.parse(text);
+
+  return {
+    verified: !!r.verified,
+    estimatedValue: r.estimated_value || asset.raise_amount,
