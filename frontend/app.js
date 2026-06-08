@@ -650,3 +650,7 @@ function initExplorer() {
     // Try as tx hash
     try {
       const tx = await api(`/api/blockchain/tx/${q}`);
+      $('explorerResult').classList.remove('hidden');
+      $('explorerResult').innerHTML = `
+        <h3>Transaction</h3>
+        <div style="font-size:13px;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
