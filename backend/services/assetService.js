@@ -290,3 +290,7 @@ class AssetService {
   }
 
   listAssets(filters = {}) {
+    let sql = 'SELECT * FROM assets WHERE 1=1';
+    const params = [];
+
+    if (filters.status) { sql += ' AND status = ?'; params.push(filters.status); }
