@@ -18,3 +18,7 @@ function adjustDifficulty(chain) {
   // Only adjust at interval boundaries
   if (chain.length < interval || chain.length % interval !== 0) {
     return currentDifficulty;
+  }
+
+  const startBlock = chain[chain.length - interval];
+  const endBlock = lastBlock;
