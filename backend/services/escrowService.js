@@ -133,3 +133,8 @@ class EscrowService {
       // Clear token ownership
       this.db.run('UPDATE asset_tokens SET owner_id = NULL, purchased_at = NULL, tx_hash = "" WHERE asset_id = ? AND owner_id = ?',
         [assetId, token.owner_id]);
+
+      this.db.run('INSERT INTO escrow_transactions (escrow_id, type, user_id, amount, tx_hash, created_at) VALUES (?,?,?,?,?,?)',
+        [escrow.id, 'REFUND', token.owner_id, refundAmount, refundTx.hash, Date.now()]);
+
+      // Notify
