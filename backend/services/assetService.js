@@ -130,3 +130,6 @@ class AssetService {
     if (!asset) throw new Error('Asset not found');
     if (asset.status !== C.ASSET_STATUS.ACTIVE && asset.status !== C.ASSET_STATUS.FUNDING) throw new Error('Asset not active');
     if (asset.owner_id === userId) throw new Error('Cannot buy own tokens');
+
+    const walletData = this.db.queryOne('SELECT * FROM wallets WHERE user_id = ?', [userId]);
+    if (!walletData) throw new Error('Wallet not found');
