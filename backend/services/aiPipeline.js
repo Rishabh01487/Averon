@@ -70,3 +70,7 @@ async function analyzeAsset(asset, documents, dbModule) {
 
   return {
     verified,
+    estimatedValue: analysis.estimatedValue,
+    riskScore: analysis.riskScore,
+    riskLevel: analysis.riskLevel,
+    confidence,
