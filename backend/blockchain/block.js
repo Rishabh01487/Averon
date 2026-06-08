@@ -82,3 +82,7 @@ class Block {
     for (let i = 0; i < this.transactions.length; i++) {
       const tx = this.transactions[i];
       if (!tx.isValid()) {
+        errors.push({ txIndex: i, hash: tx.hash, error: 'Invalid signature' });
+      }
+      const ruleCheck = tx.validateRules();
+      if (!ruleCheck.valid) {
