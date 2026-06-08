@@ -41,3 +41,8 @@ class EscrowService {
 
     this.db.run('INSERT INTO escrow_transactions (escrow_id, type, user_id, amount, tx_hash, created_at) VALUES (?,?,?,?,?,?)',
       [escrow.id, 'LOCK', userId, amount, txHash, Date.now()]);
+
+    this.db.run('UPDATE assets SET escrow_balance = ? WHERE id = ?', [newBalance, assetId]);
+
+    return { escrowId: escrow.id, newBalance, txHash };
+  }
