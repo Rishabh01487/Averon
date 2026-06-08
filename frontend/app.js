@@ -726,3 +726,7 @@ async function loadPortfolio() {
     $('myHistory').innerHTML = data.activity?.slice(0, 20).map(a => `
       <div class="tx-item">
         <span class="tx-action">${a.action}</span>
+        <span class="tx-details">${a.details || ''}</span>
+        <span class="tx-time">${timeAgo(a.created_at)}</span>
+      </div>`).join('') || '<div class="empty-state">No history yet</div>';
+  } catch {}
