@@ -306,3 +306,7 @@ app.post('/api/assets/:assetId/documents', authenticate, uploadLimiter, upload.a
 
 app.post('/api/assets/:id/analyze', authenticate, (req, res) => {
   const assetId = parseInt(req.params.id);
+  const asset = DB.queryOne('SELECT * FROM assets WHERE id = ? AND owner_id = ?', [assetId, req.user.userId]);
+  if (!asset) return res.status(404).json({ error: 'Asset not found or not owned' });
+
+  // Transition to analyzing
