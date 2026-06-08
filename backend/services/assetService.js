@@ -217,3 +217,8 @@ class AssetService {
     this.db.incrementEconomy('total_raised_inr', payoutResult.payout * currentPrice);
 
     this.transition(assetId, C.ASSET_STATUS.COMPLETED, 'system', 'Payout completed');
+
+    this.db.run('UPDATE assets SET payout_status = "paid", funded_at = ?, updated_at = ? WHERE id = ?',
+      [Date.now(), Date.now(), assetId]);
+
+    // Notify owner
