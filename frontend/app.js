@@ -442,3 +442,7 @@ function renderFileList() {
 window.removeFile = (i) => { state.selectedFiles.splice(i, 1); renderFileList(); };
 
 function setWizardStep(step) {
+  $$('.wizard-step').forEach((s, i) => {
+    s.classList.remove('active', 'done');
+    if (i + 1 < step) s.classList.add('done');
+    if (i + 1 === step) s.classList.add('active');
