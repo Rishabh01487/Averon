@@ -218,3 +218,7 @@ function initNav() {
 }
 
 function navigateTo(page) {
+  state.currentPage = page;
+  $$('.page').forEach(p => p.classList.remove('active'));
+  $$('.nav-link').forEach(l => l.classList.remove('active'));
+  const pageEl = $(`page-${page}`);
