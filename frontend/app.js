@@ -406,3 +406,7 @@ function initBuyPage() {
 // ── TOKENIZE WIZARD ──────────────────────────────────────────────────────────
 
 function initWizard() {
+  // Drop zone
+  const dropZone = $('dropZone');
+  const fileInput = $('fileInput');
+  if (!dropZone || !fileInput) return;
