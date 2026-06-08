@@ -34,3 +34,7 @@ module.exports = {
   BLOCKCHAIN: {
     DIFFICULTY: 2,
     DIFFICULTY_ADJUSTMENT_INTERVAL: 10,  // blocks
+    TARGET_BLOCK_TIME_MS: 30 * 1000,     // 30 seconds
+    MIN_DIFFICULTY: 1,
+    MAX_DIFFICULTY: 6,
+    MINING_REWARD: 0.1,
