@@ -174,3 +174,7 @@ class AssetService {
     this.db.run('UPDATE assets SET funded_amount = ?, updated_at = ? WHERE id = ?', [newFunded, Date.now(), assetId]);
 
     this.db.run('INSERT INTO activity_log (user_id, action, details, tx_hash, block_index, amount, created_at) VALUES (?,?,?,?,?,?,?)',
+      [userId, 'TOKEN_PURCHASE', `${count} token(s) of "${asset.title}"`, investTx.hash, block?.index || 0, totalCost, Date.now()]);
+
+    // Check if fully funded
+    const sold = this.db.queryOne('SELECT COUNT(*) as c FROM asset_tokens WHERE asset_id = ? AND owner_id IS NOT NULL', [assetId])?.c || 0;
