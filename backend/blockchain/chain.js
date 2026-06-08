@@ -186,3 +186,7 @@ class Blockchain {
   }
 
   /**
+   * Get all transactions for an address (full history).
+   */
+  getTransactionHistory(address, limit = 50) {
+    const txs = [];
