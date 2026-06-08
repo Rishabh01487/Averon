@@ -34,3 +34,7 @@ function logAudit(action, details = {}, options = {}) {
     details: JSON.stringify(details),
     ip_address: options.ip || '',
     user_agent: options.userAgent || '',
+    request_method: options.method || '',
+    request_path: options.path || '',
+    response_code: options.responseCode || 0,
+    created_at: Date.now(),
