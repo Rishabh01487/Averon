@@ -290,3 +290,6 @@ function drawPriceChart(prices) {
   grad.addColorStop(1, 'rgba(99, 102, 241, 0)');
   ctx.fillStyle = grad;
   ctx.fill();
+}
+
+// ── ASSETS ───────────────────────────────────────────────────────────────────
