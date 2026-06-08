@@ -94,3 +94,7 @@ class Blockchain {
     // Check for duplicate
     const exists = this.pendingTransactions.find(tx => tx.hash === transaction.hash);
     if (exists) {
+      throw new Error('Duplicate transaction');
+    }
+
+    // Check if already in a block
