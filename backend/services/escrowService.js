@@ -118,3 +118,6 @@ class EscrowService {
 
     for (const token of tokens) {
       const wallet = this.db.queryOne('SELECT address FROM wallets WHERE user_id = ?', [token.owner_id]);
+      if (!wallet) continue;
+
+      const refundAmount = parseFloat(token.total.toFixed(8));
