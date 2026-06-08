@@ -534,3 +534,7 @@ async function confirmLaunch() {
     $('launchResult').classList.remove('hidden');
     $('launchResult').innerHTML = `
       <h3>🚀 Asset Live on Blockchain!</h3>
+      <p>${result.tokenCount} tokens created at ${result.tokenPriceAC?.toFixed(4)} AC each</p>
+      <p style="font-family:var(--mono);font-size:12px;margin-top:8px">TX: ${result.txHash?.substring(0,32)}... · Block #${result.blockIndex}</p>
+      <button class="btn-primary" style="margin-top:16px" onclick="viewAsset(${state.currentAssetId}); navigateTo('assets')">View Asset →</button>`;
+    toast('Asset launched successfully!', 'success');
