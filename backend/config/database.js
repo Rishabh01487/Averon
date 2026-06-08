@@ -46,3 +46,7 @@ function createSchema() {
   // ── Users & Auth ─────────────────────────────────────────────────────────
   db.run(`CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
+    email TEXT UNIQUE,
+    password_hash TEXT,
+    name TEXT NOT NULL,
+    organization TEXT DEFAULT '',
