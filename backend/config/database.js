@@ -290,3 +290,7 @@ function createSchema() {
 
   // ── Notifications ────────────────────────────────────────────────────────
   db.run(`CREATE TABLE IF NOT EXISTS notifications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,
+    type TEXT NOT NULL,
+    title TEXT NOT NULL,
