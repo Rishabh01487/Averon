@@ -242,3 +242,7 @@ body {
 .market-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
 .market-panel h2 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
 .order-book { font-family: var(--mono); font-size: 12px; }
+.ob-header { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-weight: 600; color: var(--text-muted); }
+.ob-side { max-height: 200px; overflow-y: auto; }
+.ob-row { display: flex; justify-content: space-between; padding: 4px 0; position: relative; }
+.ob-sells .ob-row { color: var(--red); }
