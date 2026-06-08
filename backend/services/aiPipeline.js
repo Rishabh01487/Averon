@@ -245,3 +245,7 @@ function checkFraudIndicators(asset, analysis, duplicateResult) {
   if (asset.raise_amount > (analysis.estimatedValue || 0) * 2) {
     flags.push('Raise amount is more than 2x estimated value');
   }
+
+  if (analysis.confidence < C.AI.FRAUD_ALERT_THRESHOLD) {
+    flags.push(`Very low AI confidence (${analysis.confidence}%)`);
+  }
