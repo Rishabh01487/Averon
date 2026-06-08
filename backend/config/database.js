@@ -461,3 +461,8 @@ function getConfig(key) {
 function setConfig(key, value, updatedBy = 'system') {
   run('UPDATE system_config SET value = ?, updated_by = ?, updated_at = ? WHERE key = ?', [String(value), updatedBy, Date.now(), key]);
 }
+
+// ── ECONOMY HELPERS ──────────────────────────────────────────────────────────
+
+function getPrice() {
+  return queryOne('SELECT price FROM economy WHERE id = 1')?.price || C.PRICE.INITIAL_PRICE;
