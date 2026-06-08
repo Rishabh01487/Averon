@@ -102,3 +102,7 @@ class Blockchain {
       if (block.transactions.find(tx => tx.hash === transaction.hash)) {
         throw new Error('Transaction already confirmed');
       }
+    }
+
+    this.pendingTransactions.push(transaction);
+    return transaction;
