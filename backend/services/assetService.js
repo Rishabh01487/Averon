@@ -206,3 +206,7 @@ class AssetService {
     this.blockchain.minePendingTransactions(this.walletManager.getSystemWallet().address);
 
     // Boost coin price
+    const currentPrice = this.db.getPrice();
+    const asset = this.db.queryOne('SELECT * FROM assets WHERE id = ?', [assetId]);
+    const boost = Math.min(C.PRICE.FUNDED_ASSET_BOOST_MAX,
+      C.PRICE.FUNDED_ASSET_BOOST_MIN + (asset.raise_amount / 1000000) * 0.03);
