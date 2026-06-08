@@ -118,3 +118,7 @@ function processDocuments(documents) {
 
 function detectDuplicates(documents, dbModule) {
   const duplicates = [];
+
+  if (dbModule) {
+    for (const doc of documents) {
+      if (!doc.path && !doc.filepath) continue;
