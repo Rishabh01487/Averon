@@ -102,3 +102,7 @@ app.post('/api/auth/register', authLimiter, validate('register'), async (req, re
   // Determine role (first user = admin)
   const userCount = DB.queryOne('SELECT COUNT(*) as c FROM users')?.c || 0;
   const role = userCount === 0 ? C.ROLES.ADMIN : C.ROLES.USER;
+
+  const now = Date.now();
+  DB.run(
+    'INSERT INTO users (id, email, password_hash, name, organization, role, wallet_address, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?)',
