@@ -154,3 +154,7 @@ class Blockchain {
 
     // Remove mined transactions from pending pool
     const minedHashes = new Set(txsToMine.map(tx => tx.hash));
+    this.pendingTransactions = this.pendingTransactions.filter(tx => !minedHashes.has(tx.hash));
+
+    // Adjust difficulty
+    this.difficulty = adjustDifficulty(this.chain);
