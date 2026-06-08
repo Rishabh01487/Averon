@@ -74,3 +74,7 @@ function validateChain(chain) {
     }
 
     // Difficulty
+    const target = '0'.repeat(currentBlock.difficulty);
+    if (!currentBlock.hash.startsWith(target)) {
+      return { valid: false, error: 'Hash does not meet difficulty requirement', block: i };
+    }
