@@ -466,3 +466,7 @@ function setConfig(key, value, updatedBy = 'system') {
 
 function getPrice() {
   return queryOne('SELECT price FROM economy WHERE id = 1')?.price || C.PRICE.INITIAL_PRICE;
+}
+
+function setPrice(newPrice) {
+  newPrice = Math.max(C.PRICE.MIN_PRICE, Math.min(C.PRICE.MAX_PRICE, newPrice));
