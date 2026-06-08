@@ -10,3 +10,7 @@ class EventBus {
   on(event, callback) {
     if (!this.listeners.has(event)) this.listeners.set(event, []);
     this.listeners.get(event).push(callback);
+    return () => this.off(event, callback);
+  }
+
+  off(event, callback) {
