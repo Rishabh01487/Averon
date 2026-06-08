@@ -262,3 +262,7 @@ class Blockchain {
   }
 
   // ── Info / Stats ───────────────────────────────────────────────────────────
+
+  getInfo() {
+    const stats = getChainStats(this.chain);
+    return {
