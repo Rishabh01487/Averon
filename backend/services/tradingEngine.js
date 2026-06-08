@@ -161,3 +161,8 @@ class TradingEngine {
 
     return trades;
   }
+
+  // ── Cancel Order ─────────────────────────────────────────────────────────
+
+  cancelOrder(orderId, userId) {
+    const order = this.db.queryOne('SELECT * FROM coin_orders WHERE id = ? AND user_id = ? AND status = "open"', [orderId, userId]);
