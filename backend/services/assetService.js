@@ -158,3 +158,7 @@ class AssetService {
     }
 
     // Lock in escrow
+    this.escrow.lockFunds(assetId, userId, totalCost, investTx.hash);
+
+    // Update balance
+    const newBalance = this.blockchain.getBalance(walletData.address);
