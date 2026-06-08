@@ -734,3 +734,7 @@ async function loadPortfolio() {
 
 window.cancelOrder = async (id) => {
   try {
+    await api(`/api/market/order/${id}`, { method: 'DELETE', body: JSON.stringify({}) });
+    toast('Order cancelled', 'success');
+    loadPortfolio();
+  } catch {}
