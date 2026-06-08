@@ -94,3 +94,7 @@ class EscrowService {
 
     this.db.run('INSERT INTO escrow_transactions (escrow_id, type, user_id, amount, tx_hash, created_at) VALUES (?,?,?,?,?,?)',
       [escrow.id, 'RELEASE', asset.owner_id, payout, payoutTx.hash, Date.now()]);
+
+    // Update asset
+    this.db.run('UPDATE assets SET payout_status = "processing", payout_amount_inr = ?, payout_tx_hash = ?, escrow_balance = 0 WHERE id = ?',
+      [payout * this.db.getPrice(), payoutTx.hash, assetId]);
