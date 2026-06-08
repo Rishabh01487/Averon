@@ -154,3 +154,6 @@ class Block {
     // Transaction validation
     const txValidation = this.validateTransactions();
     if (!txValidation.valid) errors.push(...txValidation.errors.map(e => `TX ${e.txIndex}: ${e.error || e.errors?.join(', ')}`));
+
+    // Block size
+    if (this.size > C.BLOCKCHAIN.MAX_BLOCK_SIZE_BYTES) errors.push('Block exceeds maximum size');
