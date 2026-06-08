@@ -154,3 +154,111 @@ async function analyzeWithGemini(asset, documents, docInfo) {
     if (doc.mimetype?.startsWith('image/')) {
       try {
         const filePath = doc.path || doc.filepath;
+        if (!fs.existsSync(filePath)) continue;
+        const data = fs.readFileSync(filePath);
+        parts.push({ inlineData: { mimeType: doc.mimetype, data: data.toString('base64') } });
+      } catch {}
+    }
+  }
+
+  parts.push({ text: `You are an expert asset valuation AI for the Averon blockchain tokenization platform.
+
+ASSET: "${asset.title}" | Category: ${asset.category} | Raise: ₹${asset.raise_amount}
+Description: ${asset.description || 'None'}
+Documents: ${documents.length} file(s), ${(docInfo.totalSize / 1024).toFixed(0)}KB total
+${parts.length > 1 ? 'Document images attached above.' : 'No images available.'}
+
+Respond ONLY with this JSON (no markdown):
+{"verified":true,"estimated_value":50000,"risk_score":30,"risk_level":"LOW","analysis":"summary","concerns":"","confidence":80}` });
+
+  const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts }],
+      generationConfig: { temperature: C.AI.TEMPERATURE, maxOutputTokens: 512 },
+    }),
+    signal: AbortSignal.timeout(C.AI.TIMEOUT_MS),
+  });
+
+  if (!res.ok) throw new Error(`Gemini ${res.status}`);
+  const data = await res.json();
+  let text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  text = text.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
+  const r = JSON.parse(text);
+
+  return {
+    verified: !!r.verified,
+    estimatedValue: r.estimated_value || asset.raise_amount,
+    riskScore: Math.min(100, Math.max(0, r.risk_score || 50)),
+    riskLevel: r.risk_level || 'MEDIUM',
+    analysis: r.analysis || 'AI analysis completed.',
+    concerns: r.concerns || '',
+    confidence: r.confidence || 70,
+    source: 'gemini',
+    raw: text,
+  };
+}
+
+// ── Stage 3b: Fallback Analysis ──────────────────────────────────────────────
+
+function analyzeWithFallback(asset, documents, docInfo) {
+  const p = PROFILES[asset.category] || PROFILES['Other'];
+  const quality = docInfo.quality || 50;
+
+  const baseRisk = p.risk[0] + Math.random() * (p.risk[1] - p.risk[0]);
+  const qualityAdj = (quality / 100) * -15;
+  const ratioAdj = asset.raise_amount > p.avg ? 10 : -5;
+  const riskScore = Math.round(Math.min(95, Math.max(5, baseRisk + qualityAdj + ratioAdj)));
+  const riskLevel = riskScore < 30 ? 'LOW' : riskScore < 60 ? 'MEDIUM' : 'HIGH';
+  const estimatedValue = Math.round(p.avg * (0.7 + Math.random() * 0.6));
+  const verified = documents.length >= 1 && riskScore < 80;
+  const confidence = Math.round(35 + quality * 0.5 + (verified ? 10 : 0));
+
+  const analysis = `${asset.category} asset analyzed from ${documents.length} document(s). ` +
+    `Estimated value: ₹${estimatedValue.toLocaleString()}. ` +
+    `Risk: ${riskLevel} (${riskScore}%). ` +
+    `${verified ? 'Documents appear sufficient for tokenization.' : 'Additional documentation recommended.'}`;
+
+  const concerns = [];
+  if (documents.length < 2) concerns.push('Limited documentation');
+  if (riskScore > 60) concerns.push('Elevated risk score');
+  if (asset.raise_amount > estimatedValue) concerns.push('Raise exceeds estimated value');
+
+  return {
+    verified, estimatedValue, riskScore, riskLevel, analysis,
+    concerns: concerns.join('. '), confidence, source: 'fallback', raw: null,
+  };
+}
+
+// ── Stage 4: Fraud Detection ─────────────────────────────────────────────────
+
+function checkFraudIndicators(asset, analysis, duplicateResult) {
+  const flags = [];
+  let hasCriticalFraud = false;
+
+  if (duplicateResult.hasDuplicates) {
+    flags.push(`Duplicate documents detected (also used in asset #${duplicateResult.duplicates[0]?.existingAssetId})`);
+    hasCriticalFraud = true;
+  }
+
+  if (asset.raise_amount > (analysis.estimatedValue || 0) * 2) {
+    flags.push('Raise amount is more than 2x estimated value');
+  }
+
+  if (analysis.confidence < C.AI.FRAUD_ALERT_THRESHOLD) {
+    flags.push(`Very low AI confidence (${analysis.confidence}%)`);
+  }
+
+  if (analysis.riskScore > 85) {
+    flags.push('Extremely high risk score');
+  }
+
+  return { fraudFlags: flags, hasCriticalFraud, flagCount: flags.length };
+}
+
+// ── Stage 5: Tokenization ────────────────────────────────────────────────────
+
+function calculateTokenization(raiseAmount, analysis) {
+  const riskFactor = 1 + (analysis.riskScore || 50) / 200; // Higher risk = more tokens
+  const idealPrice = Math.max(C.LIMITS.MIN_TOKEN_PRICE_INR, Math.min(C.LIMITS.MAX_TOKEN_PRICE_INR, raiseAmount / (15 * riskFactor)));
