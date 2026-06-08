@@ -186,3 +186,7 @@ function populateCategories() {
   const sel = $('assetCategory');
   const filter = $('assetFilterCategory');
   for (const cat of state.categories) {
+    sel.innerHTML += `<option value="${cat}">${cat}</option>`;
+    filter.innerHTML += `<option value="${cat}">${cat}</option>`;
+  }
+}
