@@ -321,3 +321,8 @@ app.post('/api/assets/:id/analyze', authenticate, (req, res) => {
         docs.map(d => ({ ...d, path: d.filepath })),
         DB
       );
+
+      const newStatus = result.verified ? C.ASSET_STATUS.VERIFIED : C.ASSET_STATUS.REJECTED;
+      DB.run(`UPDATE assets SET ai_verified=?, ai_valuation=?, ai_risk_score=?, ai_risk_level=?, ai_confidence=?, ai_analysis_summary=?, ai_concerns=?, ai_raw_response=?, ai_analyzed_at=?, total_value=?, status=?, updated_at=? WHERE id=?`,
+        [result.verified ? 1 : 0, result.estimatedValue, result.riskScore, result.riskLevel, result.confidence,
+         result.analysis, result.concerns, result.raw || '', Date.now(), result.estimatedValue, newStatus, Date.now(), assetId]);
