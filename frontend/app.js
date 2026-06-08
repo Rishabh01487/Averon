@@ -342,3 +342,7 @@ async function viewAsset(id) {
           </div>
           ${a.ai_analysis_summary ? `
           <div style="margin-top:16px;padding:16px;background:var(--bg-input);border-radius:var(--radius-sm)">
+            <strong>AI Analysis:</strong> ${a.ai_analysis_summary}<br>
+            <strong>Risk:</strong> ${a.ai_risk_level} (${a.ai_risk_score}%) · <strong>Confidence:</strong> ${a.ai_confidence}%
+          </div>` : ''}
+          ${a.status === 'active' || a.status === 'funding' ? `
