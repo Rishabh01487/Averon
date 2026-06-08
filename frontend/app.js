@@ -446,3 +446,7 @@ function setWizardStep(step) {
     s.classList.remove('active', 'done');
     if (i + 1 < step) s.classList.add('done');
     if (i + 1 === step) s.classList.add('active');
+  });
+  $$('.wiz-panel').forEach(p => p.classList.remove('active'));
+  $(`wizStep${step}`)?.classList.add('active');
+}
