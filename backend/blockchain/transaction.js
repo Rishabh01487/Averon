@@ -42,3 +42,7 @@ class Transaction {
    * Sign this transaction with an ECDSA private key.
    */
   sign(privateKeyPem) {
+    if (this.from === 'SYSTEM') return; // System transactions don't need signing
+
+    const sign = crypto.createSign('SHA256');
+    sign.update(this.hash);
