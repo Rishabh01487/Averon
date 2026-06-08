@@ -69,3 +69,7 @@ class Block {
     const miningTime = Date.now() - startTime;
     return { hash: this.hash, nonce: this.nonce, time: miningTime };
   }
+
+  calculateSize() {
+    return Buffer.byteLength(JSON.stringify(this.toJSON()), 'utf8');
+  }
