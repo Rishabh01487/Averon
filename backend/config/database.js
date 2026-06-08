@@ -418,3 +418,6 @@ function query(sql, params = []) {
     return results;
   } catch (e) {
     console.error('SQL Query Error:', e.message, '\n  SQL:', sql, '\n  Params:', params);
+    return [];
+  }
+}
