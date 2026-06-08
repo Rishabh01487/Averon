@@ -134,3 +134,7 @@ class Blockchain {
     newBlock.difficulty = this.difficulty;
 
     // Mine it
+    const mineResult = newBlock.mine(this.difficulty);
+
+    // Mark transactions as confirmed
+    for (const tx of txsToMine) {
