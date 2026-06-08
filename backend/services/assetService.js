@@ -18,3 +18,7 @@ class AssetService {
   canTransition(currentStatus, newStatus) {
     const allowed = C.ASSET_TRANSITIONS[currentStatus];
     return allowed ? allowed.includes(newStatus) : false;
+  }
+
+  transition(assetId, newStatus, changedBy = '', reason = '') {
+    const asset = this.db.queryOne('SELECT * FROM assets WHERE id = ?', [assetId]);
