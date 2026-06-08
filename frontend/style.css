@@ -206,3 +206,7 @@ body {
 /* ═══ TOKENIZE WIZARD ═══ */
 .wizard-container { max-width: 700px; margin: 0 auto; }
 .wizard-steps { display: flex; gap: 4px; margin-bottom: 32px; }
+.wizard-step { flex: 1; display: flex; align-items: center; gap: 8px; padding: 14px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; color: var(--text-muted); transition: var(--transition); }
+.wizard-step.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.wizard-step.done { border-color: var(--green); color: var(--green); }
+.step-num { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: var(--border); border-radius: 50%; font-size: 12px; font-weight: 700; }
