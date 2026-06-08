@@ -138,3 +138,6 @@ class Block {
    */
   validate(previousBlock) {
     const errors = [];
+
+    // Hash validation
+    if (!this.validateHash()) errors.push('Invalid hash or does not meet difficulty');
