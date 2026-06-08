@@ -101,3 +101,8 @@ class EscrowService {
 
     return { payout, fee, txHash: payoutTx.hash };
   }
+
+  /**
+   * Refund all investors (when asset expires unfunded).
+   */
+  refundAll(assetId) {
