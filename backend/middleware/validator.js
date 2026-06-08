@@ -106,3 +106,7 @@ function validate(schemaName) {
           break; // Stop checking this field
         }
         if (value !== undefined && typeof rule === 'function' && !rule(value)) {
+          errors.push({ field, message: msg });
+          break;
+        }
+      }
