@@ -318,3 +318,7 @@ function createSchema() {
     entry_hash TEXT NOT NULL,
     created_at INTEGER NOT NULL
   )`);
+
+  // ── System Config ────────────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS system_config (
+    key TEXT PRIMARY KEY,
