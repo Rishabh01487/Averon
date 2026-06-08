@@ -18,3 +18,7 @@ module.exports = {
     MAX_LOGIN_ATTEMPTS: 5,
     LOCKOUT_DURATION_MS: 15 * 60 * 1000, // 15 minutes
     PASSWORD_MIN_LENGTH: 8,
+    SESSION_CLEANUP_INTERVAL_MS: 60 * 60 * 1000, // 1 hour
+  },
+
+  // ── Rate Limiting ──────────────────────────────────────────────────────────
