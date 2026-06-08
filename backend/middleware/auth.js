@@ -26,3 +26,7 @@ function signJWT(payload, secret, expiresIn) {
 
   let expSeconds;
   if (typeof expiresIn === 'string') {
+    const match = expiresIn.match(/^(\d+)(m|h|d)$/);
+    if (match) {
+      const val = parseInt(match[1]);
+      const unit = match[2];
