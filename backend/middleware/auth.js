@@ -14,3 +14,7 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || crypto.randomBytes(
 
 function base64url(str) {
   return Buffer.from(str).toString('base64url');
+}
+
+function base64urlDecode(str) {
+  return Buffer.from(str, 'base64url').toString('utf8');
