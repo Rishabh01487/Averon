@@ -426,3 +426,7 @@ function queryOne(sql, params = []) {
   const results = query(sql, params);
   return results.length > 0 ? results[0] : null;
 }
+
+function run(sql, params = []) {
+  if (!db) return { changes: 0, lastId: 0 };
+  try {
