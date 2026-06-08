@@ -538,3 +538,7 @@ async function confirmLaunch() {
       <p style="font-family:var(--mono);font-size:12px;margin-top:8px">TX: ${result.txHash?.substring(0,32)}... · Block #${result.blockIndex}</p>
       <button class="btn-primary" style="margin-top:16px" onclick="viewAsset(${state.currentAssetId}); navigateTo('assets')">View Asset →</button>`;
     toast('Asset launched successfully!', 'success');
+  } catch {} finally { $('confirmLaunchBtn').disabled = false; }
+}
+
+// ── MARKETPLACE ──────────────────────────────────────────────────────────────
