@@ -238,3 +238,7 @@ class AssetService {
 
     for (const asset of active) {
       if (asset.deadline && now > asset.deadline) {
+        const sold = this.db.queryOne('SELECT COUNT(*) as c FROM asset_tokens WHERE asset_id = ? AND owner_id IS NOT NULL', [asset.id])?.c || 0;
+
+        if (sold >= asset.token_count) {
+          this.processFullyFunded(asset.id);
