@@ -134,3 +134,7 @@ function inferAction(method, path) {
   if (path.includes('/market/order') && method === 'DELETE') return 'ORDER_CANCELLED';
   if (path.includes('/admin')) return 'ADMIN_ACTION';
   return null; // Don't log unknown actions
+}
+
+/**
+ * Sanitize request body for audit (remove sensitive data).
