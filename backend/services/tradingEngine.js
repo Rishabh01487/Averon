@@ -125,3 +125,8 @@ class TradingEngine {
             [buy.user_id, 'trading', buyerFee, String(tradeTx.hash), 'trade', Date.now()]);
           this.db.incrementEconomy('total_fees_collected', buyerFee + sellerFee);
         }
+
+        // Update orders
+        const newBuyFilled = buy.filled + tradeAmount;
+        const newBuyRemaining = buy.remaining - tradeAmount;
+        this.db.run('UPDATE coin_orders SET filled = ?, remaining = ?, status = ?, updated_at = ? WHERE id = ?',
