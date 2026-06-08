@@ -18,3 +18,7 @@ const { hashPassword, verifyPassword, generateTokens, verifyAccessToken, verifyR
 const { generalLimiter, authLimiter, financialLimiter, uploadLimiter } = require('./backend/middleware/rateLimiter');
 const { validate, sanitizeBody } = require('./backend/middleware/validator');
 const { initAudit, logAudit, auditMiddleware, verifyAuditChain } = require('./backend/middleware/audit');
+
+// ── Blockchain ───────────────────────────────────────────────────────────────
+const { Blockchain, Transaction } = require('./backend/blockchain/chain');
+const { WalletManager } = require('./backend/blockchain/wallet');
