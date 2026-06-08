@@ -606,3 +606,7 @@ async function loadExplorer() {
           <span class="block-tx-count">${b.transactionCount} txs</span>
           <span>Nonce: ${b.nonce}</span>
           <span>${timeAgo(b.timestamp)}</span>
+        </div>
+      </div>`).join('');
+  } catch {}
+}
