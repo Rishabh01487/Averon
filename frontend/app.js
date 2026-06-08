@@ -658,3 +658,7 @@ function initExplorer() {
           <div><strong>Amount:</strong> ${tx.amount} AC</div>
           <div><strong>From:</strong> <span style="font-family:var(--mono);font-size:11px">${tx.from}</span></div>
           <div><strong>To:</strong> <span style="font-family:var(--mono);font-size:11px">${tx.to}</span></div>
+          <div><strong>Status:</strong> ${tx.status}</div>
+          <div><strong>Block:</strong> #${tx.blockIndex}</div>
+          <div><strong>Confirmations:</strong> ${tx.confirmations}</div>
+          <div><strong>Hash:</strong> <span style="font-family:var(--mono);font-size:11px">${tx.hash}</span></div>
