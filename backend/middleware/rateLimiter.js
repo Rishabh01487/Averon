@@ -38,3 +38,7 @@ function createRateLimiter(config) {
     if (entries.length > max) {
       const retryAfter = Math.ceil(windowMs / 1000);
       res.set('Retry-After', retryAfter);
+      return res.status(429).json({
+        error: 'Too many requests',
+        code: 'RATE_LIMIT_EXCEEDED',
+        retryAfter,
