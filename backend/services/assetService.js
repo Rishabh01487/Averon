@@ -266,3 +266,7 @@ class AssetService {
 
   getAsset(assetId) {
     const asset = this.db.queryOne('SELECT * FROM assets WHERE id = ?', [assetId]);
+    if (!asset) return null;
+
+    const docs = this.db.query('SELECT * FROM asset_documents WHERE asset_id = ?', [asset.id]);
+    const tokens = this.db.query('SELECT * FROM asset_tokens WHERE asset_id = ? ORDER BY token_index', [asset.id]);
