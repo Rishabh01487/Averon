@@ -430,3 +430,6 @@ app.get('/api/blockchain/validate', (req, res) => res.json(blockchain.isChainVal
 
 app.get('/api/blockchain/address/:address', (req, res) => {
   const balance = blockchain.getBalance(req.params.address);
+  const history = blockchain.getTransactionHistory(req.params.address);
+  res.json({ address: req.params.address, balance, transactions: history });
+});
