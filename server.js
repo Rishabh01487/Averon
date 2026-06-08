@@ -94,3 +94,7 @@ app.post('/api/auth/register', authLimiter, validate('register'), async (req, re
   if (existing) return res.status(409).json({ error: 'Email already registered', code: 'EMAIL_EXISTS' });
 
   const userId = 'usr_' + crypto.randomBytes(8).toString('hex');
+  const passwordHash = await hashPassword(password);
+
+  // Create wallet
+  const wallet = walletManager.createWallet(userId);
