@@ -18,3 +18,7 @@ const PROFILES = {
   'Shop Inventory':     { avg: 30000, risk: [30,60] },
   'Equipment':          { avg: 40000, risk: [20,50] },
   'Invoices & Bills':   { avg: 15000, risk: [20,45] },
+  'Vehicles':           { avg: 100000, risk: [15,40] },
+  'Precious Metals':    { avg: 80000, risk: [10,30] },
+  'Commodities':        { avg: 25000, risk: [20,50] },
+  'Infrastructure':     { avg: 1000000, risk: [15,40] },
