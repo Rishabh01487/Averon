@@ -157,3 +157,8 @@ class Block {
 
     // Block size
     if (this.size > C.BLOCKCHAIN.MAX_BLOCK_SIZE_BYTES) errors.push('Block exceeds maximum size');
+
+    // Transaction count
+    if (this.transactions.length > C.BLOCKCHAIN.MAX_TRANSACTIONS_PER_BLOCK) errors.push('Too many transactions');
+
+    return { valid: errors.length === 0, errors };
