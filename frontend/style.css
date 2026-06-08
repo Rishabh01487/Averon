@@ -78,3 +78,7 @@ body {
 
 /* ═══ FORM ELEMENTS ═══ */
 .field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); }
+.field input, .field select, .field textarea {
+  padding: 12px 14px; background: var(--bg-input); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text-primary); font-size: 14px; font-family: var(--font);
