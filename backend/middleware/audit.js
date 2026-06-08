@@ -130,3 +130,7 @@ function inferAction(method, path) {
     if (path.includes('/tokens/buy')) return 'TOKEN_PURCHASED';
     return 'ASSET_CREATED';
   }
+  if (path.includes('/market/sell') || path.includes('/market/buy')) return 'ORDER_PLACED';
+  if (path.includes('/market/order') && method === 'DELETE') return 'ORDER_CANCELLED';
+  if (path.includes('/admin')) return 'ADMIN_ACTION';
+  return null; // Don't log unknown actions
