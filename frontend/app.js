@@ -86,3 +86,7 @@ function loadSession() {
 function logout() {
   state.user = null;
   state.accessToken = null;
+  state.refreshToken = null;
+  localStorage.removeItem('averon_session');
+  $('authOverlay').classList.remove('hidden');
+  $('mainApp').classList.add('hidden');
