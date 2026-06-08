@@ -754,3 +754,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initWizard();
   initMarket();
   initExplorer();
+
+  if (loadSession()) {
+    enterApp();
+  }
