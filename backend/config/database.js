@@ -170,3 +170,7 @@ function createSchema() {
     source TEXT DEFAULT 'ai',
     details TEXT DEFAULT '{}',
     created_at INTEGER NOT NULL,
+    FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE CASCADE
+  )`);
+
+  // ── Tokens ───────────────────────────────────────────────────────────────
