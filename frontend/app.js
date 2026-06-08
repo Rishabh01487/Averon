@@ -326,3 +326,7 @@ async function viewAsset(id) {
     // Show in a modal-like explorer result on the assets page
     const grid = $('assetGrid');
     grid.innerHTML = `
+      <div style="grid-column: 1/-1">
+        <button class="btn-ghost" onclick="loadAssets()">← Back to Assets</button>
+        <div class="asset-card" style="margin-top:12px;cursor:default">
+          <div class="asset-card-header">
