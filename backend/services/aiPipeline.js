@@ -58,3 +58,7 @@ async function analyzeAsset(asset, documents, dbModule) {
 
   // Stage 4: Fraud checks
   const stage4 = checkFraudIndicators(asset, analysis, stage2);
+  stages.push({ stage: 'Fraud Check', ...stage4 });
+
+  // Stage 5: Tokenization recommendation
+  const tokenRec = calculateTokenization(asset.raise_amount, analysis);
