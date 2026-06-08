@@ -170,3 +170,7 @@ class Block {
       index: this.index,
       previousHash: this.previousHash,
       timestamp: this.timestamp,
+      merkleRoot: this.merkleRoot,
+      hash: this.hash,
+      nonce: this.nonce,
+      difficulty: this.difficulty,
