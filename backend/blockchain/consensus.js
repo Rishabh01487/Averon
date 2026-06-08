@@ -142,3 +142,7 @@ function getChainStats(chain) {
   return {
     blocks: chain.length,
     transactions: totalTxs,
+    genesisTime: genesis.timestamp,
+    latestTime: latest.timestamp,
+    latestHash: latest.hash,
+    currentDifficulty: latest.difficulty || C.BLOCKCHAIN.DIFFICULTY,
