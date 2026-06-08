@@ -113,3 +113,8 @@ function processDocuments(documents) {
 
   return result;
 }
+
+// ── Stage 2: Duplicate Detection ─────────────────────────────────────────────
+
+function detectDuplicates(documents, dbModule) {
+  const duplicates = [];
