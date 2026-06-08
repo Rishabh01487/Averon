@@ -265,3 +265,8 @@ app.get('/api/assets/:id', optionalAuth, (req, res) => {
   if (!asset) return res.status(404).json({ error: 'Asset not found' });
   res.json(asset);
 });
+
+app.post('/api/assets/create', authenticate, validate('createAsset'), (req, res) => {
+  try {
+    const result = assetService.createAsset(req.user.userId, req.body);
+    eventBus.emit(EVENTS.ASSET_CREATED, result);
