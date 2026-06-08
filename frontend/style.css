@@ -226,3 +226,7 @@ body {
 .ai-progress { text-align: center; padding: 32px; }
 .ai-spinner { width: 48px; height: 48px; border: 3px solid var(--border); border-top: 3px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
 @keyframes spin { to { transform: rotate(360deg); } }
+.ai-result { margin-top: 24px; padding: 24px; border-radius: var(--radius); border: 1px solid var(--border); }
+.ai-result.verified { background: var(--green-dim); border-color: rgba(16,185,129,0.3); }
+.ai-result.rejected { background: var(--red-dim); border-color: rgba(239,68,68,0.3); }
+.ai-stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
