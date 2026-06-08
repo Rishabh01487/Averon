@@ -74,3 +74,7 @@ async function analyzeAsset(asset, documents, dbModule) {
     riskScore: analysis.riskScore,
     riskLevel: analysis.riskLevel,
     confidence,
+    analysis: analysis.analysis,
+    concerns: [analysis.concerns, ...(stage4.fraudFlags || [])].filter(Boolean).join('. '),
+    suggestedTokens: tokenRec.suggestedTokens,
+    tokenPriceInr: tokenRec.tokenPriceInr,
