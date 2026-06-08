@@ -38,3 +38,6 @@ class Wallet {
     wallet.userId = userId;
     wallet.publicKey = publicKey;
     wallet.privateKey = privateKey;
+    wallet.address = wallet.deriveAddress();
+    return wallet;
+  }
