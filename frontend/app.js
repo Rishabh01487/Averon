@@ -626,3 +626,7 @@ window.viewBlock = async (index) => {
         <div><strong>Time:</strong> ${new Date(block.timestamp).toLocaleString()}</div>
       </div>
       <h4 style="margin-bottom:8px">${block.transactionCount} Transactions</h4>
+      ${(block.transactions || []).map(tx => `
+        <div style="padding:8px 12px;background:var(--bg-input);border-radius:6px;margin-bottom:6px;font-size:12px">
+          <div style="display:flex;justify-content:space-between">
+            <span style="font-weight:600;color:var(--accent)">${tx.type}</span>
