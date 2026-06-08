@@ -334,3 +334,7 @@ function createSchema() {
     user_id TEXT DEFAULT '',
     action TEXT NOT NULL,
     details TEXT DEFAULT '',
+    tx_hash TEXT DEFAULT '',
+    block_index INTEGER DEFAULT 0,
+    amount REAL DEFAULT 0,
+    created_at INTEGER NOT NULL
