@@ -74,3 +74,7 @@ const schemas = {
   },
 
   buyTokens: {
+    count: [{ rule: rules.required, msg: 'Token count is required' }, { rule: rules.number, msg: 'Count must be a number' }, { rule: rules.min(1), msg: 'Minimum 1 token' }, { rule: rules.max(C.LIMITS.MAX_TOKEN_COUNT), msg: `Maximum ${C.LIMITS.MAX_TOKEN_COUNT} tokens` }],
+  },
+
+  placeOrder: {
