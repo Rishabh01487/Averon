@@ -222,3 +222,7 @@ class Blockchain {
         }
       }
     }
+    // Check pending
+    const pending = this.pendingTransactions.find(tx => tx.hash === hash);
+    if (pending) return { ...pending.toJSON(), status: 'pending', confirmations: 0 };
+    return null;
