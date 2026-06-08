@@ -366,3 +366,7 @@ app.get('/api/market/orderbook', (req, res) => {
   const trades = tradingEngine.getRecentTrades(30);
   res.json({ ...book, recentTrades: trades });
 });
+
+app.post('/api/market/order', authenticate, financialLimiter, validate('placeOrder'), (req, res) => {
+  const { side, type, amount, price } = req.body;
+  try {
