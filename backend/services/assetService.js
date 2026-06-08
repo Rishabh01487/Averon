@@ -150,3 +150,7 @@ class AssetService {
     this.blockchain.addTransaction(investTx);
 
     const block = this.blockchain.minePendingTransactions(this.walletManager.getSystemWallet().address);
+
+    // Update tokens
+    for (const token of available) {
+      this.db.run('UPDATE asset_tokens SET owner_id = ?, purchased_at = ?, tx_hash = ? WHERE id = ? AND owner_id IS NULL',
