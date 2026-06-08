@@ -54,3 +54,6 @@ class EscrowService {
     const { Transaction } = require('../blockchain/transaction');
     const escrow = this.db.queryOne('SELECT * FROM escrow_accounts WHERE asset_id = ?', [assetId]);
     if (!escrow || escrow.balance <= 0) throw new Error('Nothing to release');
+
+    const asset = this.db.queryOne('SELECT * FROM assets WHERE id = ?', [assetId]);
+    if (!asset) throw new Error('Asset not found');
