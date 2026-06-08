@@ -166,3 +166,7 @@ class Block {
 
   toJSON() {
     return {
+      version: this.version,
+      index: this.index,
+      previousHash: this.previousHash,
+      timestamp: this.timestamp,
