@@ -58,3 +58,7 @@ function createSchema() {
     is_frozen INTEGER DEFAULT 0,
     login_attempts INTEGER DEFAULT 0,
     locked_until INTEGER DEFAULT 0,
+    last_login INTEGER DEFAULT 0,
+    kyc_status TEXT DEFAULT 'none',
+    kyc_data TEXT DEFAULT '{}',
+    created_at INTEGER NOT NULL,
