@@ -194,3 +194,7 @@ function createSchema() {
     balance REAL DEFAULT 0,
     status TEXT DEFAULT 'active',
     total_received REAL DEFAULT 0,
+    total_released REAL DEFAULT 0,
+    total_refunded REAL DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (asset_id) REFERENCES assets(id)
