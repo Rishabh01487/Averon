@@ -510,3 +510,7 @@ function getDashboardStats() {
     holders: eco.holder_count || 0,
     marketCap: eco.market_cap || 0,
     tvl: eco.tvl || 0,
+    assets: { total: assetStats.total || 0, active: assetStats.active || 0, funded: assetStats.funded || 0, pending: assetStats.pending || 0 },
+    userCount,
+    priceHistory: priceHistory.map(h => h.price),
+  };
