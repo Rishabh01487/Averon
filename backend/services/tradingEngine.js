@@ -94,3 +94,7 @@ class TradingEngine {
         const feeRate = parseFloat(this.db.getConfig('trading_fee_percent') || C.FEES.TRADING_FEE_PERCENT) / 100;
         const buyerFee = parseFloat((tradeAmount * feeRate).toFixed(8));
         const sellerFee = parseFloat((totalValue * feeRate).toFixed(8));
+
+        // Execute trade
+        const buyerWallet = this.db.queryOne('SELECT address FROM wallets WHERE user_id = ?', [buy.user_id]);
+        const sellerWallet = this.db.queryOne('SELECT address FROM wallets WHERE user_id = ?', [sell.user_id]);
