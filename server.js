@@ -126,3 +126,6 @@ app.post('/api/auth/register', authLimiter, validate('register'), async (req, re
 
   res.status(201).json({
     user: { id: userId, name, email, role, walletAddress: wallet.address, balance: 0 },
+    ...tokens,
+  });
+});
