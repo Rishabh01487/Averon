@@ -341,3 +341,8 @@ app.post('/api/assets/:id/analyze', authenticate, (req, res) => {
     }
   })();
 });
+
+app.post('/api/assets/:id/confirm', authenticate, (req, res) => {
+  try {
+    const assetId = parseInt(req.params.id);
+    const result = assetService.tokenizeAsset(assetId, req.user.userId, req.body.aiResult || {});
