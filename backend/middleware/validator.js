@@ -94,3 +94,7 @@ function validate(schemaName) {
 
     // Sanitize input first
     req.body = sanitizeObject(req.body);
+
+    const errors = [];
+    for (const [field, fieldRules] of Object.entries(schema)) {
+      const value = req.body[field];
