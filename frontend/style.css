@@ -105,3 +105,8 @@ body {
 .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 .btn-danger { background: var(--red); color: white; }
 .btn-success { background: var(--green); }
+
+/* ═══ NAVBAR ═══ */
+.navbar {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
