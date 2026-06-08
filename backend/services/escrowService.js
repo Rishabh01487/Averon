@@ -86,3 +86,7 @@ class EscrowService {
         [asset.owner_id, 'capital_raise', fee, String(assetId), 'asset', Date.now()]);
 
       this.db.incrementEconomy('total_fees_collected', fee);
+    }
+
+    // Update escrow
+    this.db.run('UPDATE escrow_accounts SET balance = 0, total_released = total_released + ?, status = "released" WHERE id = ?',
