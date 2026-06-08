@@ -138,3 +138,7 @@ function initAuth() {
         }),
       });
       state.user = data.user;
+      state.accessToken = data.accessToken;
+      state.refreshToken = data.refreshToken;
+      saveSession();
+      toast(`Welcome, ${data.user.name}! Wallet: ${data.user.walletAddress}`, 'success');
