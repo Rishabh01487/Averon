@@ -585,3 +585,8 @@ function initMarket() {
     } catch {}
   });
 }
+
+// ── EXPLORER ─────────────────────────────────────────────────────────────────
+
+async function loadExplorer() {
+  try {
