@@ -210,3 +210,7 @@ class AssetService {
     const asset = this.db.queryOne('SELECT * FROM assets WHERE id = ?', [assetId]);
     const boost = Math.min(C.PRICE.FUNDED_ASSET_BOOST_MAX,
       C.PRICE.FUNDED_ASSET_BOOST_MIN + (asset.raise_amount / 1000000) * 0.03);
+    this.db.setPrice(parseFloat((currentPrice * (1 + boost)).toFixed(4)));
+
+    // Update economy
+    this.db.incrementEconomy('total_assets_funded', 1);
