@@ -238,3 +238,7 @@ function createSchema() {
     seller_id TEXT NOT NULL,
     amount REAL NOT NULL,
     price REAL NOT NULL,
+    total_value REAL NOT NULL,
+    buyer_fee REAL DEFAULT 0,
+    seller_fee REAL DEFAULT 0,
+    tx_hash TEXT DEFAULT '',
