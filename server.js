@@ -402,3 +402,6 @@ app.get('/api/portfolio', authenticate, (req, res) => {
     balance, walletAddress: wallet?.address, coinValue: parseFloat((balance * price).toFixed(2)),
     tokens, myAssets, myOrders, activity, notifications, price,
   });
+});
+
+// ── Blockchain Explorer ──────────────────────────────────────────────────────
