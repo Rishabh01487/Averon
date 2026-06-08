@@ -229,3 +229,8 @@ function createSchema() {
     updated_at INTEGER NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS coin_trades (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    buy_order_id INTEGER,
+    sell_order_id INTEGER,
