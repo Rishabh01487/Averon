@@ -250,3 +250,7 @@ class AssetService {
 
           const refundResult = this.escrow.refundAll(asset.id);
           if (refundResult.refunded > 0) {
+            this.blockchain.minePendingTransactions(this.walletManager.getSystemWallet().address);
+          }
+
+          this.transition(asset.id, C.ASSET_STATUS.CLOSED, 'system', `Expired — ${refundResult.refundCount} refunds processed`);
