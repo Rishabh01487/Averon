@@ -582,3 +582,6 @@ function initMarket() {
       await api('/api/market/order', { method: 'POST', body: JSON.stringify({ side: state.orderSide, type: 'limit', amount, price }) });
       toast(`${state.orderSide.toUpperCase()} order placed`, 'success');
       loadMarket();
+    } catch {}
+  });
+}
