@@ -37,3 +37,8 @@ class Transaction {
     });
     return crypto.createHash('sha256').update(payload).digest('hex');
   }
+
+  /**
+   * Sign this transaction with an ECDSA private key.
+   */
+  sign(privateKeyPem) {
