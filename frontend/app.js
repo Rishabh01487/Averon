@@ -338,3 +338,7 @@ async function viewAsset(id) {
           <div class="ai-stat-grid">
             <div class="ai-stat"><div class="val">₹${formatNum(a.raise_amount)}</div><div class="label">Raise Amount</div></div>
             <div class="ai-stat"><div class="val">${a.token_count || 0}</div><div class="label">Total Tokens</div></div>
+            <div class="ai-stat"><div class="val">${a.progress || 0}%</div><div class="label">Funded</div></div>
+          </div>
+          ${a.ai_analysis_summary ? `
+          <div style="margin-top:16px;padding:16px;background:var(--bg-input);border-radius:var(--radius-sm)">
