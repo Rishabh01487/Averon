@@ -398,3 +398,7 @@ function seedDefaults() {
 function persist() {
   if (!db) return;
   try {
+    const data = db.export();
+    fs.writeFileSync(DB_PATH, Buffer.from(data));
+  } catch (e) {
+    console.error('DB persist error:', e.message);
