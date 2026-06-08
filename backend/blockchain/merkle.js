@@ -74,3 +74,7 @@ class MerkleTree {
         proof.push({
           hash: layer[siblingIdx],
           position: isRight ? 'left' : 'right',
+        });
+      } else {
+        // No sibling — odd leaf gets paired with itself
+        proof.push({
