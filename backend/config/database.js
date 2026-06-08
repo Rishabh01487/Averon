@@ -82,3 +82,7 @@ function createSchema() {
     user_id TEXT PRIMARY KEY,
     public_key TEXT NOT NULL,
     private_key TEXT NOT NULL,
+    address TEXT UNIQUE NOT NULL,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`);
