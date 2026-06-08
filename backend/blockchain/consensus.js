@@ -10,3 +10,7 @@ const C = require('../config/constants');
  * If blocks are mined too fast → increase difficulty.
  * If blocks are mined too slow → decrease difficulty.
  */
+function adjustDifficulty(chain) {
+  const interval = C.BLOCKCHAIN.DIFFICULTY_ADJUSTMENT_INTERVAL;
+  const lastBlock = chain[chain.length - 1];
+  const currentDifficulty = lastBlock.difficulty || C.BLOCKCHAIN.DIFFICULTY;
