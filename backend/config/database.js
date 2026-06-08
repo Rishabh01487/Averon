@@ -206,3 +206,111 @@ function createSchema() {
     type TEXT NOT NULL,
     user_id TEXT,
     amount REAL NOT NULL,
+    tx_hash TEXT DEFAULT '',
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (escrow_id) REFERENCES escrow_accounts(id)
+  )`);
+
+  // ── Trading ──────────────────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS coin_orders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,
+    type TEXT NOT NULL,
+    side TEXT NOT NULL,
+    amount REAL NOT NULL,
+    price REAL,
+    filled REAL DEFAULT 0,
+    remaining REAL NOT NULL,
+    status TEXT DEFAULT 'open',
+    duration TEXT DEFAULT 'GTC',
+    expires_at INTEGER DEFAULT 0,
+    fee_paid REAL DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS coin_trades (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    buy_order_id INTEGER,
+    sell_order_id INTEGER,
+    buyer_id TEXT NOT NULL,
+    seller_id TEXT NOT NULL,
+    amount REAL NOT NULL,
+    price REAL NOT NULL,
+    total_value REAL NOT NULL,
+    buyer_fee REAL DEFAULT 0,
+    seller_fee REAL DEFAULT 0,
+    tx_hash TEXT DEFAULT '',
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (buyer_id) REFERENCES users(id),
+    FOREIGN KEY (seller_id) REFERENCES users(id)
+  )`);
+
+  // ── Economy ──────────────────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS economy (
+    id INTEGER PRIMARY KEY DEFAULT 1,
+    price REAL DEFAULT ${C.PRICE.INITIAL_PRICE},
+    total_supply REAL DEFAULT 0,
+    circulating_supply REAL DEFAULT 0,
+    total_raised_inr REAL DEFAULT 0,
+    total_assets_funded INTEGER DEFAULT 0,
+    total_fees_collected REAL DEFAULT 0,
+    total_trades INTEGER DEFAULT 0,
+    total_volume REAL DEFAULT 0,
+    holder_count INTEGER DEFAULT 0,
+    market_cap REAL DEFAULT 0,
+    tvl REAL DEFAULT 0,
+    updated_at INTEGER
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS price_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    price REAL NOT NULL,
+    volume REAL DEFAULT 0,
+    high REAL DEFAULT 0,
+    low REAL DEFAULT 0,
+    open REAL DEFAULT 0,
+    close REAL DEFAULT 0,
+    interval TEXT DEFAULT '1m',
+    recorded_at INTEGER NOT NULL
+  )`);
+
+  // ── Fees ─────────────────────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS fee_ledger (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT,
+    fee_type TEXT NOT NULL,
+    amount REAL NOT NULL,
+    reference_id TEXT DEFAULT '',
+    reference_type TEXT DEFAULT '',
+    tx_hash TEXT DEFAULT '',
+    created_at INTEGER NOT NULL
+  )`);
+
+  // ── Notifications ────────────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS notifications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,
+    type TEXT NOT NULL,
+    title TEXT NOT NULL,
+    message TEXT DEFAULT '',
+    data TEXT DEFAULT '{}',
+    is_read INTEGER DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`);
+
+  // ── Audit Log ────────────────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS audit_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT DEFAULT '',
+    action TEXT NOT NULL,
+    resource_type TEXT DEFAULT '',
+    resource_id TEXT DEFAULT '',
+    details TEXT DEFAULT '{}',
+    ip_address TEXT DEFAULT '',
+    user_agent TEXT DEFAULT '',
+    request_method TEXT DEFAULT '',
+    request_path TEXT DEFAULT '',
+    response_code INTEGER DEFAULT 0,
