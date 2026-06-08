@@ -114,3 +114,7 @@ class TradingEngine {
         this.blockchain.addTransaction(tradeTx);
 
         // Record in database
+        this.db.run(
+          'INSERT INTO coin_trades (buy_order_id, sell_order_id, buyer_id, seller_id, amount, price, total_value, buyer_fee, seller_fee, tx_hash, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+          [buy.id, sell.id, buy.user_id, sell.user_id, tradeAmount, tradePrice, totalValue, buyerFee, sellerFee, tradeTx.hash, Date.now()]
+        );
