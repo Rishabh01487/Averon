@@ -58,3 +58,6 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => cb(null, Date.now() + '-' + crypto.randomBytes(4).toString('hex') + path.extname(file.originalname)),
 });
 const upload = multer({ storage, limits: { fileSize: C.LIMITS.MAX_FILE_SIZE_BYTES, files: C.LIMITS.MAX_DOCUMENTS } });
+
+// ── Service instances (initialized after DB) ─────────────────────────────────
+let blockchain, walletManager, systemWallet, escrowService, assetService, tradingEngine;
