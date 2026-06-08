@@ -134,3 +134,7 @@ class TradingEngine {
 
         const newSellFilled = sell.filled + tradeAmount;
         const newSellRemaining = sell.remaining - tradeAmount;
+        this.db.run('UPDATE coin_orders SET filled = ?, remaining = ?, status = ?, updated_at = ? WHERE id = ?',
+          [newSellFilled, newSellRemaining, newSellRemaining <= 0 ? 'filled' : 'open', Date.now(), sell.id]);
+
+        // Update economy
