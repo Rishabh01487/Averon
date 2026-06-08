@@ -22,3 +22,7 @@ class Transaction {
     this.status = 'pending';        // pending → confirmed → failed
     this.blockIndex = -1;           // Set when mined into a block
     this.confirmations = 0;         // Increases as more blocks are added
+  }
+
+  calculateHash() {
+    const payload = JSON.stringify({
