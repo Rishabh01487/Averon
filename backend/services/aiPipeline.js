@@ -201,3 +201,7 @@ Respond ONLY with this JSON (no markdown):
 }
 
 // ── Stage 3b: Fallback Analysis ──────────────────────────────────────────────
+
+function analyzeWithFallback(asset, documents, docInfo) {
+  const p = PROFILES[asset.category] || PROFILES['Other'];
+  const quality = docInfo.quality || 50;
