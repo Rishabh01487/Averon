@@ -542,3 +542,111 @@ async function confirmLaunch() {
 }
 
 // ── MARKETPLACE ──────────────────────────────────────────────────────────────
+
+async function loadMarket() {
+  try {
+    const data = await api('/api/market/orderbook');
+    $('sellOrders').innerHTML = (data.sells || []).map(o => `<div class="ob-row"><span>${o.price.toFixed(4)}</span><span>${o.amount.toFixed(4)}</span><span>${o.total.toFixed(2)}</span></div>`).join('') || '<div class="empty-state" style="padding:16px">No sell orders</div>';
+    $('buyOrders').innerHTML = (data.buys || []).map(o => `<div class="ob-row"><span>${o.price.toFixed(4)}</span><span>${o.amount.toFixed(4)}</span><span>${o.total.toFixed(2)}</span></div>`).join('') || '<div class="empty-state" style="padding:16px">No buy orders</div>';
+    $('obSpread').textContent = data.spread !== null ? `Spread: ₹${data.spread.toFixed(4)}` : 'Spread: —';
+    $('recentTrades').innerHTML = (data.recentTrades || []).map(t => `<div class="trade-item"><span class="trade-amount">${t.amount.toFixed(4)} AC</span><span>₹${t.price.toFixed(4)}</span><span>${timeAgo(t.created_at)}</span></div>`).join('') || '<div class="empty-state" style="padding:16px">No trades yet</div>';
+
+    // Set default price
+    if (!$('orderPrice').value) $('orderPrice').value = parseFloat(state.config?.price || 1).toFixed(4);
+  } catch {}
+}
+
+function initMarket() {
+  $$('.order-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      $$('.order-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      state.orderSide = tab.dataset.side;
+    });
+  });
+
+  const updateTotal = () => {
+    const amt = parseFloat($('orderAmount')?.value) || 0;
+    const price = parseFloat($('orderPrice')?.value) || 0;
+    $('orderTotal').textContent = (amt * price).toFixed(2);
+  };
+  $('orderAmount')?.addEventListener('input', updateTotal);
+  $('orderPrice')?.addEventListener('input', updateTotal);
+
+  $('placeOrderBtn')?.addEventListener('click', async () => {
+    const amount = parseFloat($('orderAmount').value);
+    const price = parseFloat($('orderPrice').value);
+    if (!amount || !price) return toast('Fill amount and price', 'error');
+
+    try {
+      await api('/api/market/order', { method: 'POST', body: JSON.stringify({ side: state.orderSide, type: 'limit', amount, price }) });
+      toast(`${state.orderSide.toUpperCase()} order placed`, 'success');
+      loadMarket();
+    } catch {}
+  });
+}
+
+// ── EXPLORER ─────────────────────────────────────────────────────────────────
+
+async function loadExplorer() {
+  try {
+    const info = await api('/api/blockchain/info');
+    $('chainStats').innerHTML = `
+      <span class="chain-stat">Blocks: ${info.blocks}</span>
+      <span class="chain-stat">TXs: ${info.transactions}</span>
+      <span class="chain-stat">Difficulty: ${info.difficulty}</span>
+      <span class="chain-stat">Pending: ${info.pendingTransactions}</span>`;
+
+    const data = await api('/api/blockchain/blocks?limit=20');
+    $('blockList').innerHTML = (data.blocks || []).map(b => `
+      <div class="block-card" onclick="viewBlock(${b.index})">
+        <span class="block-index">#${b.index}</span>
+        <span class="block-hash">${b.hash.substring(0, 20)}...</span>
+        <div class="block-meta">
+          <span class="block-tx-count">${b.transactionCount} txs</span>
+          <span>Nonce: ${b.nonce}</span>
+          <span>${timeAgo(b.timestamp)}</span>
+        </div>
+      </div>`).join('');
+  } catch {}
+}
+
+window.viewBlock = async (index) => {
+  try {
+    const block = await api(`/api/blockchain/block/${index}`);
+    $('explorerResult').classList.remove('hidden');
+    $('explorerResult').innerHTML = `
+      <h3>Block #${block.index}</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;font-size:13px">
+        <div><strong>Hash:</strong> <span style="font-family:var(--mono);font-size:11px">${block.hash}</span></div>
+        <div><strong>Previous:</strong> <span style="font-family:var(--mono);font-size:11px">${block.previousHash}</span></div>
+        <div><strong>Merkle Root:</strong> <span style="font-family:var(--mono);font-size:11px">${block.merkleRoot}</span></div>
+        <div><strong>Nonce:</strong> ${block.nonce} · <strong>Difficulty:</strong> ${block.difficulty}</div>
+        <div><strong>Miner:</strong> <span style="font-family:var(--mono);font-size:11px">${block.miner}</span></div>
+        <div><strong>Time:</strong> ${new Date(block.timestamp).toLocaleString()}</div>
+      </div>
+      <h4 style="margin-bottom:8px">${block.transactionCount} Transactions</h4>
+      ${(block.transactions || []).map(tx => `
+        <div style="padding:8px 12px;background:var(--bg-input);border-radius:6px;margin-bottom:6px;font-size:12px">
+          <div style="display:flex;justify-content:space-between">
+            <span style="font-weight:600;color:var(--accent)">${tx.type}</span>
+            <span style="font-family:var(--mono)">${tx.amount.toFixed(4)} AC</span>
+          </div>
+          <div style="color:var(--text-muted);margin-top:4px;font-family:var(--mono);font-size:10px">
+            ${tx.from?.substring(0,16)}... → ${tx.to?.substring(0,16)}... · ${tx.hash?.substring(0,16)}...
+          </div>
+        </div>`).join('')}`;
+  } catch {}
+};
+
+function initExplorer() {
+  $('explorerSearchBtn')?.addEventListener('click', async () => {
+    const q = $('explorerSearch').value.trim();
+    if (!q) return;
+
+    // Try as block index
+    if (/^\d+$/.test(q)) { viewBlock(parseInt(q)); return; }
+
+    // Try as tx hash
+    try {
+      const tx = await api(`/api/blockchain/tx/${q}`);
