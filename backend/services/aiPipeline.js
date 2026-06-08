@@ -258,3 +258,7 @@ function checkFraudIndicators(asset, analysis, duplicateResult) {
 }
 
 // ── Stage 5: Tokenization ────────────────────────────────────────────────────
+
+function calculateTokenization(raiseAmount, analysis) {
+  const riskFactor = 1 + (analysis.riskScore || 50) / 200; // Higher risk = more tokens
+  const idealPrice = Math.max(C.LIMITS.MIN_TOKEN_PRICE_INR, Math.min(C.LIMITS.MAX_TOKEN_PRICE_INR, raiseAmount / (15 * riskFactor)));
