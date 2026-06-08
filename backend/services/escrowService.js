@@ -34,3 +34,7 @@ class EscrowService {
     if (escrow.status !== 'active') throw new Error('Escrow is not active');
 
     const newBalance = parseFloat((escrow.balance + amount).toFixed(8));
+    const newReceived = parseFloat((escrow.total_received + amount).toFixed(8));
+
+    this.db.run('UPDATE escrow_accounts SET balance = ?, total_received = ? WHERE id = ?',
+      [newBalance, newReceived, escrow.id]);
