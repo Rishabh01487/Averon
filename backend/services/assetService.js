@@ -118,3 +118,7 @@ class AssetService {
     }
 
     this.db.run('INSERT INTO activity_log (user_id, action, details, tx_hash, block_index, created_at) VALUES (?,?,?,?,?,?)',
+      [userId, 'ASSET_LISTED', `"${asset.title}" — ${tokenCount} tokens at ${tokenPriceAC.toFixed(4)} AC`, txHash, blockIdx, Date.now()]);
+
+    return { tokenCount, tokenPriceInr, tokenPriceAC, txHash, blockIndex: blockIdx };
+  }
