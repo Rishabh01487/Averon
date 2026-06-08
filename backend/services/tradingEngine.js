@@ -138,3 +138,7 @@ class TradingEngine {
           [newSellFilled, newSellRemaining, newSellRemaining <= 0 ? 'filled' : 'open', Date.now(), sell.id]);
 
         // Update economy
+        this.db.incrementEconomy('total_trades', 1);
+        this.db.incrementEconomy('total_volume', tradeAmount);
+
+        trades.push({ buyerId: buy.user_id, sellerId: sell.user_id, amount: tradeAmount, price: tradePrice, totalValue, txHash: tradeTx.hash });
