@@ -130,3 +130,7 @@ module.exports = {
     COOLING_OFF_PERIOD_MS: 0,         // 0 for dev, 24h for production
     MIN_DOCUMENTS: 1,
     MAX_DOCUMENTS: 10,
+    MAX_FILE_SIZE_BYTES: 10 * 1024 * 1024, // 10MB
+    ALLOWED_MIMETYPES: ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'],
+    MIN_RAISE_AMOUNT: 100,
+    MAX_RAISE_AMOUNT: 10000000,
