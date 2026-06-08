@@ -41,3 +41,8 @@ class Wallet {
     wallet.address = wallet.deriveAddress();
     return wallet;
   }
+
+  toJSON() {
+    return {
+      userId: this.userId,
+      address: this.address,
