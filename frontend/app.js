@@ -646,3 +646,7 @@ function initExplorer() {
 
     // Try as block index
     if (/^\d+$/.test(q)) { viewBlock(parseInt(q)); return; }
+
+    // Try as tx hash
+    try {
+      const tx = await api(`/api/blockchain/tx/${q}`);
