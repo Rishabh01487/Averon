@@ -102,3 +102,56 @@ function verifyAuditChain() {
       corrupted.push({ id: entry.id, expected: expectedHash, actual: entry.entry_hash });
     }
     if (entry.prev_hash !== prevHash) {
+      corrupted.push({ id: entry.id, chainBreak: true, expected: prevHash, actual: entry.prev_hash });
+    }
+    prevHash = entry.entry_hash;
+  }
+
+  return {
+    valid: corrupted.length === 0,
+    entries: entries.length,
+    corrupted: corrupted.length,
+    details: corrupted.slice(0, 10), // Only return first 10
+  };
+}
+
+/**
+ * Infer the audit action from HTTP method and path.
+ */
+function inferAction(method, path) {
+  if (path.includes('/auth/login')) return 'LOGIN';
+  if (path.includes('/auth/register')) return 'REGISTER';
+  if (path.includes('/auth/logout')) return 'LOGOUT';
+  if (path.includes('/buy-direct') || path.includes('/buy-coins')) return 'MINT';
+  if (path.includes('/assets') && method === 'POST') {
+    if (path.includes('/analyze')) return 'AI_ANALYSIS_STARTED';
+    if (path.includes('/confirm')) return 'ASSET_LISTED';
+    if (path.includes('/documents')) return 'DOCUMENT_UPLOAD';
+    if (path.includes('/tokens/buy')) return 'TOKEN_PURCHASED';
+    return 'ASSET_CREATED';
+  }
+  if (path.includes('/market/sell') || path.includes('/market/buy')) return 'ORDER_PLACED';
+  if (path.includes('/market/order') && method === 'DELETE') return 'ORDER_CANCELLED';
+  if (path.includes('/admin')) return 'ADMIN_ACTION';
+  return null; // Don't log unknown actions
+}
+
+/**
+ * Sanitize request body for audit (remove sensitive data).
+ */
+function sanitizeBodyForAudit(body) {
+  if (!body) return {};
+  const sanitized = { ...body };
+  delete sanitized.password;
+  delete sanitized.privateKey;
+  delete sanitized.secret;
+  // Truncate long fields
+  for (const [key, val] of Object.entries(sanitized)) {
+    if (typeof val === 'string' && val.length > 500) {
+      sanitized[key] = val.substring(0, 500) + '...[truncated]';
+    }
+  }
+  return sanitized;
+}
+
+module.exports = { initAudit, logAudit, auditMiddleware, verifyAuditChain };
