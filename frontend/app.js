@@ -310,3 +310,7 @@ async function loadAssets() {
           <div class="asset-title">${a.title}</div>
           <span class="asset-status status-${a.status}">${a.status.replace(/_/g, ' ')}</span>
         </div>
+        <div class="asset-category">${a.category}</div>
+        <div class="asset-meta">
+          <div><span class="label">Raise:</span> <span class="val">₹${formatNum(a.raise_amount)}</span></div>
+          <div><span class="label">Tokens:</span> <span class="val">${a.tokens_sold || 0}/${a.token_count || 0}</span></div>
