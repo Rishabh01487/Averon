@@ -198,3 +198,6 @@ class TradingEngine {
     }
 
     const pctChange = Math.abs((currentPrice - this.priceAtCheckpoint) / this.priceAtCheckpoint * 100);
+    if (pctChange > threshold) {
+      this.circuitBreakerTripped = true;
+      console.warn(`  ⚠ CIRCUIT BREAKER: Price moved ${pctChange.toFixed(1)}% — trading halted`);
