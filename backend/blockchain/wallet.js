@@ -14,3 +14,7 @@ class Wallet {
       namedCurve: 'secp256k1',
       publicKeyEncoding: { type: 'spki', format: 'pem' },
       privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+    });
+    this.publicKey = keyPair.publicKey;
+    this.privateKey = keyPair.privateKey;
+    this.address = this.deriveAddress();
