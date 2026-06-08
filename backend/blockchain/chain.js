@@ -58,3 +58,7 @@ class Blockchain {
     } catch (e) {
       console.error('Chain load error:', e.message);
       this.chain = [];
+    }
+  }
+
+  save() {
