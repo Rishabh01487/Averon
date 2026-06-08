@@ -110,3 +110,7 @@ function generateTokens(user) {
   const refreshToken = signJWT({ userId: user.id, type: 'refresh' }, JWT_REFRESH_SECRET, C.AUTH.JWT_REFRESH_EXPIRY);
 
   return { accessToken, refreshToken };
+}
+
+function verifyAccessToken(token) {
+  return verifyJWT(token, JWT_SECRET);
