@@ -66,3 +66,6 @@ function formatNum(n) { return parseFloat(n || 0).toLocaleString('en-IN', { maxi
 
 function saveSession() {
   localStorage.setItem('averon_session', JSON.stringify({
+    user: state.user, accessToken: state.accessToken, refreshToken: state.refreshToken,
+  }));
+}
