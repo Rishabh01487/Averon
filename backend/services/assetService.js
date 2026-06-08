@@ -65,3 +65,8 @@ class AssetService {
 
     return { assetId: lastId, status: C.ASSET_STATUS.DRAFT };
   }
+
+  // ── Tokenize (after AI verification) ─────────────────────────────────────
+
+  tokenizeAsset(assetId, userId, aiResult) {
+    const asset = this.db.queryOne('SELECT * FROM assets WHERE id = ?', [assetId]);
