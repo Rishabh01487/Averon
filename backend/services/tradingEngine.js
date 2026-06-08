@@ -177,3 +177,8 @@ class TradingEngine {
 
     this.db.run('INSERT INTO activity_log (user_id, action, details, created_at) VALUES (?,?,?,?)',
       [userId, 'ORDER_CANCELLED', `Cancelled ${order.side} order #${orderId}`, Date.now()]);
+
+    return { cancelled: true, returned: order.side === 'sell' ? order.remaining : 0 };
+  }
+
+  // ── Circuit Breaker ──────────────────────────────────────────────────────
