@@ -62,3 +62,6 @@ class TradingEngine {
     // Log
     this.db.run('INSERT INTO activity_log (user_id, action, details, amount, created_at) VALUES (?,?,?,?,?)',
       [userId, 'ORDER_PLACED', `${side.toUpperCase()} ${amount} AC @ ₹${price?.toFixed(4)}`, amount, now]);
+
+    // Try matching
+    const matches = this.matchOrders();
