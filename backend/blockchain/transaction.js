@@ -110,3 +110,7 @@ class Transaction {
       type: this.type,
       data: this.data,
       timestamp: this.timestamp,
+      nonce: this.nonce,
+      fee: this.fee,
+      signature: this.signature ? this.signature.substring(0, 32) + '...' : '',
+      status: this.status,
