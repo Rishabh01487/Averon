@@ -102,3 +102,7 @@ function selectChain(currentChain, candidateChain) {
   const candidateValid = validateChain(candidateChain);
 
   if (!candidateValid.valid) return { winner: 'current', reason: 'Candidate chain is invalid' };
+  if (!currentValid.valid) return { winner: 'candidate', reason: 'Current chain is invalid' };
+
+  // Longest chain wins
+  if (candidateChain.length > currentChain.length) {
