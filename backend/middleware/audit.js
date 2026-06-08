@@ -82,3 +82,7 @@ function auditMiddleware(req, res, next) {
     };
   }
   next();
+}
+
+/**
+ * Verify the integrity of the audit chain.
