@@ -133,3 +133,5 @@ class Transaction {
     return tx;
   }
 }
+
+module.exports = { Transaction };
