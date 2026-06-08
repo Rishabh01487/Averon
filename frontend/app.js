@@ -142,3 +142,7 @@ function initAuth() {
       state.refreshToken = data.refreshToken;
       saveSession();
       toast(`Welcome, ${data.user.name}! Wallet: ${data.user.walletAddress}`, 'success');
+      enterApp();
+    } catch (e) {
+      $('authError').textContent = e.message;
+      $('authError').classList.remove('hidden');
