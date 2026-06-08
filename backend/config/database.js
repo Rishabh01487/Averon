@@ -174,3 +174,7 @@ function createSchema() {
   )`);
 
   // ── Tokens ───────────────────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS asset_tokens (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    asset_id INTEGER NOT NULL,
+    token_index INTEGER NOT NULL,
