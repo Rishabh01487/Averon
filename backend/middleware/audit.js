@@ -118,3 +118,7 @@ function verifyAuditChain() {
 /**
  * Infer the audit action from HTTP method and path.
  */
+function inferAction(method, path) {
+  if (path.includes('/auth/login')) return 'LOGIN';
+  if (path.includes('/auth/register')) return 'REGISTER';
+  if (path.includes('/auth/logout')) return 'LOGOUT';
