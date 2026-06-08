@@ -278,3 +278,7 @@ function drawPriceChart(prices) {
     const y = h - ((prices[i] - min) / range) * h;
     i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
   }
+  ctx.stroke();
+
+  // Gradient fill
+  const lastY = h - ((prices[prices.length - 1] - min) / range) * h;
