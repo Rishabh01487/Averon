@@ -301,3 +301,8 @@ async function loadAssets() {
     const status = $('assetFilterStatus')?.value;
     if (cat && cat !== 'all') params.set('category', cat);
     if (status && status !== 'all') params.set('status', status);
+
+    const assets = await api(`/api/assets?${params}`);
+    const grid = $('assetGrid');
+    grid.innerHTML = assets.map(a => `
+      <div class="asset-card" onclick="viewAsset(${a.id})">
