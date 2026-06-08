@@ -26,3 +26,7 @@ class EscrowService {
   }
 
   /**
+   * Lock funds into escrow (when investor buys tokens).
+   */
+  lockFunds(assetId, userId, amount, txHash = '') {
+    const escrow = this.db.queryOne('SELECT * FROM escrow_accounts WHERE asset_id = ?', [assetId]);
