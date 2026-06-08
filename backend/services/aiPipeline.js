@@ -94,3 +94,7 @@ function processDocuments(documents) {
     types: {},
     hasImages: false,
     hasPdf: false,
+  };
+
+  for (const doc of documents) {
+    result.totalSize += doc.size || 0;
