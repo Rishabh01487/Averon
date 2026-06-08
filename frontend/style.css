@@ -285,3 +285,8 @@ body {
 .portfolio-sections { display: flex; flex-direction: column; gap: 24px; }
 .portfolio-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
 .portfolio-section h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+
+.token-holdings { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.token-hold-card { padding: 16px; background: var(--bg-input); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+.token-hold-title { font-weight: 600; margin-bottom: 4px; }
+.token-hold-meta { font-size: 12px; color: var(--text-secondary); font-family: var(--mono); }
