@@ -498,3 +498,7 @@ async function startAIAnalysis() {
   try {
     const result = await api(`/api/assets/${state.currentAssetId}/analyze`, { method: 'POST' });
     $('aiProgress').classList.add('hidden');
+    $('aiResult').classList.remove('hidden');
+    $('aiResult').className = `ai-result ${result.verified ? 'verified' : 'rejected'}`;
+    $('aiResult').innerHTML = `
+      <h3>${result.verified ? '✅ Asset Verified' : '❌ Asset Rejected'}</h3>
