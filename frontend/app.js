@@ -486,3 +486,7 @@ async function uploadDocuments() {
     state.selectedFiles = [];
     renderFileList();
     setWizardStep(3);
+  } catch (e) { toast(e.message, 'error'); } finally { $('uploadDocsBtn').disabled = false; }
+}
+
+async function startAIAnalysis() {
