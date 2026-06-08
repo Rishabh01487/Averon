@@ -130,3 +130,7 @@ class TradingEngine {
         const newBuyFilled = buy.filled + tradeAmount;
         const newBuyRemaining = buy.remaining - tradeAmount;
         this.db.run('UPDATE coin_orders SET filled = ?, remaining = ?, status = ?, updated_at = ? WHERE id = ?',
+          [newBuyFilled, newBuyRemaining, newBuyRemaining <= 0 ? 'filled' : 'open', Date.now(), buy.id]);
+
+        const newSellFilled = sell.filled + tradeAmount;
+        const newSellRemaining = sell.remaining - tradeAmount;
