@@ -194,3 +194,7 @@ class TradingEngine {
       this.lastPriceCheck = now;
       this.priceAtCheckpoint = currentPrice;
       this.circuitBreakerTripped = false;
+      return;
+    }
+
+    const pctChange = Math.abs((currentPrice - this.priceAtCheckpoint) / this.priceAtCheckpoint * 100);
