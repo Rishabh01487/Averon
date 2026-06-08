@@ -57,3 +57,8 @@ function verifyJWT(token, secret) {
     const expectedSig = crypto.createHmac('sha256', secret)
       .update(`${headerB64}.${payloadB64}`)
       .digest('base64url');
+
+    if (signature !== expectedSig) return null;
+
+    const payload = JSON.parse(base64urlDecode(payloadB64));
+    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;
