@@ -214,3 +214,7 @@ body {
 .wizard-step.done .step-num { background: var(--green); color: white; }
 .wiz-panel { display: none; padding: 32px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); }
 .wiz-panel.active { display: block; animation: fadeIn 0.3s; }
+.wiz-panel h2 { font-size: 20px; margin-bottom: 4px; }
+
+.drop-zone { border: 2px dashed var(--border); border-radius: var(--radius); padding: 40px; text-align: center; cursor: pointer; transition: var(--transition); }
+.drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: var(--accent-dim); }
