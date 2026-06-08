@@ -269,3 +269,8 @@ function drawPriceChart(prices) {
   const min = Math.min(...prices) * 0.98;
   const max = Math.max(...prices) * 1.02;
   const range = max - min || 1;
+
+  ctx.beginPath();
+  ctx.strokeStyle = '#6366f1';
+  ctx.lineWidth = 2;
+  for (let i = 0; i < prices.length; i++) {
