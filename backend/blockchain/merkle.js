@@ -58,3 +58,6 @@ class MerkleTree {
   /**
    * Generate a Merkle proof for a leaf at given index.
    * Returns an array of { hash, position } pairs needed to reconstruct the root.
+   */
+  getProof(leafIndex) {
+    if (leafIndex < 0 || leafIndex >= this.leaves.length) return null;
