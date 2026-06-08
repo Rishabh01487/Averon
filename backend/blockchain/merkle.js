@@ -13,3 +13,8 @@ class MerkleTree {
     this.root = '';
     if (this.leaves.length > 0) this.build();
   }
+
+  hashLeaf(data) {
+    if (typeof data === 'string') return crypto.createHash('sha256').update(data).digest('hex');
+    return crypto.createHash('sha256').update(JSON.stringify(data)).digest('hex');
+  }
