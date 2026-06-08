@@ -26,3 +26,7 @@ async function api(path, opts = {}) {
         state.accessToken = tokens.accessToken;
         state.refreshToken = tokens.refreshToken;
         saveSession();
+        headers['Authorization'] = `Bearer ${state.accessToken}`;
+        const retry = await fetch(API + path, { headers, ...opts });
+        return retry.json();
+      } else {
