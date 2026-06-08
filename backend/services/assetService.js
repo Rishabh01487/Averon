@@ -154,3 +154,7 @@ class AssetService {
     // Update tokens
     for (const token of available) {
       this.db.run('UPDATE asset_tokens SET owner_id = ?, purchased_at = ?, tx_hash = ? WHERE id = ? AND owner_id IS NULL',
+        [userId, Date.now(), investTx.hash, token.id]);
+    }
+
+    // Lock in escrow
