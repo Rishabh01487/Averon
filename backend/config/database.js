@@ -442,3 +442,7 @@ function run(sql, params = []) {
 
 function runTransaction(fn) {
   db.run('BEGIN TRANSACTION');
+  try {
+    const result = fn();
+    db.run('COMMIT');
+    persist();
