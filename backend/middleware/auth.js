@@ -198,3 +198,7 @@ function cleanExpiredSessions(db) {
 module.exports = {
   hashPassword, verifyPassword,
   generateTokens, verifyAccessToken, verifyRefreshToken,
+  authenticate, optionalAuth, requireRole, requireAdmin,
+  createSession, revokeSession, revokeAllUserSessions, cleanExpiredSessions,
+  signJWT, verifyJWT,
+};
