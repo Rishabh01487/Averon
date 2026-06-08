@@ -514,3 +514,7 @@ function startTimers() {
   startTimers();
 
   const PORT = process.env.PORT || 4200;
+  app.listen(PORT, () => {
+    const stats = DB.getDashboardStats();
+    console.log(`\n  ╔══════════════════════════════════════════════════╗`);
+    console.log(`  ║  AVERON v${C.PLATFORM_VERSION} — Enterprise Asset Tokenization   ║`);
