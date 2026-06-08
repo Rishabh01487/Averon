@@ -230,3 +230,6 @@ app.post('/api/buy-coins', authenticate, financialLimiter, validate('buyCoins'),
   const block = blockchain.minePendingTransactions(systemWallet.address);
 
   const newBalance = blockchain.getBalance(wallet.address);
+  DB.run('UPDATE users SET averon_balance = ?, inr_spent = inr_spent + ? WHERE id = ?', [newBalance, amountInr, userId]);
+  DB.incrementEconomy('total_supply', coinAmount);
+  DB.incrementEconomy('circulating_supply', coinAmount);
