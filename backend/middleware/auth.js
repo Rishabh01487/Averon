@@ -182,3 +182,7 @@ function createSession(db, userId, refreshToken, req) {
 }
 
 function revokeSession(db, sessionId) {
+  db.run('UPDATE sessions SET is_revoked = 1 WHERE id = ?', [sessionId]);
+}
+
+function revokeAllUserSessions(db, userId) {
