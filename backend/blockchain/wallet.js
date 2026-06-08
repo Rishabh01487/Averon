@@ -82,3 +82,7 @@ class WalletManager {
       data[userId] = wallet.toJSON();
     }
     fs.writeFileSync(this.walletsPath, JSON.stringify(data, null, 2));
+  }
+
+  createWallet(userId) {
+    if (this.wallets[userId]) return this.wallets[userId];
