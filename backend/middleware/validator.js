@@ -78,3 +78,7 @@ const schemas = {
   },
 
   placeOrder: {
+    side: [{ rule: rules.required, msg: 'Side is required' }, { rule: rules.oneOf(C.TRADING.ORDER_SIDES), msg: 'Side must be buy or sell' }],
+    amount: [{ rule: rules.required, msg: 'Amount is required' }, { rule: rules.number, msg: 'Amount must be a number' }, { rule: rules.min(C.TRADING.MIN_ORDER_AMOUNT), msg: `Minimum order: ${C.TRADING.MIN_ORDER_AMOUNT} AC` }],
+    price: [{ rule: rules.number, msg: 'Price must be a number' }, { rule: rules.min(0.001), msg: 'Price too low' }],
+    type: [{ rule: rules.oneOf(C.TRADING.ORDER_TYPES), msg: 'Invalid order type' }],
