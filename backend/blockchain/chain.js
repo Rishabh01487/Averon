@@ -70,3 +70,7 @@ class Blockchain {
         pending: this.pendingTransactions.map(tx => tx.toJSON()),
         savedAt: Date.now(),
       };
+      fs.writeFileSync(this.chainPath, JSON.stringify(data));
+    } catch (e) {
+      console.error('Chain save error:', e.message);
+    }
