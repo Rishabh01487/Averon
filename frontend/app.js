@@ -686,3 +686,7 @@ async function loadPortfolio() {
     const data = await api('/api/portfolio');
     $('portfolioValue').textContent = `₹${formatNum(data.coinValue)}`;
     $('portfolioWallet').textContent = data.walletAddress || '—';
+    $('portfolioBalance').textContent = `${parseFloat(data.balance).toFixed(4)} AC`;
+
+    // Token holdings
+    $('myTokens').innerHTML = data.tokens?.length ? data.tokens.reduce((acc, t) => {
