@@ -213,3 +213,8 @@ class TradingEngine {
   }
 
   // ── Order Book ───────────────────────────────────────────────────────────
+
+  getOrderBook() {
+    const buys = this.db.query('SELECT o.*, u.name FROM coin_orders o JOIN users u ON o.user_id = u.id WHERE o.status = "open" AND o.side = "buy" ORDER BY o.price DESC LIMIT 50');
+    const sells = this.db.query('SELECT o.*, u.name FROM coin_orders o JOIN users u ON o.user_id = u.id WHERE o.status = "open" AND o.side = "sell" ORDER BY o.price ASC LIMIT 50');
+    const spread = sells.length && buys.length ? parseFloat((sells[0].price - buys[0].price).toFixed(4)) : null;
