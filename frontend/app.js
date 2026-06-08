@@ -426,3 +426,7 @@ function initWizard() {
 function handleFiles(files) {
   for (const f of files) {
     if (state.selectedFiles.length >= 10) break;
+    state.selectedFiles.push(f);
+  }
+  renderFileList();
+}
