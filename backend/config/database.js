@@ -258,3 +258,7 @@ function createSchema() {
     total_fees_collected REAL DEFAULT 0,
     total_trades INTEGER DEFAULT 0,
     total_volume REAL DEFAULT 0,
+    holder_count INTEGER DEFAULT 0,
+    market_cap REAL DEFAULT 0,
+    tvl REAL DEFAULT 0,
+    updated_at INTEGER
