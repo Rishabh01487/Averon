@@ -702,3 +702,7 @@ async function loadPortfolio() {
     }, {})).map(([id, t]) => `
       <div class="token-hold-card">
         <div class="token-hold-title">${t.title}</div>
+        <div class="token-hold-meta">${t.count} tokens · ${t.value.toFixed(4)} AC · ${t.status}</div>
+      </div>`).join('') : '<div class="empty-state">No token holdings yet</div>';
+
+    // My assets
