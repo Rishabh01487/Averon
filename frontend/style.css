@@ -318,3 +318,5 @@ body {
   .market-layout { grid-template-columns: 1fr; }
   .nav-links { display: none; }
   .hero-stat { grid-column: span 1; }
+  .dashboard-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+}
