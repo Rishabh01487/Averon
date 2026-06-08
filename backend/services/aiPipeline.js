@@ -138,3 +138,7 @@ function detectDuplicates(documents, dbModule) {
       } catch {}
     }
   }
+
+  return {
+    hasDuplicates: duplicates.length > 0,
+    duplicates,
