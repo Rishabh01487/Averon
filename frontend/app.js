@@ -542,3 +542,7 @@ async function confirmLaunch() {
 }
 
 // ── MARKETPLACE ──────────────────────────────────────────────────────────────
+
+async function loadMarket() {
+  try {
+    const data = await api('/api/market/orderbook');
