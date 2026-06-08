@@ -118,3 +118,6 @@ function verifyAccessToken(token) {
 
 function verifyRefreshToken(token) {
   return verifyJWT(token, JWT_REFRESH_SECRET);
+}
+
+// ── Auth Middleware ───────────────────────────────────────────────────────────
