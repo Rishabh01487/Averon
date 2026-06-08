@@ -214,3 +214,7 @@ function analyzeWithFallback(asset, documents, docInfo) {
   const estimatedValue = Math.round(p.avg * (0.7 + Math.random() * 0.6));
   const verified = documents.length >= 1 && riskScore < 80;
   const confidence = Math.round(35 + quality * 0.5 + (verified ? 10 : 0));
+
+  const analysis = `${asset.category} asset analyzed from ${documents.length} document(s). ` +
+    `Estimated value: ₹${estimatedValue.toLocaleString()}. ` +
+    `Risk: ${riskLevel} (${riskScore}%). ` +
