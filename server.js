@@ -122,3 +122,7 @@ app.post('/api/auth/register', authLimiter, validate('register'), async (req, re
   eventBus.emit(EVENTS.USER_REGISTERED, { userId, name, wallet: wallet.address });
 
   DB.run('INSERT INTO activity_log (user_id, action, details, created_at) VALUES (?,?,?,?)',
+    [userId, 'ACCOUNT_CREATED', `${name} — ${wallet.address}`, now]);
+
+  res.status(201).json({
+    user: { id: userId, name, email, role, walletAddress: wallet.address, balance: 0 },
