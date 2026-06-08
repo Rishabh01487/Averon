@@ -326,3 +326,111 @@ async function viewAsset(id) {
     // Show in a modal-like explorer result on the assets page
     const grid = $('assetGrid');
     grid.innerHTML = `
+      <div style="grid-column: 1/-1">
+        <button class="btn-ghost" onclick="loadAssets()">← Back to Assets</button>
+        <div class="asset-card" style="margin-top:12px;cursor:default">
+          <div class="asset-card-header">
+            <div class="asset-title" style="font-size:20px">${a.title}</div>
+            <span class="asset-status status-${a.status}">${a.status.replace(/_/g,' ')}</span>
+          </div>
+          <div class="asset-category">${a.category} · Listed by ${a.owner_name}</div>
+          <p style="margin:12px 0;color:var(--text-secondary);font-size:14px">${a.description || 'No description'}</p>
+          <div class="ai-stat-grid">
+            <div class="ai-stat"><div class="val">₹${formatNum(a.raise_amount)}</div><div class="label">Raise Amount</div></div>
+            <div class="ai-stat"><div class="val">${a.token_count || 0}</div><div class="label">Total Tokens</div></div>
+            <div class="ai-stat"><div class="val">${a.progress || 0}%</div><div class="label">Funded</div></div>
+          </div>
+          ${a.ai_analysis_summary ? `
+          <div style="margin-top:16px;padding:16px;background:var(--bg-input);border-radius:var(--radius-sm)">
+            <strong>AI Analysis:</strong> ${a.ai_analysis_summary}<br>
+            <strong>Risk:</strong> ${a.ai_risk_level} (${a.ai_risk_score}%) · <strong>Confidence:</strong> ${a.ai_confidence}%
+          </div>` : ''}
+          ${a.status === 'active' || a.status === 'funding' ? `
+          <div style="margin-top:16px;display:flex;gap:12px;align-items:center">
+            <input type="number" id="buyTokenCount" value="1" min="1" max="${a.tokens_available}" style="width:80px;padding:8px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:white">
+            <button class="btn-primary" onclick="buyAssetTokens(${a.id})">Buy Tokens (${a.token_price?.toFixed(4) || 0} AC each)</button>
+            <span style="color:var(--text-muted);font-size:13px">${a.tokens_available} available</span>
+          </div>` : ''}
+          ${a.escrow ? `<div style="margin-top:12px;font-size:12px;color:var(--text-muted)">Escrow: ${a.escrow.address} · Balance: ${a.escrow.balance} AC</div>` : ''}
+          ${a.tx_hash ? `<div style="margin-top:8px;font-size:12px;color:var(--text-muted);font-family:var(--mono)">TX: ${a.tx_hash.substring(0,24)}... · Block #${a.block_index}</div>` : ''}
+        </div>
+      </div>`;
+  } catch {}
+}
+
+async function buyAssetTokens(assetId) {
+  const count = parseInt($('buyTokenCount')?.value) || 1;
+  try {
+    const result = await api(`/api/assets/${assetId}/tokens/buy`, { method: 'POST', body: JSON.stringify({ count }) });
+    toast(`✅ Bought ${result.tokensBought} tokens for ${result.totalCost.toFixed(4)} AC`, 'success');
+    viewAsset(assetId);
+    loadNotifications();
+  } catch {}
+}
+
+// ── BUY COIN ─────────────────────────────────────────────────────────────────
+
+async function loadBuyPage() {
+  try {
+    const acc = await api('/api/account');
+    const price = parseFloat(acc.balance !== undefined ? state.config?.price : 1);
+    $('buyPrice').textContent = `₹${price.toFixed(2)}`;
+    $('buyBalance').textContent = `${parseFloat(acc.balance).toFixed(4)} AC`;
+  } catch {}
+}
+
+function initBuyPage() {
+  $('buyAmountInr')?.addEventListener('input', () => {
+    const inr = parseFloat($('buyAmountInr').value) || 0;
+    const price = parseFloat(state.config?.price) || 1;
+    $('buyEstimate').textContent = `${(inr / price).toFixed(4)} AC`;
+  });
+
+  $('buyCoinsBtn')?.addEventListener('click', async () => {
+    const amountInr = parseFloat($('buyAmountInr').value);
+    if (!amountInr || amountInr < 10) return toast('Minimum ₹10', 'error');
+
+    $('buyCoinsBtn').disabled = true;
+    try {
+      const result = await api('/api/buy-coins', { method: 'POST', body: JSON.stringify({ amountInr }) });
+      $('buyResult').innerHTML = `✅ Minted <strong>${result.coins.toFixed(4)} AC</strong> for ₹${amountInr}<br>Balance: ${result.newBalance.toFixed(4)} AC · New Price: ₹${result.newPrice.toFixed(4)}<br><span style="font-family:var(--mono);font-size:11px">TX: ${result.txHash.substring(0,24)}... · Block #${result.blockIndex}</span>`;
+      $('buyResult').className = 'result-box success';
+      $('buyResult').classList.remove('hidden');
+      $('buyBalance').textContent = `${result.newBalance.toFixed(4)} AC`;
+      $('livePrice').textContent = result.newPrice.toFixed(2);
+      toast(`Minted ${result.coins.toFixed(4)} AC`, 'success');
+    } catch {} finally { $('buyCoinsBtn').disabled = false; }
+  });
+}
+
+// ── TOKENIZE WIZARD ──────────────────────────────────────────────────────────
+
+function initWizard() {
+  // Drop zone
+  const dropZone = $('dropZone');
+  const fileInput = $('fileInput');
+  if (!dropZone || !fileInput) return;
+
+  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+  fileInput.addEventListener('change', e => handleFiles(e.target.files));
+
+  $('createAssetBtn')?.addEventListener('click', createAsset);
+  $('uploadDocsBtn')?.addEventListener('click', uploadDocuments);
+  $('startAnalysisBtn')?.addEventListener('click', startAIAnalysis);
+  $('confirmLaunchBtn')?.addEventListener('click', confirmLaunch);
+}
+
+function handleFiles(files) {
+  for (const f of files) {
+    if (state.selectedFiles.length >= 10) break;
+    state.selectedFiles.push(f);
+  }
+  renderFileList();
+}
+
+function renderFileList() {
+  $('fileList').innerHTML = state.selectedFiles.map((f, i) => `
+    <div class="file-item">
