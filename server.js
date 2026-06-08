@@ -358,3 +358,7 @@ app.post('/api/assets/:id/tokens/buy', authenticate, financialLimiter, validate(
     res.json(result);
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
+
+// ── Marketplace ──────────────────────────────────────────────────────────────
+
+app.get('/api/market/orderbook', (req, res) => {
