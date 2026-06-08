@@ -190,3 +190,7 @@ class Blockchain {
    */
   getTransactionHistory(address, limit = 50) {
     const txs = [];
+    for (const block of this.chain) {
+      for (const tx of block.transactions) {
+        if (tx.from === address || tx.to === address) {
+          txs.push({
