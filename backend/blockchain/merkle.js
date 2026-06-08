@@ -106,3 +106,7 @@ class MerkleTree {
       }
     }
     return hash === root;
+  }
+
+  /**
+   * Build a Merkle tree from transaction hashes.
