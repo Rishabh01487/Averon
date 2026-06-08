@@ -22,3 +22,7 @@ function base64urlDecode(str) {
 
 function signJWT(payload, secret, expiresIn) {
   const header = { alg: 'HS256', typ: 'JWT' };
+  const now = Math.floor(Date.now() / 1000);
+
+  let expSeconds;
+  if (typeof expiresIn === 'string') {
