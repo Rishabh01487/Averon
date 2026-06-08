@@ -98,3 +98,6 @@ class EscrowService {
     // Update asset
     this.db.run('UPDATE assets SET payout_status = "processing", payout_amount_inr = ?, payout_tx_hash = ?, escrow_balance = 0 WHERE id = ?',
       [payout * this.db.getPrice(), payoutTx.hash, assetId]);
+
+    return { payout, fee, txHash: payoutTx.hash };
+  }
