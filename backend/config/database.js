@@ -266,3 +266,7 @@ function createSchema() {
 
   db.run(`CREATE TABLE IF NOT EXISTS price_history (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    price REAL NOT NULL,
+    volume REAL DEFAULT 0,
+    high REAL DEFAULT 0,
+    low REAL DEFAULT 0,
