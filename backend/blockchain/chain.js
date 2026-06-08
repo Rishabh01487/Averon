@@ -85,3 +85,8 @@ class Blockchain {
         throw new Error('Invalid transaction signature');
       }
     }
+
+    const ruleCheck = transaction.validateRules();
+    if (!ruleCheck.valid) {
+      throw new Error('Transaction rule violation: ' + ruleCheck.errors.join(', '));
+    }
