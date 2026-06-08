@@ -74,3 +74,7 @@ app.get('/api/config', (req, res) => {
   res.json({
     platform: C.PLATFORM_NAME, version: C.PLATFORM_VERSION,
     price: stats.price, economy: stats, blockchain: chainInfo,
+    hasGemini: !!process.env.GEMINI_API_KEY,
+    categories: C.ASSET_CATEGORIES,
+  });
+});
