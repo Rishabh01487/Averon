@@ -54,3 +54,7 @@ class Blockchain {
         this.chain = data.chain.map(b => Block.fromJSON(b));
         this.pendingTransactions = (data.pending || []).map(tx => Transaction.fromJSON(tx));
         this.difficulty = data.difficulty || C.BLOCKCHAIN.DIFFICULTY;
+      }
+    } catch (e) {
+      console.error('Chain load error:', e.message);
+      this.chain = [];
