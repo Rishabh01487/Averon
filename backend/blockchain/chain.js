@@ -109,3 +109,8 @@ class Blockchain {
   }
 
   // ── Mining ─────────────────────────────────────────────────────────────────
+
+  minePendingTransactions(minerAddress) {
+    if (this.pendingTransactions.length === 0) return null;
+
+    // Select transactions for this block (up to max)
