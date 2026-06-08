@@ -201,3 +201,8 @@ class TradingEngine {
     if (pctChange > threshold) {
       this.circuitBreakerTripped = true;
       console.warn(`  ⚠ CIRCUIT BREAKER: Price moved ${pctChange.toFixed(1)}% — trading halted`);
+
+      // Auto-reset after window
+      setTimeout(() => {
+        this.circuitBreakerTripped = false;
+        this.priceAtCheckpoint = this.db.getPrice();
