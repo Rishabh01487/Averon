@@ -434,3 +434,7 @@ function handleFiles(files) {
 function renderFileList() {
   $('fileList').innerHTML = state.selectedFiles.map((f, i) => `
     <div class="file-item">
+      <span>${f.name} (${(f.size / 1024).toFixed(0)} KB)</span>
+      <span class="file-remove" onclick="removeFile(${i})">✕</span>
+    </div>`).join('');
+  $('uploadDocsBtn').disabled = state.selectedFiles.length === 0;
