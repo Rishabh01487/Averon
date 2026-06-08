@@ -614,3 +614,7 @@ async function loadExplorer() {
 window.viewBlock = async (index) => {
   try {
     const block = await api(`/api/blockchain/block/${index}`);
+    $('explorerResult').classList.remove('hidden');
+    $('explorerResult').innerHTML = `
+      <h3>Block #${block.index}</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;font-size:13px">
