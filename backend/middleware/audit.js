@@ -70,3 +70,7 @@ function auditMiddleware(req, res, next) {
           params: req.params,
           query: req.query,
         }, {
+          userId: req.user?.userId || '',
+          ip: req.ip || '',
+          userAgent: req.headers['user-agent'] || '',
+          method: req.method,
