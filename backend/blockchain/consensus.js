@@ -114,3 +114,7 @@ function selectChain(currentChain, candidateChain) {
 }
 
 /**
+ * Detect if a fork has occurred.
+ */
+function detectFork(chain, newBlock) {
+  if (chain.length === 0) return false;
