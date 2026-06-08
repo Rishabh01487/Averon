@@ -34,3 +34,7 @@ async function analyzeAsset(asset, documents, dbModule) {
 
   // Stage 1: Document Ingestion & Classification
   const stage1 = processDocuments(documents);
+  stages.push({ stage: 'Document Ingestion', ...stage1, duration: Date.now() - startTime });
+
+  // Stage 2: Duplicate detection
+  const stage2 = detectDuplicates(documents, dbModule);
