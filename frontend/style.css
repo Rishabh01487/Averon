@@ -238,3 +238,7 @@ body {
 .launch-result { margin-top: 16px; padding: 20px; background: var(--green-dim); border: 1px solid rgba(16,185,129,0.3); border-radius: var(--radius); }
 
 /* ═══ MARKETPLACE ═══ */
+.market-layout { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.market-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+.market-panel h2 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+.order-book { font-family: var(--mono); font-size: 12px; }
