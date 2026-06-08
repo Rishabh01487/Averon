@@ -81,3 +81,8 @@ class EscrowService {
         assetId, feeType: 'capital_raise',
       });
       this.blockchain.addTransaction(feeTx);
+
+      this.db.run('INSERT INTO fee_ledger (user_id, fee_type, amount, reference_id, reference_type, created_at) VALUES (?,?,?,?,?,?)',
+        [asset.owner_id, 'capital_raise', fee, String(assetId), 'asset', Date.now()]);
+
+      this.db.incrementEconomy('total_fees_collected', fee);
