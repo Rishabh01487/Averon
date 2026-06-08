@@ -74,3 +74,6 @@ class Blockchain {
     } catch (e) {
       console.error('Chain save error:', e.message);
     }
+  }
+
+  // ── Transaction Pool ───────────────────────────────────────────────────────
