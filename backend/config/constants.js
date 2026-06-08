@@ -154,3 +154,7 @@ module.exports = {
   },
 
   // ── Price Engine ───────────────────────────────────────────────────────────
+  PRICE: {
+    INITIAL_PRICE: 1.0,
+    MIN_PRICE: 0.001,
+    MAX_PRICE: 1000000,
