@@ -58,3 +58,6 @@ function validateChain(chain) {
     const previousBlock = chain[i - 1];
 
     // Index continuity
+    if (currentBlock.index !== previousBlock.index + 1) {
+      return { valid: false, error: 'Index discontinuity', block: i, expected: previousBlock.index + 1, got: currentBlock.index };
+    }
