@@ -22,3 +22,6 @@ function computeEntryHash(entry, prevHash) {
 
 /**
  * Log an audit entry with tamper-proof hash chain.
+ */
+function logAudit(action, details = {}, options = {}) {
+  if (!_db) return;
