@@ -30,3 +30,7 @@ function adjustDifficulty(chain) {
   if (actualTime < expectedTime / 2) {
     // Blocks are mining too fast — increase difficulty
     newDifficulty = currentDifficulty + 1;
+  } else if (actualTime > expectedTime * 2) {
+    // Blocks are mining too slow — decrease difficulty
+    newDifficulty = currentDifficulty - 1;
+  }
