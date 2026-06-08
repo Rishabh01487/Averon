@@ -142,3 +142,7 @@ function inferAction(method, path) {
 function sanitizeBodyForAudit(body) {
   if (!body) return {};
   const sanitized = { ...body };
+  delete sanitized.password;
+  delete sanitized.privateKey;
+  delete sanitized.secret;
+  // Truncate long fields
