@@ -161,3 +161,8 @@ class Blockchain {
 
     // Persist
     this.save();
+
+    return newBlock;
+  }
+
+  // ── Balance Calculation (UTXO-style) ───────────────────────────────────────
