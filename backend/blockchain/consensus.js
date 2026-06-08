@@ -22,3 +22,7 @@ function adjustDifficulty(chain) {
 
   const startBlock = chain[chain.length - interval];
   const endBlock = lastBlock;
+  const actualTime = endBlock.timestamp - startBlock.timestamp;
+  const expectedTime = interval * C.BLOCKCHAIN.TARGET_BLOCK_TIME_MS;
+
+  let newDifficulty = currentDifficulty;
