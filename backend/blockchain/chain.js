@@ -90,3 +90,7 @@ class Blockchain {
     if (!ruleCheck.valid) {
       throw new Error('Transaction rule violation: ' + ruleCheck.errors.join(', '));
     }
+
+    // Check for duplicate
+    const exists = this.pendingTransactions.find(tx => tx.hash === transaction.hash);
+    if (exists) {
