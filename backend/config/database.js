@@ -502,3 +502,7 @@ function getDashboardStats() {
     price: eco.price || C.PRICE.INITIAL_PRICE,
     totalSupply: eco.total_supply || 0,
     circulatingSupply: eco.circulating_supply || 0,
+    totalRaisedInr: eco.total_raised_inr || 0,
+    totalAssetsFunded: eco.total_assets_funded || 0,
+    totalFeesCollected: eco.total_fees_collected || 0,
+    totalTrades: eco.total_trades || 0,
