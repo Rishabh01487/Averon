@@ -146,3 +146,6 @@ function detectDuplicates(documents, dbModule) {
 }
 
 // ── Stage 3a: Gemini Analysis ────────────────────────────────────────────────
+
+async function analyzeWithGemini(asset, documents, docInfo) {
+  const parts = [];
