@@ -150,3 +150,7 @@ class EscrowService {
     this.db.run('UPDATE assets SET escrow_balance = 0, funded_amount = 0 WHERE id = ?', [assetId]);
 
     return { refunded: totalRefunded, refundCount: refunds.length, refunds };
+  }
+
+  getEscrowInfo(assetId) {
+    const escrow = this.db.queryOne('SELECT * FROM escrow_accounts WHERE asset_id = ?', [assetId]);
