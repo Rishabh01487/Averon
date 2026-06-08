@@ -50,3 +50,7 @@ class MerkleTree {
 
     this.root = layer[0];
   }
+
+  getRoot() {
+    return this.root;
+  }
