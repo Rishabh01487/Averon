@@ -226,3 +226,7 @@ function analyzeWithFallback(asset, documents, docInfo) {
   if (asset.raise_amount > estimatedValue) concerns.push('Raise exceeds estimated value');
 
   return {
+    verified, estimatedValue, riskScore, riskLevel, analysis,
+    concerns: concerns.join('. '), confidence, source: 'fallback', raw: null,
+  };
+}
