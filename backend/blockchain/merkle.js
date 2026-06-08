@@ -102,3 +102,7 @@ class MerkleTree {
       if (step.position === 'left') {
         hash = MerkleTree.prototype.hashPair(step.hash, hash);
       } else {
+        hash = MerkleTree.prototype.hashPair(hash, step.hash);
+      }
+    }
+    return hash === root;
