@@ -166,3 +166,7 @@ module.exports = {
   },
 
   // ── AI Analysis ────────────────────────────────────────────────────────────
+  AI: {
+    GEMINI_MODEL: 'gemini-2.0-flash',
+    MAX_RETRIES: 3,
+    TIMEOUT_MS: 30000,
