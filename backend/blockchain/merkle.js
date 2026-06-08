@@ -98,3 +98,7 @@ class MerkleTree {
    */
   static verify(leafHash, proof, root) {
     let hash = leafHash;
+    for (const step of proof) {
+      if (step.position === 'left') {
+        hash = MerkleTree.prototype.hashPair(step.hash, hash);
+      } else {
