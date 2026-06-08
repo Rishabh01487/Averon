@@ -282,3 +282,7 @@ function createSchema() {
     user_id TEXT,
     fee_type TEXT NOT NULL,
     amount REAL NOT NULL,
+    reference_id TEXT DEFAULT '',
+    reference_type TEXT DEFAULT '',
+    tx_hash TEXT DEFAULT '',
+    created_at INTEGER NOT NULL
