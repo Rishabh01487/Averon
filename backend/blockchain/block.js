@@ -182,3 +182,7 @@ class Block {
   }
 
   static fromJSON(json) {
+    const txs = (json.transactions || []).map(tx => Transaction.fromJSON(tx));
+    const block = new Block(json.index, json.previousHash, txs, json.timestamp);
+    block.version = json.version || 1;
+    block.nonce = json.nonce;
