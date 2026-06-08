@@ -134,3 +134,7 @@ function authenticate(req, res, next) {
   if (!payload) {
     return res.status(401).json({ error: 'Invalid or expired token', code: 'TOKEN_INVALID' });
   }
+
+  // Attach user info to request
+  req.user = payload;
+  next();
