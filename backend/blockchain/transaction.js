@@ -66,3 +66,7 @@ class Transaction {
 
     // Must have a signature
     if (!this.signature || !this.signerPublicKey) {
+      return false;
+    }
+
+    try {
