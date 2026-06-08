@@ -230,3 +230,7 @@ function navigateTo(page) {
   const loaders = { home: loadDashboard, assets: loadAssets, buy: loadBuyPage, market: loadMarket, explorer: loadExplorer, portfolio: loadPortfolio };
   if (loaders[page]) loaders[page]();
 }
+
+// ── DASHBOARD ────────────────────────────────────────────────────────────────
+
+async function loadDashboard() {
