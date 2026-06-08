@@ -134,3 +134,7 @@ function detectDuplicates(documents, dbModule) {
           [hash, doc.asset_id || 0]);
         if (existing) {
           duplicates.push({ filename: doc.original_name, existingAssetId: existing.asset_id });
+        }
+      } catch {}
+    }
+  }
