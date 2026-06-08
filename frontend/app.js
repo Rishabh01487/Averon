@@ -206,3 +206,7 @@ async function loadNotifications() {
     else badge.classList.add('hidden');
   } catch {}
 }
+
+// ── NAVIGATION ───────────────────────────────────────────────────────────────
+
+function initNav() {
