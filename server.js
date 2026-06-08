@@ -370,3 +370,7 @@ app.get('/api/market/orderbook', (req, res) => {
 app.post('/api/market/order', authenticate, financialLimiter, validate('placeOrder'), (req, res) => {
   const { side, type, amount, price } = req.body;
   try {
+    const result = tradingEngine.placeOrder(req.user.userId, side, type || 'limit', parseFloat(amount), parseFloat(price));
+    eventBus.emit(EVENTS.ORDER_PLACED, result);
+    res.json(result);
+  } catch (e) { res.status(400).json({ error: e.message }); }
