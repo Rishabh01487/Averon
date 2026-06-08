@@ -494,3 +494,7 @@ async function startAIAnalysis() {
   $('aiProgress').classList.remove('hidden');
   $('aiResult').classList.add('hidden');
   $('startAnalysisBtn').disabled = true;
+
+  try {
+    const result = await api(`/api/assets/${state.currentAssetId}/analyze`, { method: 'POST' });
+    $('aiProgress').classList.add('hidden');
