@@ -54,3 +54,7 @@ class TradingEngine {
     }
 
     const now = Date.now();
+    const { lastId } = this.db.run(
+      'INSERT INTO coin_orders (user_id, type, side, amount, price, filled, remaining, status, duration, created_at, updated_at) VALUES (?,?,?,?,?,0,?,?,?,?,?)',
+      [userId, type, side, amount, price, amount, 'open', 'GTC', now, now]
+    );
