@@ -82,3 +82,7 @@ class TradingEngine {
       for (const sell of sellOrders) {
         if (sell.remaining <= 0) continue;
         if (buy.user_id === sell.user_id) continue; // No self-trade
+        if (buy.price < sell.price) break; // No match possible at this price level
+
+        const tradeAmount = Math.min(buy.remaining, sell.remaining);
+        const tradePrice = sell.price; // Seller's price (maker gets their price)
