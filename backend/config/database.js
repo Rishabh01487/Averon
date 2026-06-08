@@ -478,3 +478,7 @@ function setPrice(newPrice) {
 function updateEconomy(field, value) {
   run(`UPDATE economy SET ${field} = ?, updated_at = ? WHERE id = 1`, [value, Date.now()]);
 }
+
+function incrementEconomy(field, amount) {
+  run(`UPDATE economy SET ${field} = ${field} + ?, updated_at = ? WHERE id = 1`, [amount, Date.now()]);
+}
