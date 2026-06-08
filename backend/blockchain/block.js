@@ -26,3 +26,7 @@ class Block {
 
   computeMerkleRoot() {
     if (this.transactions.length === 0) {
+      return crypto.createHash('sha256').update('empty-block').digest('hex');
+    }
+    const tree = MerkleTree.fromTransactions(this.transactions);
+    return tree.getRoot();
