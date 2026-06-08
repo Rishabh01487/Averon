@@ -78,3 +78,6 @@ class EscrowService {
     if (fee > 0) {
       const feeWallet = this.walletManager.getPlatformFeeWallet();
       const feeTx = new Transaction(escrow.address, feeWallet.address, fee, C.TX_TYPES.FEE, {
+        assetId, feeType: 'capital_raise',
+      });
+      this.blockchain.addTransaction(feeTx);
