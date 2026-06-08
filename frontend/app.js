@@ -513,3 +513,8 @@ async function startAIAnalysis() {
       ${result.verified ? `<button class="btn-primary" style="margin-top:16px" onclick="goToLaunch(${JSON.stringify(result).replace(/"/g, '&quot;')})">Proceed to Launch →</button>` : '<p style="margin-top:12px;color:var(--red)">Please improve documentation and re-submit.</p>'}`;
   } catch (e) { $('aiProgress').classList.add('hidden'); toast(e.message, 'error'); } finally { $('startAnalysisBtn').disabled = false; }
 }
+
+window.goToLaunch = (aiResult) => {
+  state.aiResult = aiResult;
+  $('launchSummary').innerHTML = `
+    <div class="ai-stat-grid">
