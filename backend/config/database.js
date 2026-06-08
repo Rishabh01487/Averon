@@ -149,3 +149,8 @@ function createSchema() {
     uploaded_at INTEGER NOT NULL,
     FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE CASCADE
   )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS asset_status_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    asset_id INTEGER NOT NULL,
+    old_status TEXT,
