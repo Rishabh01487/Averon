@@ -154,3 +154,7 @@ app.post('/api/auth/login', authLimiter, validate('login'), async (req, res) => 
       DB.run('UPDATE users SET login_attempts = ? WHERE id = ?', [attempts, user.id]);
     }
     return res.status(401).json({ error: 'Invalid credentials', code: 'AUTH_FAILED' });
+  }
+
+  // Reset attempts on success
+  DB.run('UPDATE users SET login_attempts = 0, locked_until = 0, last_login = ? WHERE id = ?', [Date.now(), user.id]);
