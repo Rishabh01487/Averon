@@ -106,3 +106,6 @@ class EscrowService {
    * Refund all investors (when asset expires unfunded).
    */
   refundAll(assetId) {
+    const { Transaction } = require('../blockchain/transaction');
+    const escrow = this.db.queryOne('SELECT * FROM escrow_accounts WHERE asset_id = ?', [assetId]);
+    if (!escrow || escrow.balance <= 0) return { refunded: 0 };
