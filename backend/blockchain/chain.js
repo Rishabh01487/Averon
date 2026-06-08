@@ -214,3 +214,7 @@ class Blockchain {
       for (const tx of block.transactions) {
         if (tx.hash === hash) {
           return {
+            ...tx.toJSON(),
+            blockIndex: block.index,
+            blockHash: block.hash,
+            confirmations: this.chain.length - block.index,
