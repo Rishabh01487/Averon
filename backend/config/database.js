@@ -438,3 +438,7 @@ function run(sql, params = []) {
     console.error('SQL Run Error:', e.message, '\n  SQL:', sql, '\n  Params:', params);
     return { changes: 0, lastId: 0 };
   }
+}
+
+function runTransaction(fn) {
+  db.run('BEGIN TRANSACTION');
