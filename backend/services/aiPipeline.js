@@ -266,3 +266,6 @@ function calculateTokenization(raiseAmount, analysis) {
   const tokenPriceInr = parseFloat((raiseAmount / suggestedTokens).toFixed(2));
 
   return { suggestedTokens, tokenPriceInr, idealPrice: parseFloat(idealPrice.toFixed(2)) };
+}
+
+module.exports = { analyzeAsset };
