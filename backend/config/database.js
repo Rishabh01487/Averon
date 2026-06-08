@@ -182,3 +182,6 @@ function createSchema() {
     owner_id TEXT DEFAULT NULL,
     purchased_at INTEGER DEFAULT NULL,
     tx_hash TEXT DEFAULT '',
+    FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE CASCADE,
+    FOREIGN KEY (owner_id) REFERENCES users(id)
+  )`);
