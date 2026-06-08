@@ -118,3 +118,7 @@ function selectChain(currentChain, candidateChain) {
  */
 function detectFork(chain, newBlock) {
   if (chain.length === 0) return false;
+  const lastBlock = chain[chain.length - 1];
+  // Fork = new block references a block that isn't the latest
+  return newBlock.previousHash !== lastBlock.hash && newBlock.index <= lastBlock.index;
+}
