@@ -106,3 +106,6 @@ class Blockchain {
 
     this.pendingTransactions.push(transaction);
     return transaction;
+  }
+
+  // ── Mining ─────────────────────────────────────────────────────────────────
