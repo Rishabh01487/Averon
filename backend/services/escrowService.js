@@ -121,3 +121,8 @@ class EscrowService {
       if (!wallet) continue;
 
       const refundAmount = parseFloat(token.total.toFixed(8));
+
+      const refundTx = new Transaction(escrow.address, wallet.address, refundAmount, C.TX_TYPES.REFUND, {
+        assetId, tokenCount: token.count,
+      });
+      this.blockchain.addTransaction(refundTx);
