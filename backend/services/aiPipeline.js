@@ -170,3 +170,7 @@ ${parts.length > 1 ? 'Document images attached above.' : 'No images available.'}
 
 Respond ONLY with this JSON (no markdown):
 {"verified":true,"estimated_value":50000,"risk_score":30,"risk_level":"LOW","analysis":"summary","concerns":"","confidence":80}` });
+
+  const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
