@@ -86,3 +86,7 @@ body {
 }
 .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
 .field input::placeholder, .field textarea::placeholder { color: var(--text-muted); }
+.field textarea { resize: vertical; min-height: 80px; }
+.field-row { display: flex; gap: 16px; }
+.field-row .field { flex: 1; }
+.select-sm { padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 13px; }
