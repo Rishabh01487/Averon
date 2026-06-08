@@ -222,3 +222,6 @@ class AssetService {
       [Date.now(), Date.now(), assetId]);
 
     // Notify owner
+    this.db.run('INSERT INTO notifications (user_id, type, title, message, created_at) VALUES (?,?,?,?,?)',
+      [asset.owner_id, 'ASSET_FUNDED', '🎉 Asset Fully Funded!',
+       `"${asset.title}" has been fully funded! ${payoutResult.payout.toFixed(4)} AC payout processed.`, Date.now()]);
