@@ -22,3 +22,7 @@ function createRateLimiter(config) {
 
   return (req, res, next) => {
     const key = `${req.ip}:${req.baseUrl || req.path}`;
+    const now = Date.now();
+    const windowStart = now - windowMs;
+
+    let entries = windows.get(key) || [];
