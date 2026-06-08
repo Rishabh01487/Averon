@@ -74,3 +74,7 @@ class WalletManager {
       console.error('Wallet load error:', e.message);
       this.wallets = {};
     }
+  }
+
+  save() {
+    const data = {};
