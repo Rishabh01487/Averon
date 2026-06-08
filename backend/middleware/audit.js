@@ -110,3 +110,7 @@ function verifyAuditChain() {
   return {
     valid: corrupted.length === 0,
     entries: entries.length,
+    corrupted: corrupted.length,
+    details: corrupted.slice(0, 10), // Only return first 10
+  };
+}
