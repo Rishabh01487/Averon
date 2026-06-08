@@ -26,3 +26,7 @@ function adjustDifficulty(chain) {
   const expectedTime = interval * C.BLOCKCHAIN.TARGET_BLOCK_TIME_MS;
 
   let newDifficulty = currentDifficulty;
+
+  if (actualTime < expectedTime / 2) {
+    // Blocks are mining too fast — increase difficulty
+    newDifficulty = currentDifficulty + 1;
