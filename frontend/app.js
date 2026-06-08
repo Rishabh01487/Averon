@@ -750,3 +750,12 @@ document.addEventListener('change', (e) => {
 document.addEventListener('DOMContentLoaded', () => {
   initAuth();
   initNav();
+  initBuyPage();
+  initWizard();
+  initMarket();
+  initExplorer();
+
+  if (loadSession()) {
+    enterApp();
+  }
+});
