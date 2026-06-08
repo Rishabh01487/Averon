@@ -182,3 +182,7 @@ module.exports = {
     ADMIN: 'admin',
     AUDITOR: 'auditor',
   },
+
+  // ── Audit Actions ──────────────────────────────────────────────────────────
+  AUDIT_ACTIONS: [
+    'LOGIN', 'LOGOUT', 'REGISTER', 'PASSWORD_CHANGE',
