@@ -46,3 +46,7 @@ async function analyzeAsset(asset, documents, dbModule) {
     try {
       analysis = await analyzeWithGemini(asset, documents, stage1);
       stages.push({ stage: 'AI Analysis', source: 'gemini', duration: Date.now() - startTime });
+    } catch (e) {
+      console.warn('Gemini failed:', e.message);
+      analysis = analyzeWithFallback(asset, documents, stage1);
+      stages.push({ stage: 'AI Analysis', source: 'fallback', error: e.message });
