@@ -146,3 +146,7 @@ class Block {
     if (previousBlock && this.previousHash !== previousBlock.hash) errors.push('Previous hash mismatch');
 
     // Merkle root
+    if (!this.verifyMerkleRoot()) errors.push('Merkle root mismatch');
+
+    // Timestamp
+    if (previousBlock && !this.validateTimestamp(previousBlock.timestamp)) errors.push('Invalid timestamp');
