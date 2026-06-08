@@ -10,3 +10,7 @@ class TradingEngine {
     this.db = db;
     this.blockchain = blockchain;
     this.walletManager = walletManager;
+    this.circuitBreakerTripped = false;
+    this.lastPriceCheck = Date.now();
+    this.priceAtCheckpoint = db.getPrice();
+  }
