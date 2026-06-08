@@ -222,3 +222,7 @@ body {
 .file-list { margin: 16px 0; display: flex; flex-direction: column; gap: 8px; }
 .file-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--bg-input); border-radius: var(--radius-sm); font-size: 13px; }
 .file-remove { cursor: pointer; color: var(--red); font-size: 16px; }
+
+.ai-progress { text-align: center; padding: 32px; }
+.ai-spinner { width: 48px; height: 48px; border: 3px solid var(--border); border-top: 3px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+@keyframes spin { to { transform: rotate(360deg); } }
