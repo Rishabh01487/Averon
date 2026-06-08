@@ -126,3 +126,7 @@ function detectDuplicates(documents, dbModule) {
         const filePath = doc.path || doc.filepath;
         if (!fs.existsSync(filePath)) continue;
         const content = fs.readFileSync(filePath);
+        const hash = crypto.createHash('sha256').update(content).digest('hex');
+        doc.doc_hash = hash;
+
+        // Check database for same hash
