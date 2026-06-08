@@ -474,3 +474,6 @@ app.get('/api/economy/price-history', (req, res) => {
   const limit = Math.min(parseInt(req.query.limit) || 100, 500);
   const history = DB.query('SELECT price, volume, recorded_at FROM price_history ORDER BY recorded_at DESC LIMIT ?', [limit]);
   res.json(history.reverse());
+});
+
+// ── Timers ───────────────────────────────────────────────────────────────────
