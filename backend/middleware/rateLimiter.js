@@ -66,3 +66,7 @@ function createUserRateLimiter(config) {
     entries = entries.filter(t => t > windowStart);
     entries.push(now);
     windows.set(key, entries);
+
+    if (entries.length > max) {
+      return res.status(429).json({
+        error: 'Too many requests for this action',
