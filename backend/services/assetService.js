@@ -186,3 +186,6 @@ class AssetService {
     }
 
     // Notify owner
+    this.db.run('INSERT INTO notifications (user_id, type, title, message, created_at) VALUES (?,?,?,?,?)',
+      [asset.owner_id, 'TOKEN_SOLD', 'Token Purchased',
+       `${count} token(s) of "${asset.title}" purchased. ${sold}/${asset.token_count} tokens sold.`, Date.now()]);
