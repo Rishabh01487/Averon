@@ -313,3 +313,8 @@ app.post('/api/assets/:id/analyze', authenticate, (req, res) => {
   try { assetService.transition(assetId, C.ASSET_STATUS.AI_ANALYZING, req.user.userId, 'AI analysis triggered'); } catch {}
 
   const docs = DB.query('SELECT * FROM asset_documents WHERE asset_id = ?', [assetId]);
+
+  (async () => {
+    try {
+      const result = await analyzeAsset(
+        { title: asset.title, description: asset.description, category: asset.category, raise_amount: asset.raise_amount },
