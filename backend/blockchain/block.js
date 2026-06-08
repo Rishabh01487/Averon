@@ -174,3 +174,7 @@ class Block {
       hash: this.hash,
       nonce: this.nonce,
       difficulty: this.difficulty,
+      miner: this.miner,
+      size: this.size,
+      transactionCount: this.transactions.length,
+      transactions: this.transactions.map(tx => tx.toJSON ? tx.toJSON() : tx),
