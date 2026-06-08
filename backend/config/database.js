@@ -154,3 +154,7 @@ function createSchema() {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     asset_id INTEGER NOT NULL,
     old_status TEXT,
+    new_status TEXT NOT NULL,
+    changed_by TEXT DEFAULT '',
+    reason TEXT DEFAULT '',
+    created_at INTEGER NOT NULL,
