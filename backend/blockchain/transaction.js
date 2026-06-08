@@ -82,3 +82,7 @@ class Transaction {
   /**
    * Validate business rules for this transaction type.
    */
+  validateRules() {
+    const errors = [];
+
+    // Amount checks
