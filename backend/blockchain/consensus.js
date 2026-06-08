@@ -82,3 +82,7 @@ function validateChain(chain) {
     // Merkle root
     if (typeof currentBlock.verifyMerkleRoot === 'function' && !currentBlock.verifyMerkleRoot()) {
       return { valid: false, error: 'Merkle root mismatch', block: i };
+    }
+
+    // Timestamp ordering
+    if (currentBlock.timestamp <= previousBlock.timestamp) {
