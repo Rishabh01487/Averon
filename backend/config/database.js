@@ -118,3 +118,7 @@ function createSchema() {
     payout_tx_hash TEXT DEFAULT '',
     
     escrow_address TEXT DEFAULT '',
+    escrow_balance REAL DEFAULT 0,
+    
+    tx_hash TEXT DEFAULT '',
+    block_index INTEGER DEFAULT 0,
