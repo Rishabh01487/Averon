@@ -618,3 +618,7 @@ window.viewBlock = async (index) => {
     $('explorerResult').innerHTML = `
       <h3>Block #${block.index}</h3>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;font-size:13px">
+        <div><strong>Hash:</strong> <span style="font-family:var(--mono);font-size:11px">${block.hash}</span></div>
+        <div><strong>Previous:</strong> <span style="font-family:var(--mono);font-size:11px">${block.previousHash}</span></div>
+        <div><strong>Merkle Root:</strong> <span style="font-family:var(--mono);font-size:11px">${block.merkleRoot}</span></div>
+        <div><strong>Nonce:</strong> ${block.nonce} · <strong>Difficulty:</strong> ${block.difficulty}</div>
