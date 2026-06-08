@@ -62,3 +62,7 @@ class Transaction {
    */
   isValid() {
     // System transactions (mints, rewards) don't require signatures
+    if (this.from === 'SYSTEM') return true;
+
+    // Must have a signature
+    if (!this.signature || !this.signerPublicKey) {
