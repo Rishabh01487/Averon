@@ -222,3 +222,7 @@ class TradingEngine {
     return {
       buys: buys.map(o => ({ id: o.id, amount: o.remaining, price: o.price, total: parseFloat((o.remaining * o.price).toFixed(4)) })),
       sells: sells.map(o => ({ id: o.id, amount: o.remaining, price: o.price, total: parseFloat((o.remaining * o.price).toFixed(4)) })),
+      spread,
+      circuitBreaker: this.circuitBreakerTripped,
+    };
+  }
