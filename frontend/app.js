@@ -662,3 +662,7 @@ function initExplorer() {
           <div><strong>Block:</strong> #${tx.blockIndex}</div>
           <div><strong>Confirmations:</strong> ${tx.confirmations}</div>
           <div><strong>Hash:</strong> <span style="font-family:var(--mono);font-size:11px">${tx.hash}</span></div>
+        </div>`;
+    } catch {
+      // Try as address
+      try {
