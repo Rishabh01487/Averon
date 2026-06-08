@@ -326,3 +326,7 @@ function createSchema() {
     description TEXT DEFAULT '',
     updated_by TEXT DEFAULT '',
     updated_at INTEGER NOT NULL
+  )`);
+
+  // ── Activity Log ─────────────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS activity_log (
