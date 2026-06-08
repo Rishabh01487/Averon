@@ -402,3 +402,7 @@ function initBuyPage() {
     } catch {} finally { $('buyCoinsBtn').disabled = false; }
   });
 }
+
+// ── TOKENIZE WIZARD ──────────────────────────────────────────────────────────
+
+function initWizard() {
