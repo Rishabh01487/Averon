@@ -82,3 +82,6 @@ function createUserRateLimiter(config) {
 // Pre-built limiters
 const generalLimiter = createRateLimiter(C.RATE_LIMITS.GENERAL);
 const authLimiter = createRateLimiter(C.RATE_LIMITS.AUTH);
+const financialLimiter = createRateLimiter(C.RATE_LIMITS.FINANCIAL);
+const uploadLimiter = createRateLimiter(C.RATE_LIMITS.UPLOAD);
+const adminLimiter = createRateLimiter(C.RATE_LIMITS.ADMIN);
