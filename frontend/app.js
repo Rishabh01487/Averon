@@ -470,3 +470,7 @@ async function createAsset() {
 }
 
 async function uploadDocuments() {
+  if (!state.currentAssetId || state.selectedFiles.length === 0) return;
+
+  const formData = new FormData();
+  for (const file of state.selectedFiles) formData.append('documents', file);
