@@ -250,3 +250,7 @@ class Blockchain {
   getRecentBlocks(limit = 20) {
     return [...this.chain].reverse().slice(0, limit);
   }
+
+  getPendingCount() {
+    return this.pendingTransactions.length;
+  }
