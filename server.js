@@ -250,3 +250,7 @@ app.post('/api/buy-coins', authenticate, financialLimiter, validate('buyCoins'),
 });
 
 // ── Assets ───────────────────────────────────────────────────────────────────
+
+app.get('/api/assets', optionalAuth, (req, res) => {
+  const { status, category, limit } = req.query;
+  const filters = { excludeStatus: 'rejected' };
