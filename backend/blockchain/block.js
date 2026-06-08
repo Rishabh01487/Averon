@@ -78,3 +78,7 @@ class Block {
    * Validate all transactions in this block.
    */
   validateTransactions() {
+    const errors = [];
+    for (let i = 0; i < this.transactions.length; i++) {
+      const tx = this.transactions[i];
+      if (!tx.isValid()) {
