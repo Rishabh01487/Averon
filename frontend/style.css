@@ -294,3 +294,7 @@ body {
 .my-orders .order-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg-input); border-radius: var(--radius-sm); margin-bottom: 8px; }
 .tx-history .tx-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 13px; }
 .tx-action { font-weight: 600; color: var(--accent); font-family: var(--mono); font-size: 11px; min-width: 120px; }
+.tx-details { flex: 1; color: var(--text-secondary); }
+.tx-time { color: var(--text-muted); font-size: 11px; }
+
+/* ═══ TOAST ═══ */
