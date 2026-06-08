@@ -62,3 +62,6 @@ class AssetService {
 
     this.db.run('INSERT INTO activity_log (user_id, action, details, amount, created_at) VALUES (?,?,?,?,?)',
       [userId, 'ASSET_CREATED', `"${title}" — ₹${raiseAmount} raise`, parseFloat(raiseAmount), now]);
+
+    return { assetId: lastId, status: C.ASSET_STATUS.DRAFT };
+  }
