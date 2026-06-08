@@ -10,3 +10,7 @@ const path = require('path');
 class Wallet {
   constructor(userId) {
     this.userId = userId;
+    const keyPair = crypto.generateKeyPairSync('ec', {
+      namedCurve: 'secp256k1',
+      publicKeyEncoding: { type: 'spki', format: 'pem' },
+      privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
