@@ -506,3 +506,7 @@ async function startAIAnalysis() {
         <div class="ai-stat"><div class="val">₹${formatNum(result.estimatedValue)}</div><div class="label">Estimated Value</div></div>
         <div class="ai-stat"><div class="val">${result.riskScore}%</div><div class="label">Risk Score (${result.riskLevel})</div></div>
         <div class="ai-stat"><div class="val">${result.confidence}%</div><div class="label">Confidence</div></div>
+      </div>
+      <p style="margin-top:12px;font-size:13px;color:var(--text-secondary)">${result.analysis}</p>
+      ${result.concerns ? `<p style="margin-top:8px;font-size:12px;color:var(--yellow)">⚠️ ${result.concerns}</p>` : ''}
+      <p style="margin-top:8px;font-size:11px;color:var(--text-muted)">Source: ${result.source} · ${result.duration}ms · ${(result.stages||[]).length} stages</p>
