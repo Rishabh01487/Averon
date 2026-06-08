@@ -98,3 +98,7 @@ app.post('/api/auth/register', authLimiter, validate('register'), async (req, re
 
   // Create wallet
   const wallet = walletManager.createWallet(userId);
+
+  // Determine role (first user = admin)
+  const userCount = DB.queryOne('SELECT COUNT(*) as c FROM users')?.c || 0;
+  const role = userCount === 0 ? C.ROLES.ADMIN : C.ROLES.USER;
