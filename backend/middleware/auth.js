@@ -174,3 +174,6 @@ function createSession(db, userId, refreshToken, req) {
   const expiresAt = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days
   const deviceInfo = req.headers['user-agent'] || '';
   const ip = req.ip || req.connection?.remoteAddress || '';
+
+  run('INSERT INTO sessions (id, user_id, refresh_token, device_info, ip_address, expires_at, created_at) VALUES (?,?,?,?,?,?,?)',
+    [sessionId, userId, refreshToken, deviceInfo, ip, expiresAt, Date.now()]);
