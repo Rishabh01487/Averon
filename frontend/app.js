@@ -286,3 +286,7 @@ function drawPriceChart(prices) {
   ctx.lineTo(0, h);
   ctx.closePath();
   const grad = ctx.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, 'rgba(99, 102, 241, 0.3)');
+  grad.addColorStop(1, 'rgba(99, 102, 241, 0)');
+  ctx.fillStyle = grad;
+  ctx.fill();
