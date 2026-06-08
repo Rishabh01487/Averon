@@ -122,3 +122,7 @@ function detectFork(chain, newBlock) {
   // Fork = new block references a block that isn't the latest
   return newBlock.previousHash !== lastBlock.hash && newBlock.index <= lastBlock.index;
 }
+
+/**
+ * Get chain statistics.
+ */
