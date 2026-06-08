@@ -182,3 +182,7 @@ class TradingEngine {
   }
 
   // ── Circuit Breaker ──────────────────────────────────────────────────────
+
+  checkCircuitBreaker(currentPrice) {
+    const enabled = this.db.getConfig('circuit_breaker_enabled') === 'true';
+    if (!enabled) return;
