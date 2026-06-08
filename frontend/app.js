@@ -14,3 +14,7 @@ async function api(path, opts = {}) {
 
   try {
     const res = await fetch(API + path, { headers, ...opts });
+
+    // Token refresh
+    if (res.status === 401 && state.refreshToken) {
+      const refreshed = await fetch(API + '/api/auth/refresh', {
