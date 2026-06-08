@@ -70,3 +70,7 @@ module.exports = {
     COMPLIANCE_REVIEW: 'compliance_review',
     FLAGGED: 'flagged',
     ACTIVE: 'active',
+    FUNDING: 'funding',
+    FUNDED: 'funded',
+    PAYOUT_PENDING: 'payout_pending',
+    COMPLETED: 'completed',
