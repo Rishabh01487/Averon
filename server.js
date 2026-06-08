@@ -226,3 +226,7 @@ app.post('/api/buy-coins', authenticate, financialLimiter, validate('buyCoins'),
 
   // Blockchain MINT
   const mintTx = new Transaction('SYSTEM', wallet.address, coinAmount, C.TX_TYPES.MINT, { inr: amountInr, price });
+  blockchain.addTransaction(mintTx);
+  const block = blockchain.minePendingTransactions(systemWallet.address);
+
+  const newBalance = blockchain.getBalance(wallet.address);
