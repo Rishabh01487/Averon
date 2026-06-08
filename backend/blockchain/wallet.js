@@ -30,3 +30,7 @@ class Wallet {
     if (typeof transaction.sign === 'function') {
       transaction.sign(this.privateKey);
       transaction.setSignerPublicKey(this.publicKey);
+    }
+  }
+
+  static fromKeys(userId, publicKey, privateKey) {
