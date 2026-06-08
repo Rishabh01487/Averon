@@ -490,3 +490,7 @@ function getEconomy() {
 function getDashboardStats() {
   const eco = getEconomy() || {};
   const assetStats = queryOne(`SELECT 
+    COUNT(*) as total,
+    SUM(CASE WHEN status = '${C.ASSET_STATUS.ACTIVE}' OR status = '${C.ASSET_STATUS.FUNDING}' THEN 1 ELSE 0 END) as active,
+    SUM(CASE WHEN status = '${C.ASSET_STATUS.FUNDED}' OR status = '${C.ASSET_STATUS.COMPLETED}' THEN 1 ELSE 0 END) as funded,
+    SUM(CASE WHEN status IN ('${C.ASSET_STATUS.DRAFT}','${C.ASSET_STATUS.DOCUMENTS_UPLOADED}','${C.ASSET_STATUS.AI_ANALYZING}','${C.ASSET_STATUS.VERIFIED}','${C.ASSET_STATUS.COMPLIANCE_REVIEW}') THEN 1 ELSE 0 END) as pending
