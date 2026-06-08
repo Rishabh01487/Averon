@@ -26,3 +26,7 @@ class EventBus {
     // Also emit to wildcard listeners
     const wildcards = this.listeners.get('*') || [];
     for (const cb of wildcards) {
+      try { cb({ event, data }); } catch {}
+    }
+  }
+}
