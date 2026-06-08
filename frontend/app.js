@@ -34,3 +34,7 @@ async function api(path, opts = {}) {
         return null;
       }
     }
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || data.details?.map(d => d.message).join(', ') || `HTTP ${res.status}`);
+    return data;
