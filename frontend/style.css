@@ -302,3 +302,7 @@ body {
 .toast {
   padding: 14px 20px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500;
   box-shadow: var(--shadow); animation: toastIn 0.3s, toastOut 0.3s 3.7s;
+  max-width: 380px;
+}
+.toast.success { background: var(--green-dim); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+.toast.error { background: var(--red-dim); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
