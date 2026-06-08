@@ -25,3 +25,8 @@ const PROFILES = {
   'Energy':             { avg: 200000, risk: [20,45] },
   'Other':              { avg: 25000, risk: [30,65] },
 };
+
+// ── MAIN PIPELINE ────────────────────────────────────────────────────────────
+
+async function analyzeAsset(asset, documents, dbModule) {
+  const stages = [];
