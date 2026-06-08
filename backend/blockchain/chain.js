@@ -26,3 +26,7 @@ class Blockchain {
   }
 
   // ── Genesis Block ──────────────────────────────────────────────────────────
+
+  createGenesisBlock() {
+    const genesisTx = new Transaction('SYSTEM', 'SYSTEM', 0, C.TX_TYPES.MINT, {
+      message: 'Averon Genesis Block — Real-World Asset Tokenization Platform',
