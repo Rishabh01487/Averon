@@ -30,3 +30,7 @@ class Block {
     }
     const tree = MerkleTree.fromTransactions(this.transactions);
     return tree.getRoot();
+  }
+
+  calculateHash() {
+    const payload = JSON.stringify({
