@@ -210,3 +210,7 @@ function analyzeWithFallback(asset, documents, docInfo) {
   const qualityAdj = (quality / 100) * -15;
   const ratioAdj = asset.raise_amount > p.avg ? 10 : -5;
   const riskScore = Math.round(Math.min(95, Math.max(5, baseRisk + qualityAdj + ratioAdj)));
+  const riskLevel = riskScore < 30 ? 'LOW' : riskScore < 60 ? 'MEDIUM' : 'HIGH';
+  const estimatedValue = Math.round(p.avg * (0.7 + Math.random() * 0.6));
+  const verified = documents.length >= 1 && riskScore < 80;
+  const confidence = Math.round(35 + quality * 0.5 + (verified ? 10 : 0));
