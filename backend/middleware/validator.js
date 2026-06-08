@@ -102,3 +102,7 @@ function validate(schemaName) {
         // Skip non-required fields that are undefined
         if (value === undefined && rule !== rules.required) continue;
         if (rule === rules.required && !rule(value)) {
+          errors.push({ field, message: msg });
+          break; // Stop checking this field
+        }
+        if (value !== undefined && typeof rule === 'function' && !rule(value)) {
