@@ -118,3 +118,7 @@ class WalletManager {
 
   getAllAddresses() {
     return Object.values(this.wallets).map(w => ({ userId: w.userId, address: w.address }));
+  }
+
+  /**
+   * Get wallet info safe for client (no private key).
