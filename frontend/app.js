@@ -546,3 +546,7 @@ async function confirmLaunch() {
 async function loadMarket() {
   try {
     const data = await api('/api/market/orderbook');
+    $('sellOrders').innerHTML = (data.sells || []).map(o => `<div class="ob-row"><span>${o.price.toFixed(4)}</span><span>${o.amount.toFixed(4)}</span><span>${o.total.toFixed(2)}</span></div>`).join('') || '<div class="empty-state" style="padding:16px">No sell orders</div>';
+    $('buyOrders').innerHTML = (data.buys || []).map(o => `<div class="ob-row"><span>${o.price.toFixed(4)}</span><span>${o.amount.toFixed(4)}</span><span>${o.total.toFixed(2)}</span></div>`).join('') || '<div class="empty-state" style="padding:16px">No buy orders</div>';
+    $('obSpread').textContent = data.spread !== null ? `Spread: ₹${data.spread.toFixed(4)}` : 'Spread: —';
+    $('recentTrades').innerHTML = (data.recentTrades || []).map(t => `<div class="trade-item"><span class="trade-amount">${t.amount.toFixed(4)} AC</span><span>₹${t.price.toFixed(4)}</span><span>${timeAgo(t.created_at)}</span></div>`).join('') || '<div class="empty-state" style="padding:16px">No trades yet</div>';
