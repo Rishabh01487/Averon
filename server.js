@@ -186,3 +186,7 @@ app.post('/api/auth/refresh', (req, res) => {
 });
 
 // ── Account ──────────────────────────────────────────────────────────────────
+
+app.get('/api/account', authenticate, (req, res) => {
+  const user = DB.queryOne('SELECT * FROM users WHERE id = ?', [req.user.userId]);
+  if (!user) return res.status(404).json({ error: 'User not found' });
