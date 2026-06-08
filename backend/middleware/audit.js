@@ -62,3 +62,7 @@ function auditMiddleware(req, res, next) {
   if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
     const originalSend = res.send;
     res.send = function (body) {
+      // Log after response is sent
+      const action = inferAction(req.method, req.path);
+      if (action) {
+        logAudit(action, {
