@@ -246,3 +246,7 @@ class AssetService {
         } else {
           // Expired — refund
           this.transition(asset.id, C.ASSET_STATUS.EXPIRED, 'system', 'Deadline reached');
+          this.transition(asset.id, C.ASSET_STATUS.REFUNDING, 'system', 'Processing refunds');
+
+          const refundResult = this.escrow.refundAll(asset.id);
+          if (refundResult.refunded > 0) {
