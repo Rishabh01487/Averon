@@ -142,3 +142,7 @@ class AssetService {
     if (balance < totalCost) throw new Error(`Need ${totalCost.toFixed(4)} AC, have ${balance.toFixed(4)} AC`);
 
     // Blockchain: User → Escrow
+    const wallet = this.walletManager.getWallet(userId);
+    const investTx = new Transaction(walletData.address, asset.escrow_address || `ESCROW_${assetId}`, totalCost, C.TX_TYPES.INVEST, {
+      assetId, tokenCount: count, pricePerToken: asset.token_price,
+    });
