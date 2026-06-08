@@ -410,3 +410,7 @@ function initWizard() {
   const dropZone = $('dropZone');
   const fileInput = $('fileInput');
   if (!dropZone || !fileInput) return;
+
+  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
