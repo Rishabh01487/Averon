@@ -89,3 +89,8 @@ class TradingEngine {
         const totalValue = parseFloat((tradeAmount * tradePrice).toFixed(4));
 
         if (tradeAmount <= 0) continue;
+
+        // Calculate fees
+        const feeRate = parseFloat(this.db.getConfig('trading_fee_percent') || C.FEES.TRADING_FEE_PERCENT) / 100;
+        const buyerFee = parseFloat((tradeAmount * feeRate).toFixed(8));
+        const sellerFee = parseFloat((totalValue * feeRate).toFixed(8));
