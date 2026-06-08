@@ -266,3 +266,7 @@ class Blockchain {
   getInfo() {
     const stats = getChainStats(this.chain);
     return {
+      ...stats,
+      difficulty: this.difficulty,
+      miningReward: this.miningReward,
+      pendingTransactions: this.pendingTransactions.length,
