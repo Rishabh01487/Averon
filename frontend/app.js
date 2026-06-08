@@ -558,3 +558,7 @@ async function loadMarket() {
 
 function initMarket() {
   $$('.order-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      $$('.order-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      state.orderSide = tab.dataset.side;
