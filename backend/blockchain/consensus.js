@@ -106,3 +106,7 @@ function selectChain(currentChain, candidateChain) {
 
   // Longest chain wins
   if (candidateChain.length > currentChain.length) {
+    return { winner: 'candidate', reason: 'Candidate chain is longer' };
+  }
+
+  // If same length, keep current (no unnecessary switch)
