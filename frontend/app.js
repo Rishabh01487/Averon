@@ -346,3 +346,7 @@ async function viewAsset(id) {
             <strong>Risk:</strong> ${a.ai_risk_level} (${a.ai_risk_score}%) · <strong>Confidence:</strong> ${a.ai_confidence}%
           </div>` : ''}
           ${a.status === 'active' || a.status === 'funding' ? `
+          <div style="margin-top:16px;display:flex;gap:12px;align-items:center">
+            <input type="number" id="buyTokenCount" value="1" min="1" max="${a.tokens_available}" style="width:80px;padding:8px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:white">
+            <button class="btn-primary" onclick="buyAssetTokens(${a.id})">Buy Tokens (${a.token_price?.toFixed(4) || 0} AC each)</button>
+            <span style="color:var(--text-muted);font-size:13px">${a.tokens_available} available</span>
