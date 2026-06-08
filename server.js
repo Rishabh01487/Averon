@@ -382,3 +382,7 @@ app.delete('/api/market/order/:id', authenticate, (req, res) => {
     res.json(result);
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
+
+// ── Portfolio ────────────────────────────────────────────────────────────────
+
+app.get('/api/portfolio', authenticate, (req, res) => {
