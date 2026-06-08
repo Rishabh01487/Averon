@@ -634,3 +634,7 @@ window.viewBlock = async (index) => {
           </div>
           <div style="color:var(--text-muted);margin-top:4px;font-family:var(--mono);font-size:10px">
             ${tx.from?.substring(0,16)}... → ${tx.to?.substring(0,16)}... · ${tx.hash?.substring(0,16)}...
+          </div>
+        </div>`).join('')}`;
+  } catch {}
+};
