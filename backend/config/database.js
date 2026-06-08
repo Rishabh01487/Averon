@@ -390,3 +390,7 @@ function seedDefaults() {
   for (const [key, value, desc] of defaults) {
     const exists = queryOne('SELECT key FROM system_config WHERE key = ?', [key]);
     if (!exists) run('INSERT INTO system_config (key, value, description, updated_at) VALUES (?, ?, ?, ?)', [key, value, desc, Date.now()]);
+  }
+}
+
+// ── PERSISTENCE ──────────────────────────────────────────────────────────────
