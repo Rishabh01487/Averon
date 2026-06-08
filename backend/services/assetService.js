@@ -158,3 +158,111 @@ class AssetService {
     }
 
     // Lock in escrow
+    this.escrow.lockFunds(assetId, userId, totalCost, investTx.hash);
+
+    // Update balance
+    const newBalance = this.blockchain.getBalance(walletData.address);
+    this.db.run('UPDATE users SET averon_balance = ? WHERE id = ?', [newBalance, userId]);
+
+    // Transition to funding if first investment
+    if (asset.status === C.ASSET_STATUS.ACTIVE) {
+      this.transition(assetId, C.ASSET_STATUS.FUNDING, userId, 'First token purchase');
+    }
+
+    // Update funded amount
+    const newFunded = parseFloat((asset.funded_amount + totalCost).toFixed(8));
+    this.db.run('UPDATE assets SET funded_amount = ?, updated_at = ? WHERE id = ?', [newFunded, Date.now(), assetId]);
+
+    this.db.run('INSERT INTO activity_log (user_id, action, details, tx_hash, block_index, amount, created_at) VALUES (?,?,?,?,?,?,?)',
+      [userId, 'TOKEN_PURCHASE', `${count} token(s) of "${asset.title}"`, investTx.hash, block?.index || 0, totalCost, Date.now()]);
+
+    // Check if fully funded
+    const sold = this.db.queryOne('SELECT COUNT(*) as c FROM asset_tokens WHERE asset_id = ? AND owner_id IS NOT NULL', [assetId])?.c || 0;
+    let funded = false;
+
+    if (sold >= asset.token_count) {
+      funded = true;
+      this.processFullyFunded(assetId);
+    }
+
+    // Notify owner
+    this.db.run('INSERT INTO notifications (user_id, type, title, message, created_at) VALUES (?,?,?,?,?)',
+      [asset.owner_id, 'TOKEN_SOLD', 'Token Purchased',
+       `${count} token(s) of "${asset.title}" purchased. ${sold}/${asset.token_count} tokens sold.`, Date.now()]);
+
+    return { tokensBought: count, totalCost, newBalance, txHash: investTx.hash, blockIndex: block?.index, funded };
+  }
+
+  // ── Fully Funded Processing ──────────────────────────────────────────────
+
+  processFullyFunded(assetId) {
+    this.transition(assetId, C.ASSET_STATUS.FUNDED, 'system', 'All tokens sold');
+    this.transition(assetId, C.ASSET_STATUS.PAYOUT_PENDING, 'system', 'Processing payout');
+
+    // Release escrow to owner
+    const payoutResult = this.escrow.releaseFunds(assetId);
+
+    // Mine the payout transactions
+    this.blockchain.minePendingTransactions(this.walletManager.getSystemWallet().address);
+
+    // Boost coin price
+    const currentPrice = this.db.getPrice();
+    const asset = this.db.queryOne('SELECT * FROM assets WHERE id = ?', [assetId]);
+    const boost = Math.min(C.PRICE.FUNDED_ASSET_BOOST_MAX,
+      C.PRICE.FUNDED_ASSET_BOOST_MIN + (asset.raise_amount / 1000000) * 0.03);
+    this.db.setPrice(parseFloat((currentPrice * (1 + boost)).toFixed(4)));
+
+    // Update economy
+    this.db.incrementEconomy('total_assets_funded', 1);
+    this.db.incrementEconomy('total_raised_inr', payoutResult.payout * currentPrice);
+
+    this.transition(assetId, C.ASSET_STATUS.COMPLETED, 'system', 'Payout completed');
+
+    this.db.run('UPDATE assets SET payout_status = "paid", funded_at = ?, updated_at = ? WHERE id = ?',
+      [Date.now(), Date.now(), assetId]);
+
+    // Notify owner
+    this.db.run('INSERT INTO notifications (user_id, type, title, message, created_at) VALUES (?,?,?,?,?)',
+      [asset.owner_id, 'ASSET_FUNDED', '🎉 Asset Fully Funded!',
+       `"${asset.title}" has been fully funded! ${payoutResult.payout.toFixed(4)} AC payout processed.`, Date.now()]);
+
+    return payoutResult;
+  }
+
+  // ── Deadline Check ───────────────────────────────────────────────────────
+
+  checkDeadlines() {
+    const active = this.db.query(`SELECT * FROM assets WHERE status IN ('${C.ASSET_STATUS.ACTIVE}', '${C.ASSET_STATUS.FUNDING}')`);
+    const now = Date.now();
+    const results = [];
+
+    for (const asset of active) {
+      if (asset.deadline && now > asset.deadline) {
+        const sold = this.db.queryOne('SELECT COUNT(*) as c FROM asset_tokens WHERE asset_id = ? AND owner_id IS NOT NULL', [asset.id])?.c || 0;
+
+        if (sold >= asset.token_count) {
+          this.processFullyFunded(asset.id);
+          results.push({ type: 'funded', assetId: asset.id });
+        } else {
+          // Expired — refund
+          this.transition(asset.id, C.ASSET_STATUS.EXPIRED, 'system', 'Deadline reached');
+          this.transition(asset.id, C.ASSET_STATUS.REFUNDING, 'system', 'Processing refunds');
+
+          const refundResult = this.escrow.refundAll(asset.id);
+          if (refundResult.refunded > 0) {
+            this.blockchain.minePendingTransactions(this.walletManager.getSystemWallet().address);
+          }
+
+          this.transition(asset.id, C.ASSET_STATUS.CLOSED, 'system', `Expired — ${refundResult.refundCount} refunds processed`);
+          results.push({ type: 'expired', assetId: asset.id, ...refundResult });
+        }
+      }
+    }
+
+    return results;
+  }
+
+  // ── Queries ──────────────────────────────────────────────────────────────
+
+  getAsset(assetId) {
+    const asset = this.db.queryOne('SELECT * FROM assets WHERE id = ?', [assetId]);
