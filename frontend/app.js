@@ -306,3 +306,7 @@ async function loadAssets() {
     const grid = $('assetGrid');
     grid.innerHTML = assets.map(a => `
       <div class="asset-card" onclick="viewAsset(${a.id})">
+        <div class="asset-card-header">
+          <div class="asset-title">${a.title}</div>
+          <span class="asset-status status-${a.status}">${a.status.replace(/_/g, ' ')}</span>
+        </div>
