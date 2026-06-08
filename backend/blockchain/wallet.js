@@ -22,3 +22,6 @@ class Wallet {
 
   deriveAddress() {
     const hash = crypto.createHash('sha256').update(this.publicKey).digest('hex');
+    const ripemd = crypto.createHash('ripemd160').update(hash).digest('hex');
+    return '0x' + ripemd;
+  }
