@@ -174,3 +174,6 @@ class TradingEngine {
     }
 
     this.db.run('UPDATE coin_orders SET status = "cancelled", updated_at = ? WHERE id = ?', [Date.now(), orderId]);
+
+    this.db.run('INSERT INTO activity_log (user_id, action, details, created_at) VALUES (?,?,?,?)',
+      [userId, 'ORDER_CANCELLED', `Cancelled ${order.side} order #${orderId}`, Date.now()]);
