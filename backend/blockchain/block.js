@@ -34,3 +34,7 @@ class Block {
 
   calculateHash() {
     const payload = JSON.stringify({
+      version: this.version,
+      index: this.index,
+      previousHash: this.previousHash,
+      timestamp: this.timestamp,
