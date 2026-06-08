@@ -590,3 +590,7 @@ function initMarket() {
 
 async function loadExplorer() {
   try {
+    const info = await api('/api/blockchain/info');
+    $('chainStats').innerHTML = `
+      <span class="chain-stat">Blocks: ${info.blocks}</span>
+      <span class="chain-stat">TXs: ${info.transactions}</span>
