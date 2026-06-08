@@ -250,3 +250,7 @@ async function loadDashboard() {
 
     // Activity
     const feed = $('activityFeed');
+    feed.innerHTML = (data.recentActivity || []).slice(0, 15).map(a => `
+      <div class="activity-item">
+        <span class="activity-action">${a.action}</span>
+        <span class="activity-details">${a.details || ''}</span>
