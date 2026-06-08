@@ -161,3 +161,7 @@ function requireRole(...roles) {
     next();
   };
 }
+
+function requireAdmin(req, res, next) {
+  return requireRole(C.ROLES.ADMIN)(req, res, next);
+}
