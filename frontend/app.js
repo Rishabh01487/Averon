@@ -357,3 +357,8 @@ async function viewAsset(id) {
       </div>`;
   } catch {}
 }
+
+async function buyAssetTokens(assetId) {
+  const count = parseInt($('buyTokenCount')?.value) || 1;
+  try {
+    const result = await api(`/api/assets/${assetId}/tokens/buy`, { method: 'POST', body: JSON.stringify({ count }) });
