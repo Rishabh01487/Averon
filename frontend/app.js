@@ -174,3 +174,6 @@ async function enterApp() {
     state.user = { ...state.user, ...acc };
     saveSession();
   } catch {}
+
+  // Check notifications
+  loadNotifications();
