@@ -17,3 +17,8 @@ class Block {
     this.nonce = 0;
     this.difficulty = C.BLOCKCHAIN.DIFFICULTY;
     this.miner = '';
+
+    // Build Merkle tree from transactions
+    this.merkleRoot = this.computeMerkleRoot();
+    this.hash = this.calculateHash();
+    this.size = 0; // Calculated after mining
