@@ -1,328 +1,464 @@
 // ─── PARTICLE BACKGROUND ─────────────────────────────────────────────────────
-(function(){
-  const canvas=document.getElementById('particleCanvas');
-  const ctx=canvas.getContext('2d');
-  let W,H,particles=[];
-  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
-  resize();window.addEventListener('resize',resize);
-  function Particle(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-.5)*.3;this.vy=(Math.random()-.5)*.3;this.r=Math.random()*1.5+.5;}
-  for(let i=0;i<80;i++)particles.push(new Particle());
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,0.35)';ctx.fill();});
-    for(let i=0;i<particles.length;i++){for(let j=i+1;j<particles.length;j++){const dx=particles[i].x-particles[j].x,dy=particles[i].y-particles[j].y;const d=Math.sqrt(dx*dx+dy*dy);if(d<130){ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.strokeStyle=`rgba(255,255,255,${.1*(1-d/130)})`;ctx.lineWidth=.5;ctx.stroke();}}}
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
+(function(){const c=document.getElementById('particleCanvas'),x=c.getContext('2d');let W,H,p=[];function r(){W=c.width=innerWidth;H=c.height=innerHeight}r();addEventListener('resize',r);function P(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-.5)*.3;this.vy=(Math.random()-.5)*.3;this.r=Math.random()*1.5+.5}for(let i=0;i<70;i++)p.push(new P);(function d(){x.clearRect(0,0,W,H);p.forEach(q=>{q.x+=q.vx;q.y+=q.vy;if(q.x<0||q.x>W)q.vx*=-1;if(q.y<0||q.y>H)q.vy*=-1;x.beginPath();x.arc(q.x,q.y,q.r,0,Math.PI*2);x.fillStyle='rgba(255,255,255,0.3)';x.fill()});for(let i=0;i<p.length;i++)for(let j=i+1;j<p.length;j++){const dx=p[i].x-p[j].x,dy=p[i].y-p[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<120){x.beginPath();x.moveTo(p[i].x,p[i].y);x.lineTo(p[j].x,p[j].y);x.strokeStyle=`rgba(255,255,255,${.08*(1-d/120)})`;x.lineWidth=.5;x.stroke()}}requestAnimationFrame(d)})()})();
 
+// ─── STATE ───────────────────────────────────────────────────────────────────
 const LS='averon_user';
-let USER=null,ECONOMY={price:1,prevPrice:1,history:[1]},PROPOSALS=[],RZP_LIVE=false,RZP_KEY='';
-function saveUser(){if(USER)localStorage.setItem(LS,JSON.stringify(USER));}
-function loadUser(){try{return JSON.parse(localStorage.getItem(LS));}catch{return null;}}
+let USER=null, ECO={price:1,prevPrice:1,priceHistory:[1],totalMinted:0,holders:0,assets:{}}, ASSETS=[], CHAIN={};
+let _wizAssetId=null, _wizFiles=[], _wizAI=null, _orderType='buy', _expandedBlock=null;
+
+function save(){if(USER)localStorage.setItem(LS,JSON.stringify(USER))}
+function load(){try{return JSON.parse(localStorage.getItem(LS))}catch{return null}}
 
 window.addEventListener('DOMContentLoaded',async()=>{
-  setupNav();USER=loadUser();await loadConfig();
-  if(!USER){document.getElementById('authOverlay').classList.add('open');return;}
-  await syncAccount();init();
+  setupNav();USER=load();await fetchConfig();
+  if(!USER){document.getElementById('authOverlay').classList.add('open');return}
+  await syncUser();init();
 });
 
-async function loadConfig(){
+// ─── API HELPERS ─────────────────────────────────────────────────────────────
+async function fetchConfig(){
   try{
     const r=await fetch('/api/config');const d=await r.json();
-    ECONOMY.prevPrice=ECONOMY.price;ECONOMY.price=d.price||1;ECONOMY.history=d.economy?.history||[1];
-    ECONOMY.totalSold=d.economy?.totalSold||0;ECONOMY.holders=d.economy?.holders||0;
-    RZP_LIVE=d.isLive;RZP_KEY=d.keyId||'';
-    const el=document.getElementById('rzpStatus');if(!el)return;
-    if(RZP_LIVE){el.className='rzp-status rzp-live';el.textContent='✓ Razorpay connected — live payments active';}
-    else if(RZP_KEY&&RZP_KEY.startsWith('rzp_')){el.className='rzp-status rzp-test';el.textContent='◎ Razorpay in test mode — add live keys to go fully live';}
-    else{el.className='rzp-status rzp-off';el.textContent='⚠ Add RAZORPAY_KEY_ID + RAZORPAY_KEY_SECRET to .env and restart server';}
-  }catch(e){
-    const el=document.getElementById('rzpStatus');if(el){el.className='rzp-status rzp-off';el.textContent='⚠ Restart the server (node server.js) to enable Razorpay payments';}
-  }
+    ECO.prevPrice=ECO.price;ECO.price=d.price||1;CHAIN=d.blockchain||{};
+    if(d.economy){ECO.priceHistory=d.economy.priceHistory||[1];ECO.totalMinted=d.economy.totalMinted||0;ECO.holders=d.economy.holders||0;ECO.assets=d.economy.assets||{}}
+  }catch{}
 }
-
-async function syncAccount(){
+async function syncUser(){
   if(!USER)return;
-  try{const r=await fetch('/api/account/'+USER.id);if(r.ok){const d=await r.json();USER.kbc=d.kbc;USER.inr=d.inr;saveUser();}}catch{}
+  try{const r=await fetch('/api/account/'+USER.id);if(r.ok){const d=await r.json();USER.kbc=d.averon_balance;USER.walletAddress=d.walletAddress;save()}}catch{}
 }
-
 async function init(){
-  updateNav();updateTicker();await loadProposals();
-  renderFeatured();updateStats();updateTokenSpot();
-  setInterval(async()=>{await loadConfig();updateTicker();updateTokenSpot();},15000);
+  updateNav();updateTicker();await loadAssetList();renderFeatured();updateStats();
+  setInterval(async()=>{await fetchConfig();updateTicker()},15000);
 }
 
 async function createAccount(){
   const name=document.getElementById('authName').value.trim();
-  const family=document.getElementById('authFamily').value.trim();
-  if(!name||!family){showToast('Fill in both fields','error');return;}
+  const org=document.getElementById('authFamily').value.trim();
+  if(!name||!org){showToast('Fill both fields','error');return}
   const id='usr_'+Math.random().toString(36).slice(2,10);
-  USER={id,name,family,kbc:0,inr:0};saveUser();
-  fetch('/api/account',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:id,name,family})}).catch(()=>{});
-  document.getElementById('authOverlay').classList.remove('open');
-  await init();showToast('Welcome, '+name+'! Restart server to enable payments.','info');
+  try{
+    const r=await fetch('/api/account',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:id,name,family:org})});
+    const d=await r.json();
+    USER={id,name,org,kbc:d.averon_balance||0,walletAddress:d.walletAddress};save();
+    document.getElementById('authOverlay').classList.remove('open');
+    await init();showToast('Wallet: '+shortAddr(USER.walletAddress),'success');
+  }catch(e){USER={id,name,org,kbc:0};save();document.getElementById('authOverlay').classList.remove('open');init()}
 }
 
-function setupNav(){document.querySelectorAll('.nav-link').forEach(l=>l.addEventListener('click',()=>navigateTo(l.dataset.view)));}
+// ─── NAV ─────────────────────────────────────────────────────────────────────
+function setupNav(){document.querySelectorAll('.nav-link').forEach(l=>l.addEventListener('click',()=>navigateTo(l.dataset.view)))}
 function navigateTo(v){
   document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.nav-link').forEach(x=>x.classList.remove('active'));
   const el=document.getElementById('view'+v.charAt(0).toUpperCase()+v.slice(1));
   if(el)el.classList.add('active');
-  document.querySelectorAll('.nav-link').forEach(x=>{if(x.dataset.view===v)x.classList.add('active');});
-  window.scrollTo({top:0,behavior:'smooth'});
-  if(v==='proposals')renderProposals();
-  if(v==='portfolio'){syncAccount().then(renderPortfolio);}
-  if(v==='buytoken'){updateBuyPage();renderTxList();}
-  if(v==='home'){renderFeatured();updateTokenSpot();}
+  document.querySelectorAll('.nav-link').forEach(x=>{if(x.dataset.view===v)x.classList.add('active')});
+  scrollTo({top:0,behavior:'smooth'});
+  if(v==='assets')loadAssetList();
+  if(v==='portfolio')renderPortfolio();
+  if(v==='buytoken')updateBuyPage();
+  if(v==='explorer')renderExplorer();
+  if(v==='market')renderMarket();
+  if(v==='home'){loadAssetList().then(renderFeatured);updateStats()}
 }
-
 function updateTicker(){
-  const p=ECONOMY.price,prev=ECONOMY.prevPrice||p;
-  const pct=((p-prev)/prev*100).toFixed(2);const up=p>=prev;
-  document.getElementById('tickerPrice').textContent='₹'+p.toFixed(4);
-  const ch=document.getElementById('tickerChange');
-  ch.textContent=(up?'+':'')+pct+'%';ch.className=up?'ticker-up':'ticker-dn';
+  const p=ECO.price;document.getElementById('tickerPrice').textContent='₹'+p.toFixed(2);
+  const pct=((p-(ECO.prevPrice||p))/(ECO.prevPrice||p)*100).toFixed(2);
+  const ch=document.getElementById('tickerChange');ch.textContent=(p>=ECO.prevPrice?'+':'')+pct+'%';ch.className=p>=ECO.prevPrice?'ticker-up':'ticker-dn';
 }
-function updateNav(){if(!USER)return;document.getElementById('acctName').textContent=USER.name;document.getElementById('acctBal').textContent=(USER.kbc||0).toFixed(2)+' Averon Coin';}
-
-function calcBuy(){
-  const inr=parseFloat(document.getElementById('buyInr').value)||0;
-  const kbc=inr>0?parseFloat((inr/ECONOMY.price).toFixed(4)):0;
-  document.getElementById('kbcReceive').value=kbc||'';
-  document.getElementById('priceImpact').textContent='~'+(inr>0?((kbc/10000)*100).toFixed(2):'0.00')+'%';
-  document.getElementById('afterPrice').textContent='₹'+(inr>0?(ECONOMY.price*(1+kbc/10000)).toFixed(4):ECONOMY.price.toFixed(4));
+function updateNav(){if(!USER)return;document.getElementById('acctName').textContent=USER.name;document.getElementById('acctBal').textContent=(USER.kbc||0).toFixed(2)+' AC'}
+function updateStats(){
+  document.getElementById('statBlocks').textContent=CHAIN.blocks||1;
+  document.getElementById('statTotal').textContent=ECO.assets?.total||0;
+  document.getElementById('statFunded').textContent=ECO.assets?.funded||0;
+  document.getElementById('statMinted').textContent=Math.round(ECO.totalMinted||0);
 }
 
-async function startBuy(){
-  if(!USER){showToast('Create account first','error');return;}
-  const inr=parseFloat(document.getElementById('buyInr').value);
-  if(!inr||inr<10){showToast('Minimum ₹10 required','error');return;}
-  if(!RZP_LIVE&&!RZP_KEY.includes('rzp_')){showToast('Razorpay not configured. Add keys to .env','error');return;}
-  const btn=document.getElementById('buyBtn');btn.disabled=true;btn.textContent='Opening payment...';
-  try{
-    const or=await fetch('/api/order/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:USER.id,amountInr:inr})});
-    const od=await or.json();
-    if(!or.ok)throw new Error(od.error||'Order failed');
-    new Razorpay({
-      key:RZP_KEY,amount:od.amount,currency:'INR',name:'Averon',description:'Buy Averon Coin',
-      order_id:od.orderId,
-      handler:async(response)=>{
-        const vr=await fetch('/api/order/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...response,userId:USER.id,amountInr:inr})});
-        const vd=await vr.json();
-        if(vd.success){USER.kbc=vd.newBalance;ECONOMY.prevPrice=ECONOMY.price;ECONOMY.price=vd.newPrice;saveUser();updateNav();updateTicker();updateBuyPage();renderTxList();showToast('Bought '+vd.kbc.toFixed(4)+' Averon Coin!','success');}
-        else showToast('Payment verification failed','error');
-      },
-      prefill:{name:USER.name},theme:{color:'#ffffff',backdrop_color:'#000000'}
-    }).open();
-  }catch(e){showToast(e.message||'Payment failed','error');}
-  finally{btn.disabled=false;btn.textContent='Buy Averon Coin via Razorpay →';}
-}
-
+// ─── BUY COIN ────────────────────────────────────────────────────────────────
+function calcBuy(){const inr=parseFloat(document.getElementById('buyInr').value)||0;document.getElementById('kbcReceive').value=inr>0?(inr/ECO.price).toFixed(4):''}
 function updateBuyPage(){
   if(!USER)return;
-  document.getElementById('buyPriceNow').textContent='₹'+ECONOMY.price.toFixed(4);
-  document.getElementById('inrHint').textContent='₹'+(USER.inr||0).toFixed(2);
-  document.getElementById('wInr').textContent='₹'+(USER.inr||0).toFixed(2);
-  document.getElementById('wKbc').textContent=(USER.kbc||0).toFixed(4)+' Averon Coin';
-  const kv=((USER.kbc||0)*ECONOMY.price).toFixed(2);
-  document.getElementById('wKbcVal').textContent='₹'+kv;
-  document.getElementById('wTotal').textContent='₹'+((USER.inr||0)+parseFloat(kv)).toFixed(2);
-}
-
-function renderTxList(){
-  const el=document.getElementById('txList');
-  fetch('/api/economy').then(r=>r.json()).then(e=>{
-    const txs=(e.transactions||[]).filter(t=>t.userId===USER?.id).slice(0,20);
-    if(!txs.length){el.innerHTML='<div class="empty-state"><div class="empty-ico">◎</div><div class="empty-title">No transactions yet</div></div>';return;}
-    el.innerHTML=txs.map(t=>`<div class="tx-item"><div style="display:flex;align-items:center"><span class="tx-ico">${t.type==='buy'?'↓':'→'}</span><div><div class="tx-type">${t.type==='buy'?'Bought Averon Coin':'Invested Averon Coin'}</div><div class="tx-time">${timeAgo(t.time)} · @₹${t.price?.toFixed(4)||'—'}</div></div></div><div style="text-align:right"><div class="tx-kbc">${t.type==='buy'?'+':'−'}${(t.kbc||0).toFixed(4)} Averon Coin</div><div class="tx-inr">₹${(t.inr||0).toFixed(2)}</div></div></div>`).join('');
-  }).catch(()=>{});
-}
-
-function updateTokenSpot(){
-  const p=ECONOMY.price,prev=ECONOMY.prevPrice||p;
-  const pct=((p-prev)/prev*100).toFixed(2);const up=p>=prev;
-  document.getElementById('tokenPriceBig').textContent='₹'+p.toFixed(4);
-  const ch=document.getElementById('tokenChangeBig');ch.textContent=(up?'+':'')+pct+'%';ch.className=up?'ticker-up':'ticker-dn';
-  const ts=ECONOMY.totalSold||0;
-  document.getElementById('tsSold').textContent=ts.toFixed(0);
-  document.getElementById('tsMcap').textContent='₹'+(ts*p).toFixed(0);
-  document.getElementById('tsHolders').textContent=ECONOMY.holders||0;
+  document.getElementById('buyPriceNow').textContent='₹'+ECO.price.toFixed(4);
+  document.getElementById('wAddr').textContent=shortAddr(USER.walletAddress||'—');
+  document.getElementById('wKbc').textContent=(USER.kbc||0).toFixed(4)+' AC';
+  document.getElementById('wKbcVal').textContent='₹'+((USER.kbc||0)*ECO.price).toFixed(2);
   drawChart();
 }
-
+async function startBuy(){
+  if(!USER){showToast('Create account first','error');return}
+  const inr=parseFloat(document.getElementById('buyInr').value);
+  if(!inr||inr<10){showToast('Minimum ₹10','error');return}
+  const btn=document.getElementById('buyBtn');btn.disabled=true;btn.textContent='Mining...';
+  try{
+    const r=await fetch('/api/buy-direct',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:USER.id,amountInr:inr})});
+    const d=await r.json();if(!r.ok)throw new Error(d.error);
+    USER.kbc=d.newBalance;ECO.prevPrice=ECO.price;ECO.price=d.newPrice;save();updateNav();updateTicker();updateBuyPage();
+    showToast(`⛏ Minted ${d.kbc.toFixed(4)} AC — Block #${d.blockIndex}`,'success');
+  }catch(e){showToast(e.message,'error')}
+  finally{btn.disabled=false;btn.textContent='Mint Averon Coin →'}
+}
 function drawChart(){
   const c=document.getElementById('priceCanvas');if(!c)return;
   const ctx=c.getContext('2d'),w=c.width,h=c.height;ctx.clearRect(0,0,w,h);
-  const hist=ECONOMY.history||[];if(hist.length<2)return;
+  const hist=ECO.priceHistory||[];if(hist.length<2)return;
   const mn=Math.min(...hist),mx=Math.max(...hist),rng=mx-mn||.01;
-  ctx.beginPath();ctx.strokeStyle='rgba(255,255,255,0.6)';ctx.lineWidth=1.5;
-  hist.forEach((v,i)=>{const x=(i/(hist.length-1))*w,y=h-((v-mn)/rng)*(h-8)-4;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
-  ctx.stroke();
-  const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'rgba(255,255,255,0.08)');g.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.beginPath();ctx.strokeStyle='rgba(255,255,255,0.5)';ctx.lineWidth=1.5;
+  hist.forEach((v,i)=>{const x=(i/(hist.length-1))*w,y=h-((v-mn)/rng)*(h-8)-4;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)});
+  ctx.stroke();const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'rgba(255,255,255,0.06)');g.addColorStop(1,'rgba(255,255,255,0)');
   ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();ctx.fillStyle=g;ctx.fill();
 }
 
-let fStatus='all',fCat='all';
-async function loadProposals(){try{const r=await fetch('/api/proposals');if(r.ok)PROPOSALS=await r.json();}catch{}}
-function checkDL(){PROPOSALS.forEach(p=>{if(p.status==='active'&&Date.now()>p.deadline)p.status=p.raised>=p.goal?'funded':'expired';});}
-
-function updateStats(){
-  checkDL();
-  document.getElementById('statTotal').textContent=PROPOSALS.length;
-  document.getElementById('statFunded').textContent=PROPOSALS.filter(p=>p.status==='funded').length;
-  document.getElementById('statActive').textContent=PROPOSALS.filter(p=>p.status==='active').length;
-  document.getElementById('statKbc').textContent=PROPOSALS.reduce((a,p)=>a+p.raised,0).toFixed(0)+' Averon Coin';
+// ─── ASSETS ──────────────────────────────────────────────────────────────────
+let _fStatus='all';
+async function loadAssetList(){
+  try{const r=await fetch('/api/assets');if(r.ok)ASSETS=await r.json()}catch{}
 }
-
-function renderFeatured(){checkDL();const g=document.getElementById('featuredGrid');const a=PROPOSALS.filter(p=>p.status==='active').slice(0,3);g.innerHTML=a.length?a.map(pCard).join(''):empty('No active proposals yet','Submit the first idea','◎');}
-function renderProposals(){checkDL();const g=document.getElementById('proposalsGrid');const list=PROPOSALS.filter(p=>(fStatus==='all'||p.status===fStatus)&&(fCat==='all'||p.category===fCat));g.innerHTML=list.length?list.map(pCard).join(''):empty('No proposals found','Try a different filter','◎');}
-function filterP(f,btn){fStatus=f;document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderProposals();}
-function filterCat(){fCat=document.getElementById('catFilter').value;renderProposals();}
-
-function pCard(p){
-  const pct=Math.min(100,Math.round((p.raised/p.goal)*100));
-  const d=Math.max(0,Math.ceil((p.deadline-Date.now())/864e5));
-  const lbl={active:'Active',funded:'Funded',expired:'Expired'}[p.status]||p.status;
-  return `<div class="p-card" onclick="openProp(${p.id})">
-    <div class="card-top"><span class="cat-badge">${p.category}</span><span class="s-badge s-${p.status}">${lbl}</span></div>
-    <div class="card-title">${esc(p.title)}</div>
-    <div class="card-desc">${esc(p.desc)}</div>
-    <div class="card-by">By <span>${esc(p.proposer)}</span></div>
+function filterAssets(s,btn){
+  _fStatus=s;document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  renderAssetGrid();
+}
+function renderFeatured(){
+  const g=document.getElementById('featuredGrid');
+  const active=ASSETS.filter(a=>a.status==='active').slice(0,6);
+  g.innerHTML=active.length?active.map(assetCard).join(''):empty('No active listings yet','Be the first to tokenize an asset','📋');
+}
+function renderAssetGrid(){
+  const g=document.getElementById('assetsGrid');
+  const cat=document.getElementById('catFilter')?.value;
+  let list=_fStatus==='all'?ASSETS:ASSETS.filter(a=>a.status===_fStatus);
+  if(cat&&cat!=='all')list=list.filter(a=>a.category===cat);
+  g.innerHTML=list.length?list.map(assetCard).join(''):empty('No assets found','Try a different filter','◎');
+}
+function assetCard(a){
+  const pct=a.progress||0;
+  const statusLabels={active:'Active',funded:'Funded',expired:'Expired',pending_review:'Pending',ai_analyzing:'AI Analyzing',verified:'Verified',rejected:'Rejected'};
+  const riskColors={LOW:'ai-risk-low',MEDIUM:'ai-risk-medium',HIGH:'ai-risk-high'};
+  return `<div class="p-card" onclick="openAsset(${a.id})">
+    <div class="card-top"><span class="cat-badge">${esc(a.category)}</span><span class="s-badge s-${a.status}">${statusLabels[a.status]||a.status}</span></div>
+    <div class="card-title">${esc(a.title)}</div>
+    <div class="card-desc">${esc(a.description)}</div>
+    ${a.ai_verified?`<div class="card-ai"><span class="ai-badge ai-verified">✓ AI Verified</span>${a.ai_risk_level?`<span class="ai-badge ${riskColors[a.ai_risk_level]||''}">${a.ai_risk_level} Risk</span>`:''}</div>`:''}
+    ${a.token_count>0?`<div class="token-grid-small">${Array.from({length:Math.min(a.token_count,30)},(_,i)=>`<div class="token-dot${i<(a.tokens_sold||0)?' sold':''}"></div>`).join('')}${a.token_count>30?`<span style="font-size:10px;color:var(--txt3);margin-left:4px">+${a.token_count-30}</span>`:''}</div>`:''}
     <div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div>
-    <div class="prog-lbl"><span class="prog-raised">${p.raised.toFixed(0)} Averon Coin</span><span class="prog-goal">Goal: ${p.goal} Averon Coin</span></div>
-    <div class="card-foot"><span>${p.status==='active'?`⏱ ${d}d left`:p.status==='funded'?'✓ Funded':'✗ Expired'}</span><span>${pct}%</span></div>
+    <div class="prog-lbl"><span class="prog-raised">${(a.tokens_sold||0)}/${a.token_count||0} tokens</span><span>${pct}%</span></div>
+    <div class="card-foot"><span>₹${(a.raise_amount||0).toLocaleString()} raise</span><span>${a.token_price?(a.token_price.toFixed(2)+' AC/token'):''}</span></div>
   </div>`;
 }
 
-function openProp(id){
-  const p=PROPOSALS.find(x=>x.id===id);if(!p)return;
-  const pct=Math.min(100,Math.round((p.raised/p.goal)*100));
-  const d=Math.max(0,Math.ceil((p.deadline-Date.now())/864e5));
-  const isOwner=USER&&p.proposerId===USER.id;
-  const canFund=USER&&p.status==='active'&&!isOwner;
-  const canW=USER&&isOwner&&p.raised>=p.goal&&!p.withdrawn;
-  const myInv=USER?(p.investments?.find(i=>i.id===USER.id)||{kbc:0}).kbc:0;
-  const canRef=USER&&p.status==='expired'&&p.raised<p.goal&&myInv>0;
-  document.getElementById('modalContent').innerHTML=`
-    <span class="m-cat">${p.category}</span>
-    <div class="m-title">${esc(p.title)}</div>
-    <div class="m-by">Proposed by <code>${esc(p.proposer)}</code></div>
-    <div class="m-desc">${esc(p.desc)}</div>
-    <div class="m-stats">
-      <div class="m-stat"><div class="m-sv">${p.raised.toFixed(0)}</div><div class="m-sl">Averon Coin Raised</div></div>
-      <div class="m-stat"><div class="m-sv">${p.goal}</div><div class="m-sl">Averon Coin Goal</div></div>
-      <div class="m-stat"><div class="m-sv">${d}d</div><div class="m-sl">Days Left</div></div>
+async function openAsset(id){
+  try{
+    const r=await fetch('/api/assets/'+id);const a=await r.json();
+    const isOwner=USER&&a.owner_id===USER.id;
+    const canBuy=USER&&a.status==='active'&&!isOwner&&a.tokens_available>0;
+    document.getElementById('modalContent').innerHTML=`
+      <span class="m-cat">${esc(a.category)}</span>
+      <div class="m-title">${esc(a.title)}</div>
+      <div class="m-by">Listed by ${esc(a.owner_name)} · ${esc(a.owner_org)}</div>
+      <div class="m-desc">${esc(a.description)}</div>
+      ${a.ai_verified?`
+        <div class="ai-verdict pass"><div class="ai-verdict-ico">✓</div><div class="ai-verdict-txt"><h4>AI Verified</h4><p>Valuation: ₹${(a.ai_valuation||0).toLocaleString()} · Risk: ${a.ai_risk_level} (${a.ai_risk_score}%)</p></div></div>
+        ${a.ai_analysis_summary?`<div class="ai-summary">${esc(a.ai_analysis_summary)}</div>`:''}
+        ${a.ai_concerns?`<div class="ai-concerns">${esc(a.ai_concerns)}</div>`:''}
+      `:''}
+      <div class="m-stats">
+        <div class="m-stat"><div class="m-sv">₹${(a.raise_amount||0).toLocaleString()}</div><div class="m-sl">Raise Amount</div></div>
+        <div class="m-stat"><div class="m-sv">${a.tokens_sold||0}/${a.token_count||0}</div><div class="m-sl">Tokens Sold</div></div>
+        <div class="m-stat"><div class="m-sv">${a.progress||0}%</div><div class="m-sl">Funded</div></div>
+      </div>
+      ${a.token_count>0?`
+        <div style="font-size:12px;font-weight:700;margin-bottom:8px">Token Grid (${a.token_price?.toFixed(2)} AC each)</div>
+        <div class="token-grid">${a.tokens.map(t=>`<div class="token-cell ${t.owned?(t.ownerId===USER?.id?'mine':'sold'):'available'}">${t.index}</div>`).join('')}</div>
+      `:''}
+      ${a.documents?.length?`
+        <div style="font-size:12px;font-weight:700;margin:16px 0 8px">Documents (${a.documents.length})</div>
+        ${a.documents.map(d=>`<div class="file-item"><span class="fi-name">📄 ${esc(d.name)}</span><span class="fi-size">${(d.size/1024).toFixed(0)}KB</span></div>`).join('')}
+      `:''}
+      ${canBuy?`
+        <div style="margin-top:20px">
+          <div style="font-size:13px;font-weight:700;margin-bottom:8px">Buy Tokens</div>
+          <div class="fund-row">
+            <input class="f-inp2" type="number" id="buyTokenCount" placeholder="How many tokens?" min="1" max="${a.tokens_available}" value="1"/>
+            <button class="btn btn-white btn-sm" onclick="buyTokens(${a.id})">Buy →</button>
+          </div>
+          <div class="avail">Available: ${a.tokens_available} tokens · Cost per token: ${a.token_price?.toFixed(4)} AC · Your balance: ${(USER?.kbc||0).toFixed(4)} AC</div>
+        </div>
+      `:''}
+      ${a.tx_hash?`<div style="margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--txt3)">TX: ${a.tx_hash}</div>`:''}
+    `;
+    document.getElementById('assetModal').classList.add('open');
+  }catch(e){showToast('Failed to load asset','error')}
+}
+function closeAssetModal(){document.getElementById('assetModal').classList.remove('open')}
+
+async function buyTokens(assetId){
+  const count=parseInt(document.getElementById('buyTokenCount')?.value)||1;
+  try{
+    const r=await fetch(`/api/assets/${assetId}/tokens/buy`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:USER.id,count})});
+    const d=await r.json();if(!r.ok)throw new Error(d.error);
+    USER.kbc=d.newBalance;save();updateNav();
+    showToast(`⛏ Bought ${d.tokensBought} tokens — Block #${d.blockIndex}${d.funded?' — ASSET FULLY FUNDED! 🎉':''}`,'success');
+    closeAssetModal();loadAssetList().then(()=>{renderAssetGrid();renderFeatured()});
+  }catch(e){showToast(e.message,'error')}
+}
+
+// ─── TOKENIZE WIZARD ─────────────────────────────────────────────────────────
+function wizNext(step){
+  document.querySelectorAll('.wiz-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.wiz-step').forEach(s=>{
+    const n=parseInt(s.dataset.step);
+    s.classList.toggle('active',n===step);
+    s.classList.toggle('done',n<step);
+  });
+  document.getElementById('wizStep'+step).classList.add('active');
+}
+
+// Drag & Drop
+const dz=document.getElementById('dropzone');
+if(dz){
+  ['dragenter','dragover'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.classList.add('dragover')}));
+  ['dragleave','drop'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.classList.remove('dragover')}));
+  dz.addEventListener('drop',ev=>handleFiles(ev.dataTransfer.files));
+}
+
+function handleFiles(files){
+  for(const f of files){
+    if(_wizFiles.length>=5)break;
+    if(f.size>10*1024*1024){showToast('File too large (max 10MB)','error');continue}
+    _wizFiles.push(f);
+  }
+  renderFileList();
+}
+function renderFileList(){
+  const el=document.getElementById('fileList');
+  el.innerHTML=_wizFiles.map((f,i)=>`<div class="file-item"><span class="fi-name">${esc(f.name)}</span><span class="fi-size">${(f.size/1024).toFixed(0)}KB</span><button class="fi-remove" onclick="removeFile(${i})">✕</button></div>`).join('');
+}
+function removeFile(i){_wizFiles.splice(i,1);renderFileList()}
+
+async function uploadAndAnalyze(){
+  if(!USER){showToast('Create account first','error');return}
+  const title=document.getElementById('assetTitle').value.trim();
+  const cat=document.getElementById('assetCat').value;
+  const raise=parseFloat(document.getElementById('assetRaise').value);
+  const desc=document.getElementById('assetDesc').value.trim();
+  const days=parseInt(document.getElementById('assetDays').value)||30;
+  if(!title||!raise||!desc){showToast('Fill all required fields','error');wizNext(1);return}
+  if(_wizFiles.length===0){showToast('Upload at least one document','error');return}
+
+  wizNext(3);
+  document.getElementById('aiResult').style.display='none';
+  document.getElementById('aiStatus').style.display='block';
+
+  try{
+    // Step 1: Create asset
+    const cr=await fetch('/api/assets/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:USER.id,title,description:desc,category:cat,raiseAmount:raise,days})});
+    const cd=await cr.json();if(!cr.ok)throw new Error(cd.error);
+    _wizAssetId=cd.assetId;
+
+    // Step 2: Upload documents
+    const formData=new FormData();
+    _wizFiles.forEach(f=>formData.append('documents',f));
+    await fetch(`/api/assets/${_wizAssetId}/documents`,{method:'POST',body:formData});
+
+    // Step 3: Trigger AI analysis
+    const ar=await fetch(`/api/assets/${_wizAssetId}/analyze`,{method:'POST',headers:{'Content-Type':'application/json'}});
+    const ai=await ar.json();if(!ar.ok)throw new Error(ai.error);
+    _wizAI=ai;
+
+    // Show result
+    document.getElementById('aiStatus').style.display='none';
+    document.getElementById('aiResult').style.display='block';
+    document.getElementById('aiResult').innerHTML=renderAIResult(ai, raise);
+
+    if(ai.verified){
+      setTimeout(()=>wizNext(4),100);
+      renderConfirmSummary(title, cat, raise, ai);
+    }
+  }catch(e){
+    document.getElementById('aiStatus').innerHTML=`<div style="color:var(--red);font-size:14px">❌ ${e.message}</div><button class="btn btn-ghost" style="margin-top:16px" onclick="wizNext(2)">← Try Again</button>`;
+  }
+}
+
+function renderAIResult(ai, raise){
+  const riskColors={LOW:'var(--green-profit)',MEDIUM:'#fbbf24',HIGH:'var(--red)'};
+  return `<div class="ai-result-card">
+    <div class="ai-verdict ${ai.verified?'pass':'fail'}">
+      <div class="ai-verdict-ico">${ai.verified?'✓':'✗'}</div>
+      <div class="ai-verdict-txt"><h4>${ai.verified?'Asset Verified':'Verification Failed'}</h4><p>${ai.verified?'AI has verified this asset for tokenization':'Documents could not be verified'} (${ai.source==='gemini'?'Gemini AI':'Simulated AI'})</p></div>
     </div>
+    <div class="ai-metrics">
+      <div class="ai-metric"><div class="am-val" style="color:${riskColors[ai.riskLevel]||'var(--txt)'}">${ai.riskScore}%</div><div class="am-lbl">Risk Score</div></div>
+      <div class="ai-metric"><div class="am-val">₹${(ai.estimatedValue||0).toLocaleString()}</div><div class="am-lbl">Valuation</div></div>
+      <div class="ai-metric"><div class="am-val">${ai.confidence||0}%</div><div class="am-lbl">Confidence</div></div>
+    </div>
+    <div class="ai-summary">${esc(ai.analysis)}</div>
+    ${ai.concerns?`<div class="ai-concerns">${esc(ai.concerns)}</div>`:''}
+    <div style="margin-top:16px;font-size:12px;color:var(--txt3)">
+      Suggested: ${ai.suggestedTokens} tokens × ₹${ai.tokenPriceInr?.toFixed(2)}/token = ₹${raise?.toLocaleString()} raise
+    </div>
+  </div>
+  ${!ai.verified?`<button class="btn btn-ghost btn-full" style="margin-top:12px" onclick="wizNext(1)">← Edit & Retry</button>`:''}`;
+}
+
+function renderConfirmSummary(title, cat, raise, ai){
+  const tokenPriceAC=(ai.tokenPriceInr/ECO.price).toFixed(4);
+  document.getElementById('confirmSummary').innerHTML=`
     <div style="margin-bottom:20px">
-      <div style="font-size:12px;color:var(--txt2);margin-bottom:8px">${pct}% funded · ₹${(p.raised*ECONOMY.price).toFixed(2)} INR value</div>
-      <div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div>
+      <div style="font-size:12px;color:var(--txt3);margin-bottom:4px">Asset</div>
+      <div style="font-size:16px;font-weight:700">${esc(title)}</div>
+      <div style="font-size:12px;color:var(--txt2);margin-top:4px">${cat} · AI Verified ✓ · Risk: ${ai.riskLevel} (${ai.riskScore}%)</div>
     </div>
-    <div class="m-actions">
-      ${canFund?`<div><div style="font-size:13px;font-weight:700;margin-bottom:8px">💰 Invest Averon Coin</div>
-        <div class="fund-row"><input class="f-inp2" type="number" id="fundAmt" placeholder="Amount in Averon Coin" min="1" step="1"/>
-        <button class="btn btn-white btn-sm" onclick="fundProp(${id})">Invest</button></div>
-        <div class="avail">Your Averon Coin: <strong>${USER?USER.kbc.toFixed(4):0}</strong></div></div>`:''}
-      ${myInv>0?`<div style="font-size:13px;color:var(--txt2)">Your investment: <strong>${myInv.toFixed(4)} Averon Coin</strong></div>`:''}
-      ${canW?`<button class="btn-danger" onclick="withdrawProp(${id})">Withdraw ${p.raised.toFixed(0)} Averon Coin</button>`:''}
-      ${canRef?`<button class="btn-danger" onclick="refundProp(${id})">Claim Refund — ${myInv.toFixed(4)} Averon Coin</button>`:''}
+    <div class="bm-grid">
+      <div class="bm-item"><div class="bm-label">Raise Amount</div><div class="bm-value">₹${raise.toLocaleString()}</div></div>
+      <div class="bm-item"><div class="bm-label">AI Valuation</div><div class="bm-value">₹${(ai.estimatedValue||0).toLocaleString()}</div></div>
+      <div class="bm-item"><div class="bm-label">Tokens</div><div class="bm-value">${ai.suggestedTokens} × ${tokenPriceAC} AC</div></div>
+      <div class="bm-item"><div class="bm-label">Duration</div><div class="bm-value">${document.getElementById('assetDays').value} days</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--txt2);margin-bottom:20px;line-height:1.6">
+      An <strong>ASSET_CREATE</strong> transaction will be recorded on the Averon blockchain. Investors can then buy tokens. When fully funded, you receive the raise amount converted to INR.
     </div>`;
-  document.getElementById('propModal').classList.add('open');
 }
-function closePropModal(){document.getElementById('propModal').classList.remove('open');}
-function closeModal(e){if(e.target.id==='propModal')closePropModal();}
 
-async function fundProp(id){
-  if(!USER){showToast('Create account first','error');return;}
-  const kbc=parseFloat(document.getElementById('fundAmt')?.value);
-  if(!kbc||kbc<=0){showToast('Enter Averon Coin amount','error');return;}
-  if(kbc>USER.kbc){showToast('Not enough Averon Coin. Buy more first.','error');return;}
+async function confirmListing(){
+  if(!_wizAssetId){showToast('No asset to confirm','error');return}
+  const btn=document.getElementById('confirmBtn');btn.disabled=true;btn.textContent='Mining block...';
   try{
-    const r=await fetch(`/api/proposals/${id}/fund`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:USER.id,kbc})});
+    const r=await fetch(`/api/assets/${_wizAssetId}/confirm`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:USER.id})});
     const d=await r.json();if(!r.ok)throw new Error(d.error);
-    USER.kbc=d.userKbc;saveUser();
-    const idx=PROPOSALS.findIndex(x=>x.id===id);if(idx>=0)PROPOSALS[idx]=d.proposal;
-    showToast(`Invested ${kbc} Averon Coin!`,'success');
-    closePropModal();updateNav();renderFeatured();updateStats();
-  }catch(e){showToast(e.message||'Failed','error');}
+    showToast(`⛓ Listed! ${d.tokenCount} tokens created — on blockchain`,'success');
+    _wizAssetId=null;_wizFiles=[];_wizAI=null;
+    wizNext(1);
+    ['assetTitle','assetDesc','assetRaise'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
+    document.getElementById('fileList').innerHTML='';
+    navigateTo('assets');
+  }catch(e){showToast(e.message,'error')}
+  finally{btn.disabled=false;btn.textContent='⛓ Confirm & List on Blockchain →'}
 }
 
-async function withdrawProp(id){
+// ─── MARKETPLACE ─────────────────────────────────────────────────────────────
+function setOrderType(type,btn){_orderType=type;document.querySelectorAll('.o-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}
+
+document.getElementById('orderAmt')?.addEventListener('input',updateOrderTotal);
+document.getElementById('orderPrice')?.addEventListener('input',updateOrderTotal);
+function updateOrderTotal(){
+  const a=parseFloat(document.getElementById('orderAmt')?.value)||0;
+  const p=parseFloat(document.getElementById('orderPrice')?.value)||0;
+  document.getElementById('orderTotal').textContent='₹'+(a*p).toFixed(2);
+}
+
+async function renderMarket(){
   try{
-    const r=await fetch(`/api/proposals/${id}/withdraw`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:USER.id})});
-    const d=await r.json();if(!r.ok)throw new Error(d.error);
-    USER.kbc+=d.kbc;saveUser();
-    const idx=PROPOSALS.findIndex(x=>x.id===id);if(idx>=0)PROPOSALS[idx].withdrawn=true;
-    showToast(`Withdrew ${d.kbc.toFixed(0)} Averon Coin!`,'success');closePropModal();updateNav();
-  }catch(e){showToast(e.message,'error');}
+    const r=await fetch('/api/market/orderbook');const d=await r.json();
+    const ob=document.getElementById('orderBook');
+    ob.innerHTML=`<div class="ob-row hdr"><div>Type</div><div>Amount</div><div>Price</div></div>` +
+      (d.sells||[]).map(o=>`<div class="ob-row"><div class="sell-side">SELL</div><div>${o.remaining.toFixed(2)} AC</div><div>₹${o.price.toFixed(4)}</div></div>`).join('') +
+      (d.buys||[]).map(o=>`<div class="ob-row"><div class="buy-side">BUY</div><div>${o.remaining.toFixed(2)} AC</div><div>₹${o.price.toFixed(4)}</div></div>`).join('') +
+      (!d.buys?.length&&!d.sells?.length?'<div style="padding:20px;text-align:center;color:var(--txt3);font-size:12px">No open orders</div>':'');
+
+    const tl=document.getElementById('recentTrades');
+    tl.innerHTML=(d.recentTrades||[]).length?d.recentTrades.map(t=>`<div class="trade-row"><span>${t.buyer_name} bought ${t.amount.toFixed(2)} AC</span><span>₹${t.price_per_coin.toFixed(4)}</span></div>`).join(''):'<div style="padding:16px;text-align:center;color:var(--txt3);font-size:12px">No trades yet</div>';
+  }catch{}
 }
 
-async function refundProp(id){
-  const p=PROPOSALS.find(x=>x.id===id);
-  const inv=p&&p.investments?.find(i=>i.id===USER.id);
-  if(!inv||inv.kbc<=0){showToast('Nothing to refund','error');return;}
-  const rf=inv.kbc;USER.kbc=parseFloat((USER.kbc+rf).toFixed(4));inv.kbc=0;saveUser();
-  showToast(`Refunded ${rf.toFixed(4)} Averon Coin`,'success');closePropModal();updateNav();
-}
-
-function updateHint(){
-  const v=parseFloat(document.getElementById('propGoal').value);
-  if(v>0){const u=(v*ECONOMY.price).toFixed(2);document.getElementById('kbcHint').textContent='≈ ₹'+u;document.getElementById('kbcInr').textContent=v+' Averon Coin ≈ ₹'+u+' INR';}
-  else{document.getElementById('kbcHint').textContent='';document.getElementById('kbcInr').textContent='set a goal above';}
-}
-
-async function submitProposal(){
-  if(!USER){showToast('Create account first','error');return;}
-  const title=document.getElementById('propTitle').value.trim();
-  const desc=document.getElementById('propDesc').value.trim();
-  const category=document.getElementById('propCat').value;
-  const goal=parseFloat(document.getElementById('propGoal').value);
-  const days=parseInt(document.getElementById('propDays').value);
-  if(!title||!desc||!goal||!days){showToast('Fill all required fields','error');return;}
+async function placeOrder(){
+  if(!USER){showToast('Create account first','error');return}
+  const amount=parseFloat(document.getElementById('orderAmt').value);
+  const price=parseFloat(document.getElementById('orderPrice').value);
+  if(!amount||!price){showToast('Fill amount and price','error');return}
   try{
-    const r=await fetch('/api/proposals',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:USER.id,title,desc,category,goal,days})});
+    const r=await fetch('/api/market/'+(_orderType==='buy'?'buy':'sell'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:USER.id,amount,pricePerCoin:price})});
     const d=await r.json();if(!r.ok)throw new Error(d.error);
-    PROPOSALS.unshift(d);
-    ['propTitle','propDesc','propGoal'].forEach(i=>{document.getElementById(i).value='';});
-    document.getElementById('propDays').value='30';
-    showToast('Proposal submitted!','success');navigateTo('proposals');updateStats();
-  }catch(e){showToast(e.message||'Failed','error');}
+    showToast(`${_orderType.toUpperCase()} order placed`,'success');
+    renderMarket();syncUser().then(updateNav);
+  }catch(e){showToast(e.message,'error')}
 }
 
-function renderPortfolio(){
+// ─── EXPLORER ────────────────────────────────────────────────────────────────
+async function renderExplorer(){
+  try{
+    const [infoR,blocksR,validR]=await Promise.all([fetch('/api/blockchain/info'),fetch('/api/blockchain/blocks?limit=30'),fetch('/api/blockchain/validate')]);
+    const info=await infoR.json(),bd=await blocksR.json(),valid=await validR.json();
+    document.getElementById('exBlocks').textContent=info.blocks;
+    document.getElementById('exTxs').textContent=info.transactions;
+    document.getElementById('exDiff').textContent=info.difficulty;
+    document.getElementById('exValid').innerHTML=valid.valid?'<span class="chain-valid">✓ Valid</span>':'<span style="color:var(--red)">✗ Invalid</span>';
+    const bl=document.getElementById('blockList');
+    bl.innerHTML=(bd.blocks||[]).map(b=>`
+      <div class="block-card" onclick="toggleBlock(${b.index})" id="bc-${b.index}">
+        <div class="blk-idx">#${b.index}</div>
+        <div class="blk-hash">${shortHash(b.hash)}</div>
+        <div class="blk-txcount">${b.transactionCount}<span>txs</span></div>
+        <div class="blk-time">${timeAgo(b.timestamp)}</div>
+      </div>
+      <div id="bd-${b.index}" style="display:none"></div>
+    `).join('');
+  }catch{document.getElementById('blockList').innerHTML='<div class="empty-state"><div class="empty-ico">⚠</div><div class="empty-title">Server offline</div></div>'}
+}
+
+async function toggleBlock(idx){
+  const el=document.getElementById('bd-'+idx);if(!el)return;
+  if(_expandedBlock===idx){el.style.display='none';_expandedBlock=null;return}
+  if(_expandedBlock!==null){const p=document.getElementById('bd-'+_expandedBlock);if(p)p.style.display='none'}
+  try{
+    const r=await fetch('/api/blockchain/block/'+idx);const b=await r.json();
+    el.innerHTML=`<div class="block-detail">
+      <div class="bm-grid">
+        <div class="bm-item"><div class="bm-label">Hash</div><div class="bm-value">${b.hash}</div></div>
+        <div class="bm-item"><div class="bm-label">Previous</div><div class="bm-value">${b.previousHash}</div></div>
+        <div class="bm-item"><div class="bm-label">Time</div><div class="bm-value">${new Date(b.timestamp).toLocaleString()}</div></div>
+        <div class="bm-item"><div class="bm-label">Nonce</div><div class="bm-value">${b.nonce}</div></div>
+      </div>
+      <div style="font-size:12px;font-weight:700;margin-bottom:8px">${b.transactions.length} Transaction(s)</div>
+      ${b.transactions.map(tx=>`<div class="tx-detail-card">
+        <div class="tx-detail-row"><span class="tx-label">Type</span><span class="tx-type-badge ${(tx.type||'').toLowerCase()}">${tx.type||'TX'}</span></div>
+        <div class="tx-detail-row"><span class="tx-label">Hash</span><span class="tx-value mono" style="font-size:10px">${shortHash(tx.hash)}</span></div>
+        <div class="tx-detail-row"><span class="tx-label">From</span><span class="tx-value mono" style="font-size:10px">${tx.from==='SYSTEM'?'⚙ SYSTEM':shortAddr(tx.from)}</span></div>
+        <div class="tx-detail-row"><span class="tx-label">To</span><span class="tx-value mono" style="font-size:10px">${tx.to==='SYSTEM'?'⚙ SYSTEM':shortAddr(tx.to)}</span></div>
+        <div class="tx-detail-row"><span class="tx-label">Amount</span><span class="tx-value" style="font-weight:800">${tx.amount.toFixed(4)} AC</span></div>
+      </div>`).join('')}
+    </div>`;
+    el.style.display='block';_expandedBlock=idx;
+  }catch{}
+}
+
+// ─── PORTFOLIO ───────────────────────────────────────────────────────────────
+async function renderPortfolio(){
   if(!USER)return;
-  const kbcVal=(USER.kbc*ECONOMY.price).toFixed(2);
-  let costBasis=0,curVal=0;
-  PROPOSALS.forEach(p=>{const inv=p.investments?.find(i=>i.id===USER.id);if(inv&&inv.kbc>0){costBasis+=inv.kbc*(inv.avgPrice||1);curVal+=inv.kbc*ECONOMY.price;}});
-  const pnl=curVal-costBasis,pnlPct=costBasis>0?((pnl/costBasis)*100).toFixed(2):'0.00';
-  const pc=pnl>=0?'var(--green-profit)':'var(--red)',ps=pnl>=0?'+':'';
-  document.getElementById('portSum').innerHTML=`
-    <div class="stat-card"><div class="stat-ico">₹</div><div class="stat-val">₹${(USER.inr||0).toFixed(2)}</div><div class="stat-lbl">INR Balance</div></div>
-    <div class="stat-card"><div class="stat-ico">◎</div><div class="stat-val">${USER.kbc.toFixed(4)}</div><div class="stat-lbl">Averon Coin Balance</div></div>
-    <div class="stat-card"><div class="stat-ico">↑</div><div class="stat-val">₹${kbcVal}</div><div class="stat-lbl">Averon Coin Value</div></div>
-    <div class="stat-card" style="border-color:${pc}22"><div class="stat-ico">${pnl>=0?'▲':'▼'}</div><div class="stat-val" style="color:${pc}">${ps}₹${Math.abs(pnl).toFixed(2)}</div><div class="stat-lbl">P&amp;L (${ps}${pnlPct}%)</div></div>`;
-  const mp=PROPOSALS.filter(p=>p.proposerId===USER.id);
-  document.getElementById('myPropsGrid').innerHTML=mp.length?mp.map(pCard).join(''):empty('No proposals yet','Submit your first idea','◎');
-  const mi=PROPOSALS.filter(p=>p.investments?.find(i=>i.id===USER.id&&i.kbc>0));
-  document.getElementById('myInvGrid').innerHTML=mi.length?mi.map(pCard).join(''):empty('No investments yet','Browse proposals','◎');
-  const mr=PROPOSALS.filter(p=>p.status==='expired'&&p.raised<p.goal&&p.investments?.find(i=>i.id===USER.id&&i.kbc>0));
-  document.getElementById('myRefGrid').innerHTML=mr.length?mr.map(pCard).join(''):empty('No refunds available',"You're all clear",'✓');
-}
+  await syncUser();
+  try{
+    const r=await fetch('/api/portfolio/'+USER.id);const p=await r.json();
+    document.getElementById('portSum').innerHTML=`
+      <div class="stat-card"><div class="stat-ico">🔑</div><div class="stat-val mono" style="font-size:12px">${shortAddr(p.walletAddress||'—')}</div><div class="stat-lbl">Wallet</div></div>
+      <div class="stat-card"><div class="stat-ico">◎</div><div class="stat-val">${(p.balance||0).toFixed(4)}</div><div class="stat-lbl">Averon Coin</div></div>
+      <div class="stat-card"><div class="stat-ico">₹</div><div class="stat-val">₹${(p.coinValue||0).toFixed(2)}</div><div class="stat-lbl">Coin Value</div></div>
+      <div class="stat-card"><div class="stat-ico">🎫</div><div class="stat-val">${(p.tokens||[]).length}</div><div class="stat-lbl">Tokens Held</div></div>`;
 
-function switchTab(id,btn){
-  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');btn.classList.add('active');renderPortfolio();
-}
+    // Tokens
+    const tg=document.getElementById('myTokensGrid');
+    if(p.tokens?.length){
+      const grouped={};p.tokens.forEach(t=>{if(!grouped[t.asset_title])grouped[t.asset_title]=[];grouped[t.asset_title].push(t)});
+      tg.innerHTML=Object.entries(grouped).map(([title,tokens])=>`<div class="p-card"><div class="card-top"><span class="cat-badge">${esc(tokens[0].category)}</span><span class="s-badge s-${tokens[0].asset_status}">${tokens[0].asset_status}</span></div><div class="card-title">${esc(title)}</div><div style="font-size:13px;font-weight:700;margin-bottom:4px">${tokens.length} token(s) held</div><div style="font-size:12px;color:var(--txt2)">Total value: ${(tokens.reduce((s,t)=>s+t.price,0)).toFixed(4)} AC</div></div>`).join('');
+    }else tg.innerHTML=empty('No tokens yet','Invest in assets','🎫');
 
-function empty(t,s,ic){return`<div class="empty-state"><div class="empty-ico">${ic}</div><div class="empty-title">${t}</div><div class="empty-txt">${s}</div></div>`;}
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function timeAgo(ts){const s=Math.floor((Date.now()-ts)/1000);if(s<60)return'just now';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
-let _tt;
-function showToast(msg,type='info'){
-  const t=document.getElementById('toast');
-  document.getElementById('toastIco').textContent={success:'✓',error:'✗',info:'◎'}[type]||'◎';
-  document.getElementById('toastMsg').textContent=msg;
-  t.className=`toast ${type} show`;clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),4000);
+    // Assets
+    const ag=document.getElementById('myAssetsGrid');
+    ag.innerHTML=(p.myAssets?.length)?p.myAssets.map(assetCard).join(''):empty('No assets listed','Tokenize your first asset','📋');
+
+    // Orders
+    const ol=document.getElementById('myOrdersList');
+    ol.innerHTML=(p.myOrders?.length)?p.myOrders.map(o=>`<div class="tx-item"><div><div class="tx-type">${o.type.toUpperCase()} ${o.amount} AC @ ₹${o.price_per_coin}</div><div class="tx-time">${o.status} · ${timeAgo(o.created_at)}</div></div><div style="text-align:right"><div class="tx-kbc">${o.filled}/${o.amount}</div></div></div>`).join(''):empty('No orders','Place a trade on the marketplace','📊');
+
+    // Activity
+    const al=document.getElementById('activityList');
+    al.innerHTML=(p.activity?.length)?p.activity.map(a=>`<div class="tx-item"><div><div class="tx-type">${a.action}</div><div class="tx-time">${timeAgo(a.created_at)}${a.tx_hash?' · TX: '+shortHash(a.tx_hash):''}</div></div>${a.amount?`<div class="tx-kbc">${a.amount}</div>`:''}</div>`).join(''):empty('No activity','Start by buying Averon Coin','◎');
+  }catch{}
 }
+function switchTab(id,btn){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById(id)?.classList.add('active');btn.classList.add('active')}
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+function shortHash(h){return h?(h.slice(0,8)+'…'+h.slice(-6)):'—'}
+function shortAddr(a){return a?(a.slice(0,8)+'…'+a.slice(-4)):'—'}
+function empty(t,s,ic='◎'){return`<div class="empty-state"><div class="empty-ico">${ic}</div><div class="empty-title">${t}</div><div class="empty-txt">${s}</div></div>`}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function timeAgo(ts){const s=Math.floor((Date.now()-ts)/1000);if(s<60)return'just now';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago'}
+let _tt;function showToast(msg,type='info'){const t=document.getElementById('toast');document.getElementById('toastIco').textContent={success:'✓',error:'✗',info:'◎'}[type]||'◎';document.getElementById('toastMsg').textContent=msg;t.className=`toast ${type} show`;clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),4000)}
