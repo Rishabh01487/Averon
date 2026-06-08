@@ -102,3 +102,7 @@ function verifyAuditChain() {
       corrupted.push({ id: entry.id, expected: expectedHash, actual: entry.entry_hash });
     }
     if (entry.prev_hash !== prevHash) {
+      corrupted.push({ id: entry.id, chainBreak: true, expected: prevHash, actual: entry.prev_hash });
+    }
+    prevHash = entry.entry_hash;
+  }
