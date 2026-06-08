@@ -194,3 +194,6 @@ function populateCategories() {
 async function pollPrice() {
   try {
     const data = await api('/api/economy');
+    $('livePrice').textContent = parseFloat(data.price).toFixed(2);
+  } catch {}
+}
