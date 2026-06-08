@@ -478,3 +478,7 @@ async function uploadDocuments() {
   $('uploadDocsBtn').disabled = true;
   try {
     const res = await fetch(`/api/assets/${state.currentAssetId}/documents`, {
+      method: 'POST', headers: { 'Authorization': `Bearer ${state.accessToken}` }, body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
