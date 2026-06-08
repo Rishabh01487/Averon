@@ -78,3 +78,7 @@ async function analyzeAsset(asset, documents, dbModule) {
     concerns: [analysis.concerns, ...(stage4.fraudFlags || [])].filter(Boolean).join('. '),
     suggestedTokens: tokenRec.suggestedTokens,
     tokenPriceInr: tokenRec.tokenPriceInr,
+    source: analysis.source || 'fallback',
+    stages,
+    raw: analysis.raw || null,
+    duration: Date.now() - startTime,
