@@ -66,3 +66,7 @@ class WalletManager {
     try {
       if (fs.existsSync(this.walletsPath)) {
         const data = JSON.parse(fs.readFileSync(this.walletsPath, 'utf8'));
+        for (const [userId, w] of Object.entries(data)) {
+          this.wallets[userId] = Wallet.fromKeys(userId, w.publicKey, w.privateKey);
+        }
+      }
