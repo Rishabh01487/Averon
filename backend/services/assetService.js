@@ -182,3 +182,7 @@ class AssetService {
 
     if (sold >= asset.token_count) {
       funded = true;
+      this.processFullyFunded(assetId);
+    }
+
+    // Notify owner
