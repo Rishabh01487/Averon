@@ -34,3 +34,7 @@ function createRateLimiter(config) {
     res.set('X-RateLimit-Limit', max);
     res.set('X-RateLimit-Remaining', Math.max(0, max - entries.length));
     res.set('X-RateLimit-Reset', Math.ceil((windowStart + windowMs) / 1000));
+
+    if (entries.length > max) {
+      const retryAfter = Math.ceil(windowMs / 1000);
+      res.set('Retry-After', retryAfter);
