@@ -129,3 +129,7 @@ class EscrowService {
 
       totalRefunded += refundAmount;
       refunds.push({ userId: token.owner_id, amount: refundAmount, txHash: refundTx.hash });
+
+      // Clear token ownership
+      this.db.run('UPDATE asset_tokens SET owner_id = NULL, purchased_at = NULL, tx_hash = "" WHERE asset_id = ? AND owner_id = ?',
+        [assetId, token.owner_id]);
