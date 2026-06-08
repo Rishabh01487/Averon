@@ -134,3 +134,7 @@ app.post('/api/auth/login', authLimiter, validate('login'), async (req, res) => 
   const { email, password } = req.body;
 
   const user = DB.queryOne('SELECT * FROM users WHERE email = ?', [email]);
+  if (!user) return res.status(401).json({ error: 'Invalid credentials', code: 'AUTH_FAILED' });
+
+  // Check lockout
+  if (user.locked_until && user.locked_until > Date.now()) {
