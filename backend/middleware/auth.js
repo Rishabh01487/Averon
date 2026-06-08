@@ -190,3 +190,7 @@ function revokeAllUserSessions(db, userId) {
 }
 
 function cleanExpiredSessions(db) {
+  db.run('DELETE FROM sessions WHERE expires_at < ? OR is_revoked = 1', [Date.now()]);
+}
+
+// ── EXPORTS ──────────────────────────────────────────────────────────────────
