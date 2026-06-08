@@ -22,3 +22,7 @@ class EscrowService {
       [assetId, address, 'active', Date.now()]
     );
     this.db.run('UPDATE assets SET escrow_address = ? WHERE id = ?', [address, assetId]);
+    return { assetId, address };
+  }
+
+  /**
