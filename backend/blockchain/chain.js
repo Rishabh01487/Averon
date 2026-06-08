@@ -169,3 +169,8 @@ class Blockchain {
 
   getBalance(address) {
     let balance = 0;
+
+    for (const block of this.chain) {
+      for (const tx of block.transactions) {
+        if (tx.to === address) balance += tx.amount;
+        if (tx.from === address) balance -= (tx.amount + (tx.fee || 0));
