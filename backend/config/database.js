@@ -497,3 +497,8 @@ function getDashboardStats() {
     FROM assets`) || {};
   const userCount = queryOne('SELECT COUNT(*) as c FROM users')?.c || 0;
   const priceHistory = query('SELECT price FROM price_history ORDER BY recorded_at DESC LIMIT 200').reverse();
+
+  return {
+    price: eco.price || C.PRICE.INITIAL_PRICE,
+    totalSupply: eco.total_supply || 0,
+    circulatingSupply: eco.circulating_supply || 0,
