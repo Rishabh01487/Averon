@@ -106,28 +106,3 @@ class WalletManager {
       this.save();
     }
     return this.wallets['__SYSTEM__'];
-  }
-
-  getPlatformFeeWallet() {
-    if (!this.wallets['__PLATFORM_FEE__']) {
-      this.wallets['__PLATFORM_FEE__'] = new Wallet('__PLATFORM_FEE__');
-      this.save();
-    }
-    return this.wallets['__PLATFORM_FEE__'];
-  }
-
-  getAllAddresses() {
-    return Object.values(this.wallets).map(w => ({ userId: w.userId, address: w.address }));
-  }
-
-  /**
-   * Get wallet info safe for client (no private key).
-   */
-  getPublicInfo(userId) {
-    const w = this.wallets[userId];
-    if (!w) return null;
-    return { userId: w.userId, address: w.address, publicKey: w.publicKey };
-  }
-}
-
-module.exports = { Wallet, WalletManager };
