@@ -518,3 +518,7 @@ function startTimers() {
     const stats = DB.getDashboardStats();
     console.log(`\n  ╔══════════════════════════════════════════════════╗`);
     console.log(`  ║  AVERON v${C.PLATFORM_VERSION} — Enterprise Asset Tokenization   ║`);
+    console.log(`  ╚══════════════════════════════════════════════════╝`);
+    console.log(`  🌐 http://localhost:${PORT}`);
+    console.log(`  ⛓  ${blockchain.chain.length} blocks | Difficulty ${blockchain.difficulty}`);
+    console.log(`  💾 SQLite (WASM) | 🔑 ${systemWallet.address.substring(0, 16)}...`);
