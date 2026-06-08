@@ -122,3 +122,7 @@ function inferAction(method, path) {
   if (path.includes('/auth/login')) return 'LOGIN';
   if (path.includes('/auth/register')) return 'REGISTER';
   if (path.includes('/auth/logout')) return 'LOGOUT';
+  if (path.includes('/buy-direct') || path.includes('/buy-coins')) return 'MINT';
+  if (path.includes('/assets') && method === 'POST') {
+    if (path.includes('/analyze')) return 'AI_ANALYSIS_STARTED';
+    if (path.includes('/confirm')) return 'ASSET_LISTED';
