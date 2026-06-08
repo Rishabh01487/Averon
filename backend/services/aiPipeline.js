@@ -253,3 +253,8 @@ function checkFraudIndicators(asset, analysis, duplicateResult) {
   if (analysis.riskScore > 85) {
     flags.push('Extremely high risk score');
   }
+
+  return { fraudFlags: flags, hasCriticalFraud, flagCount: flags.length };
+}
+
+// ── Stage 5: Tokenization ────────────────────────────────────────────────────
