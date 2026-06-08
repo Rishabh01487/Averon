@@ -46,3 +46,7 @@ function signJWT(payload, secret, expiresIn) {
     .digest('base64url');
 
   return `${headerB64}.${payloadB64}.${signature}`;
+}
+
+function verifyJWT(token, secret) {
+  try {
