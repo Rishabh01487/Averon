@@ -298,3 +298,7 @@ function createSchema() {
     data TEXT DEFAULT '{}',
     is_read INTEGER DEFAULT 0,
     created_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`);
+
+  // ── Audit Log ────────────────────────────────────────────────────────────
