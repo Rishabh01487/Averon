@@ -89,3 +89,8 @@ function validateChain(chain) {
       return { valid: false, error: 'Timestamp must be after previous block', block: i };
     }
   }
+
+  return { valid: true, blocks: chain.length };
+}
+
+/**
