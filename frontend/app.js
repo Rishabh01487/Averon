@@ -366,3 +366,6 @@ async function buyAssetTokens(assetId) {
     viewAsset(assetId);
     loadNotifications();
   } catch {}
+}
+
+// ── BUY COIN ─────────────────────────────────────────────────────────────────
