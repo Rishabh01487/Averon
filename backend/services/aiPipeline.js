@@ -54,3 +54,7 @@ async function analyzeAsset(asset, documents, dbModule) {
   } else {
     analysis = analyzeWithFallback(asset, documents, stage1);
     stages.push({ stage: 'AI Analysis', source: 'fallback' });
+  }
+
+  // Stage 4: Fraud checks
+  const stage4 = checkFraudIndicators(asset, analysis, stage2);
