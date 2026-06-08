@@ -86,3 +86,7 @@ const schemas = {
 };
 
 // ── Validate Function ────────────────────────────────────────────────────────
+
+function validate(schemaName) {
+  return (req, res, next) => {
+    const schema = schemas[schemaName];
