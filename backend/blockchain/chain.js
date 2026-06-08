@@ -286,3 +286,7 @@ class Blockchain {
   /**
    * Get total minted supply.
    */
+  getTotalSupply() {
+    let supply = 0;
+    for (const block of this.chain) {
+      for (const tx of block.transactions) {
