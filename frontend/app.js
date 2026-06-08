@@ -510,3 +510,6 @@ async function startAIAnalysis() {
       <p style="margin-top:12px;font-size:13px;color:var(--text-secondary)">${result.analysis}</p>
       ${result.concerns ? `<p style="margin-top:8px;font-size:12px;color:var(--yellow)">⚠️ ${result.concerns}</p>` : ''}
       <p style="margin-top:8px;font-size:11px;color:var(--text-muted)">Source: ${result.source} · ${result.duration}ms · ${(result.stages||[]).length} stages</p>
+      ${result.verified ? `<button class="btn-primary" style="margin-top:16px" onclick="goToLaunch(${JSON.stringify(result).replace(/"/g, '&quot;')})">Proceed to Launch →</button>` : '<p style="margin-top:12px;color:var(--red)">Please improve documentation and re-submit.</p>'}`;
+  } catch (e) { $('aiProgress').classList.add('hidden'); toast(e.message, 'error'); } finally { $('startAnalysisBtn').disabled = false; }
+}
