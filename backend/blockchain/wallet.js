@@ -18,3 +18,7 @@ class Wallet {
     this.publicKey = keyPair.publicKey;
     this.privateKey = keyPair.privateKey;
     this.address = this.deriveAddress();
+  }
+
+  deriveAddress() {
+    const hash = crypto.createHash('sha256').update(this.publicKey).digest('hex');
