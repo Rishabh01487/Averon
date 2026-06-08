@@ -258,3 +258,7 @@ body {
 .trade-list { font-family: var(--mono); font-size: 12px; max-height: 400px; overflow-y: auto; }
 .trade-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
 .trade-amount { font-weight: 600; }
+
+/* ═══ EXPLORER ═══ */
+.chain-stats { display: flex; gap: 16px; font-size: 13px; color: var(--text-secondary); flex-wrap: wrap; }
+.chain-stat { padding: 6px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; font-family: var(--mono); }
