@@ -46,3 +46,111 @@ async function analyzeAsset(asset, documents, dbModule) {
     try {
       analysis = await analyzeWithGemini(asset, documents, stage1);
       stages.push({ stage: 'AI Analysis', source: 'gemini', duration: Date.now() - startTime });
+    } catch (e) {
+      console.warn('Gemini failed:', e.message);
+      analysis = analyzeWithFallback(asset, documents, stage1);
+      stages.push({ stage: 'AI Analysis', source: 'fallback', error: e.message });
+    }
+  } else {
+    analysis = analyzeWithFallback(asset, documents, stage1);
+    stages.push({ stage: 'AI Analysis', source: 'fallback' });
+  }
+
+  // Stage 4: Fraud checks
+  const stage4 = checkFraudIndicators(asset, analysis, stage2);
+  stages.push({ stage: 'Fraud Check', ...stage4 });
+
+  // Stage 5: Tokenization recommendation
+  const tokenRec = calculateTokenization(asset.raise_amount, analysis);
+  stages.push({ stage: 'Tokenization', ...tokenRec });
+
+  // Compile final result
+  const confidence = Math.max(0, Math.min(100, analysis.confidence - (stage4.fraudFlags?.length || 0) * 10));
+  const verified = analysis.verified && confidence >= C.AI.MIN_CONFIDENCE_FOR_LISTING && !stage4.hasCriticalFraud;
+
+  return {
+    verified,
+    estimatedValue: analysis.estimatedValue,
+    riskScore: analysis.riskScore,
+    riskLevel: analysis.riskLevel,
+    confidence,
+    analysis: analysis.analysis,
+    concerns: [analysis.concerns, ...(stage4.fraudFlags || [])].filter(Boolean).join('. '),
+    suggestedTokens: tokenRec.suggestedTokens,
+    tokenPriceInr: tokenRec.tokenPriceInr,
+    source: analysis.source || 'fallback',
+    stages,
+    raw: analysis.raw || null,
+    duration: Date.now() - startTime,
+  };
+}
+
+// ── Stage 1: Document Processing ─────────────────────────────────────────────
+
+function processDocuments(documents) {
+  const result = {
+    totalFiles: documents.length,
+    totalSize: 0,
+    types: {},
+    hasImages: false,
+    hasPdf: false,
+  };
+
+  for (const doc of documents) {
+    result.totalSize += doc.size || 0;
+    const mime = doc.mimetype || '';
+    result.types[mime] = (result.types[mime] || 0) + 1;
+    if (mime.startsWith('image/')) result.hasImages = true;
+    if (mime === 'application/pdf') result.hasPdf = true;
+  }
+
+  result.quality = Math.min(100, (
+    (result.totalFiles / 3) * 30 +
+    (result.totalSize > 100000 ? 25 : result.totalSize > 50000 ? 15 : 5) +
+    (result.hasImages ? 25 : 0) +
+    (result.hasPdf ? 20 : 0)
+  ));
+
+  return result;
+}
+
+// ── Stage 2: Duplicate Detection ─────────────────────────────────────────────
+
+function detectDuplicates(documents, dbModule) {
+  const duplicates = [];
+
+  if (dbModule) {
+    for (const doc of documents) {
+      if (!doc.path && !doc.filepath) continue;
+      try {
+        const filePath = doc.path || doc.filepath;
+        if (!fs.existsSync(filePath)) continue;
+        const content = fs.readFileSync(filePath);
+        const hash = crypto.createHash('sha256').update(content).digest('hex');
+        doc.doc_hash = hash;
+
+        // Check database for same hash
+        const existing = dbModule.queryOne('SELECT asset_id FROM asset_documents WHERE doc_hash = ? AND asset_id != ?',
+          [hash, doc.asset_id || 0]);
+        if (existing) {
+          duplicates.push({ filename: doc.original_name, existingAssetId: existing.asset_id });
+        }
+      } catch {}
+    }
+  }
+
+  return {
+    hasDuplicates: duplicates.length > 0,
+    duplicates,
+  };
+}
+
+// ── Stage 3a: Gemini Analysis ────────────────────────────────────────────────
+
+async function analyzeWithGemini(asset, documents, docInfo) {
+  const parts = [];
+
+  for (const doc of documents) {
+    if (doc.mimetype?.startsWith('image/')) {
+      try {
+        const filePath = doc.path || doc.filepath;
