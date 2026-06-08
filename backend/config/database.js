@@ -185,3 +185,8 @@ function createSchema() {
     FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE CASCADE,
     FOREIGN KEY (owner_id) REFERENCES users(id)
   )`);
+
+  // ── Escrow ───────────────────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS escrow_accounts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    asset_id INTEGER UNIQUE NOT NULL,
