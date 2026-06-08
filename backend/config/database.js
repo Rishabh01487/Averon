@@ -310,3 +310,7 @@ function createSchema() {
     resource_id TEXT DEFAULT '',
     details TEXT DEFAULT '{}',
     ip_address TEXT DEFAULT '',
+    user_agent TEXT DEFAULT '',
+    request_method TEXT DEFAULT '',
+    request_path TEXT DEFAULT '',
+    response_code INTEGER DEFAULT 0,
