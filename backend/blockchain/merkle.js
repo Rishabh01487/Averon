@@ -18,3 +18,7 @@ class MerkleTree {
     if (typeof data === 'string') return crypto.createHash('sha256').update(data).digest('hex');
     return crypto.createHash('sha256').update(JSON.stringify(data)).digest('hex');
   }
+
+  hashPair(a, b) {
+    // Sort to ensure consistent ordering
+    const sorted = [a, b].sort();
