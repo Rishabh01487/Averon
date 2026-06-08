@@ -94,3 +94,6 @@ class Transaction {
     if (!this.from) errors.push('From address required');
     if (!this.to) errors.push('To address required');
     if (this.from === this.to && this.type === C.TX_TYPES.TRANSFER) errors.push('Cannot transfer to self');
+
+    // Type check
+    if (!Object.values(C.TX_TYPES).includes(this.type)) errors.push('Invalid transaction type');
