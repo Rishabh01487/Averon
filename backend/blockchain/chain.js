@@ -270,3 +270,6 @@ class Blockchain {
       difficulty: this.difficulty,
       miningReward: this.miningReward,
       pendingTransactions: this.pendingTransactions.length,
+      version: C.PLATFORM_VERSION,
+    };
+  }
