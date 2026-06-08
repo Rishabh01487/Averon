@@ -506,3 +506,7 @@ function getDashboardStats() {
     totalAssetsFunded: eco.total_assets_funded || 0,
     totalFeesCollected: eco.total_fees_collected || 0,
     totalTrades: eco.total_trades || 0,
+    totalVolume: eco.total_volume || 0,
+    holders: eco.holder_count || 0,
+    marketCap: eco.market_cap || 0,
+    tvl: eco.tvl || 0,
