@@ -66,3 +66,6 @@ class Block {
     }
 
     this.size = this.calculateSize();
+    const miningTime = Date.now() - startTime;
+    return { hash: this.hash, nonce: this.nonce, time: miningTime };
+  }
