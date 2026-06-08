@@ -174,3 +174,7 @@ Respond ONLY with this JSON (no markdown):
   const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts }],
+      generationConfig: { temperature: C.AI.TEMPERATURE, maxOutputTokens: 512 },
+    }),
