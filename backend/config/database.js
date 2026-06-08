@@ -22,3 +22,7 @@ async function initDatabase() {
 
   if (fs.existsSync(DB_PATH)) {
     const buffer = fs.readFileSync(DB_PATH);
+    db = new SQL.Database(buffer);
+    console.log('  💾 Loaded existing database');
+  } else {
+    db = new SQL.Database();
