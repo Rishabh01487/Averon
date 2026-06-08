@@ -106,3 +106,7 @@ class AssetService {
     let txHash = '', blockIdx = 0;
 
     if (wallet && walletData) {
+      const assetTx = new Transaction(walletData.address, 'SYSTEM', 0, C.TX_TYPES.ASSET_CREATE, {
+        assetId, title: asset.title, tokens: tokenCount, raiseAmount: asset.raise_amount,
+      });
+      wallet.sign(assetTx);
