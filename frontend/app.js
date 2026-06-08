@@ -721,3 +721,8 @@ async function loadPortfolio() {
         <span style="font-weight:600;color:${o.side === 'buy' ? 'var(--green)' : 'var(--red)'}">${o.side.toUpperCase()} ${o.remaining.toFixed(4)} AC @ ₹${o.price.toFixed(4)}</span>
         <button class="btn-ghost btn-sm btn-danger" onclick="cancelOrder(${o.id})">Cancel</button>
       </div>`).join('') || '<div class="empty-state">No open orders</div>';
+
+    // History
+    $('myHistory').innerHTML = data.activity?.slice(0, 20).map(a => `
+      <div class="tx-item">
+        <span class="tx-action">${a.action}</span>
