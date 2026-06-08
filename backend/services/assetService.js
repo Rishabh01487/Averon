@@ -201,3 +201,8 @@ class AssetService {
 
     // Release escrow to owner
     const payoutResult = this.escrow.releaseFunds(assetId);
+
+    // Mine the payout transactions
+    this.blockchain.minePendingTransactions(this.walletManager.getSystemWallet().address);
+
+    // Boost coin price
