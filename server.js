@@ -238,3 +238,6 @@ app.post('/api/buy-coins', authenticate, financialLimiter, validate('buyCoins'),
   const eco = DB.getEconomy();
   const newPrice = parseFloat((C.PRICE.INITIAL_PRICE * (1 + (eco.total_supply || 0) / 10000) * (1 + (eco.total_assets_funded || 0) * 0.04)).toFixed(4));
   DB.setPrice(newPrice);
+
+  DB.run('INSERT INTO activity_log (user_id, action, details, tx_hash, block_index, amount, created_at) VALUES (?,?,?,?,?,?,?)',
+    [userId, 'MINT', `Minted ${coinAmount.toFixed(4)} AC for ₹${amountInr}`, mintTx.hash, block?.index || 0, coinAmount, Date.now()]);
