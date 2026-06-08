@@ -30,3 +30,7 @@ function signJWT(payload, secret, expiresIn) {
     if (match) {
       const val = parseInt(match[1]);
       const unit = match[2];
+      expSeconds = val * (unit === 'm' ? 60 : unit === 'h' ? 3600 : 86400);
+    } else {
+      expSeconds = 900; // 15min default
+    }
