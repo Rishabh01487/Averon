@@ -306,3 +306,7 @@ function createSchema() {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id TEXT DEFAULT '',
     action TEXT NOT NULL,
+    resource_type TEXT DEFAULT '',
+    resource_id TEXT DEFAULT '',
+    details TEXT DEFAULT '{}',
+    ip_address TEXT DEFAULT '',
