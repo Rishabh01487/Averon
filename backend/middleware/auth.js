@@ -114,3 +114,7 @@ function generateTokens(user) {
 
 function verifyAccessToken(token) {
   return verifyJWT(token, JWT_SECRET);
+}
+
+function verifyRefreshToken(token) {
+  return verifyJWT(token, JWT_REFRESH_SECRET);
