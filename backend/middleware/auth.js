@@ -74,3 +74,7 @@ function verifyJWT(token, secret) {
 
 const HASH_ITERATIONS = 100000;
 const HASH_KEYLEN = 64;
+const HASH_DIGEST = 'sha512';
+
+async function hashPassword(password) {
+  return new Promise((resolve, reject) => {
