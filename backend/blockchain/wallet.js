@@ -106,3 +106,7 @@ class WalletManager {
       this.save();
     }
     return this.wallets['__SYSTEM__'];
+  }
+
+  getPlatformFeeWallet() {
+    if (!this.wallets['__PLATFORM_FEE__']) {
