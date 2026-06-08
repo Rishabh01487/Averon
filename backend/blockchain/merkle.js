@@ -46,3 +46,7 @@ class MerkleTree {
       }
       this.layers.push(nextLayer);
       layer = nextLayer;
+    }
+
+    this.root = layer[0];
+  }
