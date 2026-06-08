@@ -26,3 +26,7 @@ class Transaction {
 
   calculateHash() {
     const payload = JSON.stringify({
+      from: this.from,
+      to: this.to,
+      amount: this.amount,
+      type: this.type,
