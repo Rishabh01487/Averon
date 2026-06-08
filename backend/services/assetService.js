@@ -302,3 +302,7 @@ class AssetService {
     if (filters.limit) { sql += ' LIMIT ?'; params.push(filters.limit); }
 
     let assets = this.db.query(sql, params);
+
+    return assets.map(a => {
+      const sold = this.db.queryOne('SELECT COUNT(*) as c FROM asset_tokens WHERE asset_id = ? AND owner_id IS NOT NULL', [a.id])?.c || 0;
+      return {
