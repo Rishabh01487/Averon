@@ -10,3 +10,7 @@ const C = require('../config/constants');
 // This avoids the `jsonwebtoken` dependency while maintaining full JWT spec.
 
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || crypto.randomBytes(64).toString('hex');
+
+function base64url(str) {
+  return Buffer.from(str).toString('base64url');
