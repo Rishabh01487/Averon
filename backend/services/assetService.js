@@ -22,3 +22,7 @@ class AssetService {
 
   transition(assetId, newStatus, changedBy = '', reason = '') {
     const asset = this.db.queryOne('SELECT * FROM assets WHERE id = ?', [assetId]);
+    if (!asset) throw new Error('Asset not found');
+
+    if (!this.canTransition(asset.status, newStatus)) {
+      throw new Error(`Cannot transition from ${asset.status} to ${newStatus}`);
