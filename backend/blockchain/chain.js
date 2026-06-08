@@ -77,3 +77,8 @@ class Blockchain {
   }
 
   // ── Transaction Pool ───────────────────────────────────────────────────────
+
+  addTransaction(transaction) {
+    // Validate transaction
+    if (transaction.from !== 'SYSTEM') {
+      if (!transaction.isValid()) {
