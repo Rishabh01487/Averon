@@ -126,3 +126,7 @@ class Blockchain {
     // Create new block
     const previousBlock = this.getLatestBlock();
     const newBlock = new Block(
+      this.chain.length,
+      previousBlock.hash,
+      txsToMine
+    );
