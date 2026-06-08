@@ -310,3 +310,7 @@ class AssetService {
         tokens_sold: sold,
         tokens_available: a.token_count - sold,
         progress: a.token_count ? Math.round((sold / a.token_count) * 100) : 0,
+      };
+    });
+  }
+}
