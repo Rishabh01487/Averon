@@ -730,3 +730,7 @@ async function loadPortfolio() {
         <span class="tx-time">${timeAgo(a.created_at)}</span>
       </div>`).join('') || '<div class="empty-state">No history yet</div>';
   } catch {}
+}
+
+window.cancelOrder = async (id) => {
+  try {
