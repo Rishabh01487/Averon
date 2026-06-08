@@ -158,3 +158,6 @@ class EscrowService {
     const txs = this.db.query('SELECT * FROM escrow_transactions WHERE escrow_id = ? ORDER BY created_at DESC', [escrow.id]);
     return { ...escrow, transactions: txs };
   }
+}
+
+module.exports = { EscrowService };
