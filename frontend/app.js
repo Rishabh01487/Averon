@@ -110,3 +110,7 @@ function initAuth() {
   $('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     $('authError').classList.add('hidden');
+    try {
+      const data = await api('/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email: $('loginEmail').value, password: $('loginPassword').value }),
