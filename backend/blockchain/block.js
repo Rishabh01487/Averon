@@ -114,3 +114,7 @@ class Block {
   }
 
   /**
+   * Validate the block's timestamp is reasonable.
+   */
+  validateTimestamp(previousBlockTimestamp) {
+    // Must be after previous block
