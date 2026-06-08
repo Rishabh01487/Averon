@@ -230,3 +230,7 @@ class AssetService {
   }
 
   // ── Deadline Check ───────────────────────────────────────────────────────
+
+  checkDeadlines() {
+    const active = this.db.query(`SELECT * FROM assets WHERE status IN ('${C.ASSET_STATUS.ACTIVE}', '${C.ASSET_STATUS.FUNDING}')`);
+    const now = Date.now();
