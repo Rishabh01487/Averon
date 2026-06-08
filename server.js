@@ -338,3 +338,6 @@ app.post('/api/assets/:id/analyze', authenticate, (req, res) => {
     } catch (e) {
       DB.run('UPDATE assets SET status = ?, updated_at = ? WHERE id = ?', [C.ASSET_STATUS.DOCUMENTS_UPLOADED, Date.now(), assetId]);
       res.status(500).json({ error: 'AI analysis failed: ' + e.message });
+    }
+  })();
+});
