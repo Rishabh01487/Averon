@@ -78,3 +78,7 @@ function auditMiddleware(req, res, next) {
           responseCode: res.statusCode,
         });
       }
+      return originalSend.call(this, body);
+    };
+  }
+  next();
