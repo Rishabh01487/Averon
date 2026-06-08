@@ -322,3 +322,7 @@ function createSchema() {
   // ── System Config ────────────────────────────────────────────────────────
   db.run(`CREATE TABLE IF NOT EXISTS system_config (
     key TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    description TEXT DEFAULT '',
+    updated_by TEXT DEFAULT '',
+    updated_at INTEGER NOT NULL
