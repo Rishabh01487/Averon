@@ -250,3 +250,7 @@ function createSchema() {
   // ── Economy ──────────────────────────────────────────────────────────────
   db.run(`CREATE TABLE IF NOT EXISTS economy (
     id INTEGER PRIMARY KEY DEFAULT 1,
+    price REAL DEFAULT ${C.PRICE.INITIAL_PRICE},
+    total_supply REAL DEFAULT 0,
+    circulating_supply REAL DEFAULT 0,
+    total_raised_inr REAL DEFAULT 0,
