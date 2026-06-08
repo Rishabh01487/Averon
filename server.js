@@ -141,3 +141,8 @@ app.post('/api/auth/login', authLimiter, validate('login'), async (req, res) => 
     const remaining = Math.ceil((user.locked_until - Date.now()) / 60000);
     return res.status(423).json({ error: `Account locked. Try again in ${remaining} minutes.`, code: 'ACCOUNT_LOCKED' });
   }
+
+  if (user.is_frozen) return res.status(403).json({ error: 'Account is frozen', code: 'ACCOUNT_FROZEN' });
+
+  const valid = await verifyPassword(password, user.password_hash);
+  if (!valid) {
