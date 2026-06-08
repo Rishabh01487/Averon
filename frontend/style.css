@@ -230,3 +230,6 @@ body {
 .ai-result.verified { background: var(--green-dim); border-color: rgba(16,185,129,0.3); }
 .ai-result.rejected { background: var(--red-dim); border-color: rgba(239,68,68,0.3); }
 .ai-stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
+.ai-stat { padding: 12px; background: rgba(0,0,0,0.2); border-radius: var(--radius-sm); text-align: center; }
+.ai-stat .val { font-size: 22px; font-weight: 800; }
+.ai-stat .label { font-size: 11px; color: var(--text-muted); }
