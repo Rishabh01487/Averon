@@ -466,3 +466,7 @@ app.post('/api/admin/config', authenticate, requireRole(C.ROLES.ADMIN), (req, re
   logAudit('SYSTEM_CONFIG_CHANGE', { key, value }, { userId: req.user.userId });
   res.json({ success: true });
 });
+
+// ── Economy ──────────────────────────────────────────────────────────────────
+
+app.get('/api/economy', (req, res) => res.json(DB.getDashboardStats()));
