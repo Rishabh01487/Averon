@@ -374,3 +374,7 @@ async function loadBuyPage() {
   try {
     const acc = await api('/api/account');
     const price = parseFloat(acc.balance !== undefined ? state.config?.price : 1);
+    $('buyPrice').textContent = `₹${price.toFixed(2)}`;
+    $('buyBalance').textContent = `${parseFloat(acc.balance).toFixed(4)} AC`;
+  } catch {}
+}
