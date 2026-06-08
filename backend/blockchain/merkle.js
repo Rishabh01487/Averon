@@ -30,3 +30,6 @@ class MerkleTree {
       this.root = crypto.createHash('sha256').update('empty').digest('hex');
       return;
     }
+
+    let layer = [...this.leaves];
+    this.layers = [layer];
