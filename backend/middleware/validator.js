@@ -122,3 +122,7 @@ function validate(schemaName) {
 
     next();
   };
+}
+
+// Global sanitizer middleware
+function sanitizeBody(req, res, next) {
