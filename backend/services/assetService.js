@@ -258,3 +258,6 @@ class AssetService {
         }
       }
     }
+
+    return results;
+  }
