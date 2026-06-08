@@ -14,3 +14,7 @@ class AssetService {
   }
 
   // ── State Machine ──────────────────────────────────────────────────────────
+
+  canTransition(currentStatus, newStatus) {
+    const allowed = C.ASSET_TRANSITIONS[currentStatus];
+    return allowed ? allowed.includes(newStatus) : false;
