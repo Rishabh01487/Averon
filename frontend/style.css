@@ -190,3 +190,7 @@ body {
 .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--green)); border-radius: 3px; transition: width 0.5s; }
 
 /* ═══ BUY COIN ═══ */
+.centered-card { max-width: 520px; margin: 0 auto; padding: 40px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+.centered-card h1 { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+.subtitle { color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; }
+.buy-info { display: flex; gap: 12px; margin-bottom: 24px; }
