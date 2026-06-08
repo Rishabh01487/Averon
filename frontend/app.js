@@ -554,3 +554,7 @@ async function loadMarket() {
     // Set default price
     if (!$('orderPrice').value) $('orderPrice').value = parseFloat(state.config?.price || 1).toFixed(4);
   } catch {}
+}
+
+function initMarket() {
+  $$('.order-tab').forEach(tab => {
