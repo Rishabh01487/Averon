@@ -70,3 +70,7 @@ const schemas = {
   },
 
   buyCoins: {
+    amountInr: [{ rule: rules.required, msg: 'Amount is required' }, { rule: rules.number, msg: 'Amount must be a number' }, { rule: rules.min(C.LIMITS.MIN_INVESTMENT_INR), msg: `Minimum ₹${C.LIMITS.MIN_INVESTMENT_INR}` }],
+  },
+
+  buyTokens: {
