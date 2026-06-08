@@ -258,3 +258,7 @@ app.get('/api/assets', optionalAuth, (req, res) => {
   if (category && category !== 'all') filters.category = category;
   if (limit) filters.limit = parseInt(limit);
   res.json(assetService.listAssets(filters));
+});
+
+app.get('/api/assets/:id', optionalAuth, (req, res) => {
+  const asset = assetService.getAsset(parseInt(req.params.id));
