@@ -53,3 +53,8 @@ function logAudit(action, details = {}, options = {}) {
 
   return entry;
 }
+
+/**
+ * Express middleware that auto-logs all state-changing requests.
+ */
+function auditMiddleware(req, res, next) {
