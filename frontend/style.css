@@ -166,3 +166,7 @@ body {
 /* ═══ ASSETS ═══ */
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
 .page-header h1 { font-size: 24px; font-weight: 800; }
+.filter-row { display: flex; gap: 8px; }
+
+.asset-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+.asset-card {
