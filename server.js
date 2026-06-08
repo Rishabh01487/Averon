@@ -262,3 +262,6 @@ app.get('/api/assets', optionalAuth, (req, res) => {
 
 app.get('/api/assets/:id', optionalAuth, (req, res) => {
   const asset = assetService.getAsset(parseInt(req.params.id));
+  if (!asset) return res.status(404).json({ error: 'Asset not found' });
+  res.json(asset);
+});
