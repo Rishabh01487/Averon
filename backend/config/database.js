@@ -454,3 +454,6 @@ function runTransaction(fn) {
 }
 
 function getConfig(key) {
+  const row = queryOne('SELECT value FROM system_config WHERE key = ?', [key]);
+  return row?.value ?? null;
+}
