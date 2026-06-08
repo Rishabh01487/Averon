@@ -134,3 +134,7 @@ module.exports = {
     ALLOWED_MIMETYPES: ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'],
     MIN_RAISE_AMOUNT: 100,
     MAX_RAISE_AMOUNT: 10000000,
+    DEFAULT_LISTING_DAYS: 30,
+    MAX_LISTING_DAYS: 365,
+    MIN_TOKEN_COUNT: 2,
+    MAX_TOKEN_COUNT: 10000,
