@@ -398,3 +398,7 @@ function initBuyPage() {
       $('buyResult').classList.remove('hidden');
       $('buyBalance').textContent = `${result.newBalance.toFixed(4)} AC`;
       $('livePrice').textContent = result.newPrice.toFixed(2);
+      toast(`Minted ${result.coins.toFixed(4)} AC`, 'success');
+    } catch {} finally { $('buyCoinsBtn').disabled = false; }
+  });
+}
