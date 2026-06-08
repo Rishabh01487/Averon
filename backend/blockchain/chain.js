@@ -218,3 +218,7 @@ class Blockchain {
             blockIndex: block.index,
             blockHash: block.hash,
             confirmations: this.chain.length - block.index,
+          };
+        }
+      }
+    }
