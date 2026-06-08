@@ -46,3 +46,7 @@ class Block {
     });
     return crypto.createHash('sha256').update(payload).digest('hex');
   }
+
+  /**
+   * Mine this block — find a nonce that produces a hash starting with `difficulty` zeros.
+   */
