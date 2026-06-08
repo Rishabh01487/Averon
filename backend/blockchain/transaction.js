@@ -74,3 +74,7 @@ class Transaction {
       verify.update(this.hash);
       verify.end();
       return verify.verify(this.signerPublicKey, this.signature, 'hex');
+    } catch {
+      return false;
+    }
+  }
