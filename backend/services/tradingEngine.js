@@ -146,3 +146,7 @@ class TradingEngine {
         buy.filled = newBuyFilled;
         buy.remaining = newBuyRemaining;
         sell.filled = newSellFilled;
+        sell.remaining = newSellRemaining;
+
+        if (buy.remaining <= 0) break;
+      }
