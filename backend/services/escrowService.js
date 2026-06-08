@@ -146,3 +146,7 @@ class EscrowService {
 
     this.db.run('UPDATE escrow_accounts SET balance = 0, total_refunded = total_refunded + ?, status = "refunded" WHERE id = ?',
       [totalRefunded, escrow.id]);
+
+    this.db.run('UPDATE assets SET escrow_balance = 0, funded_amount = 0 WHERE id = ?', [assetId]);
+
+    return { refunded: totalRefunded, refundCount: refunds.length, refunds };
