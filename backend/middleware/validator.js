@@ -29,3 +29,8 @@ function sanitizeObject(obj) {
   }
   return sanitized;
 }
+
+// ── Validation Rules ─────────────────────────────────────────────────────────
+
+const rules = {
+  required: (val) => val !== undefined && val !== null && val !== '',
