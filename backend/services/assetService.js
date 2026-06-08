@@ -214,3 +214,6 @@ class AssetService {
 
     // Update economy
     this.db.incrementEconomy('total_assets_funded', 1);
+    this.db.incrementEconomy('total_raised_inr', payoutResult.payout * currentPrice);
+
+    this.transition(assetId, C.ASSET_STATUS.COMPLETED, 'system', 'Payout completed');
