@@ -214,3 +214,7 @@ function initNav() {
     link.addEventListener('click', () => navigateTo(link.dataset.page));
   });
   $('logoutBtn').addEventListener('click', logout);
+  $('notifBell').addEventListener('click', () => { navigateTo('portfolio'); api('/api/notifications/read', { method: 'POST' }); $('notifCount').classList.add('hidden'); });
+}
+
+function navigateTo(page) {
