@@ -50,3 +50,7 @@ class EscrowService {
   /**
    * Release escrow to asset owner (when fully funded).
    */
+  releaseFunds(assetId) {
+    const { Transaction } = require('../blockchain/transaction');
+    const escrow = this.db.queryOne('SELECT * FROM escrow_accounts WHERE asset_id = ?', [assetId]);
+    if (!escrow || escrow.balance <= 0) throw new Error('Nothing to release');
