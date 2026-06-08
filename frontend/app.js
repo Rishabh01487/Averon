@@ -202,3 +202,7 @@ async function loadNotifications() {
   try {
     const data = await api('/api/notifications');
     const badge = $('notifCount');
+    if (data.unread > 0) { badge.textContent = data.unread; badge.classList.remove('hidden'); }
+    else badge.classList.add('hidden');
+  } catch {}
+}
