@@ -22,3 +22,6 @@ const PROFILES = {
   'Precious Metals':    { avg: 80000, risk: [10,30] },
   'Commodities':        { avg: 25000, risk: [20,50] },
   'Infrastructure':     { avg: 1000000, risk: [15,40] },
+  'Energy':             { avg: 200000, risk: [20,45] },
+  'Other':              { avg: 25000, risk: [30,65] },
+};
