@@ -114,3 +114,7 @@ class WalletManager {
       this.save();
     }
     return this.wallets['__PLATFORM_FEE__'];
+  }
+
+  getAllAddresses() {
+    return Object.values(this.wallets).map(w => ({ userId: w.userId, address: w.address }));
