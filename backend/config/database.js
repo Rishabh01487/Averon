@@ -330,3 +330,7 @@ function createSchema() {
 
   // ── Activity Log ─────────────────────────────────────────────────────────
   db.run(`CREATE TABLE IF NOT EXISTS activity_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT DEFAULT '',
+    action TEXT NOT NULL,
+    details TEXT DEFAULT '',
