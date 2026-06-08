@@ -457,3 +457,8 @@ async function createAsset() {
   const description = $('assetDescription').value;
   const raiseAmount = parseFloat($('assetRaise').value);
   const days = parseInt($('assetDays').value) || 30;
+
+  if (!title || !category || !description || !raiseAmount) return toast('Fill all fields', 'error');
+  if (description.length < 20) return toast('Description too short (min 20 chars)', 'error');
+
+  try {
