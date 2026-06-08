@@ -142,3 +142,7 @@ function detectDuplicates(documents, dbModule) {
   return {
     hasDuplicates: duplicates.length > 0,
     duplicates,
+  };
+}
+
+// ── Stage 3a: Gemini Analysis ────────────────────────────────────────────────
