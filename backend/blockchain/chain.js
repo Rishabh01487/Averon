@@ -130,3 +130,7 @@ class Blockchain {
       previousBlock.hash,
       txsToMine
     );
+    newBlock.miner = minerAddress;
+    newBlock.difficulty = this.difficulty;
+
+    // Mine it
