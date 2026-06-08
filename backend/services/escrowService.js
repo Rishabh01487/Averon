@@ -62,3 +62,7 @@ class EscrowService {
     if (!ownerWallet) throw new Error('Owner wallet not found');
 
     const amount = escrow.balance;
+
+    // Deduct platform fee
+    const feePercent = parseFloat(this.db.getConfig('capital_raise_fee_percent') || C.FEES.CAPITAL_RAISE_FEE_PERCENT);
+    const fee = parseFloat((amount * feePercent / 100).toFixed(8));
