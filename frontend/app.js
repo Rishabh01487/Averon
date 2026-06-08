@@ -330,3 +330,7 @@ async function viewAsset(id) {
         <button class="btn-ghost" onclick="loadAssets()">← Back to Assets</button>
         <div class="asset-card" style="margin-top:12px;cursor:default">
           <div class="asset-card-header">
+            <div class="asset-title" style="font-size:20px">${a.title}</div>
+            <span class="asset-status status-${a.status}">${a.status.replace(/_/g,' ')}</span>
+          </div>
+          <div class="asset-category">${a.category} · Listed by ${a.owner_name}</div>
