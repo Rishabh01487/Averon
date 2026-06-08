@@ -94,3 +94,7 @@ module.exports = {
     payout_pending: ['completed'],
     expired: ['refunding'],
     refunding: ['closed'],
+    completed: ['closed'],
+  },
+
+  // ── Asset Categories ───────────────────────────────────────────────────────
