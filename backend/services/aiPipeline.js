@@ -98,3 +98,7 @@ function processDocuments(documents) {
 
   for (const doc of documents) {
     result.totalSize += doc.size || 0;
+    const mime = doc.mimetype || '';
+    result.types[mime] = (result.types[mime] || 0) + 1;
+    if (mime.startsWith('image/')) result.hasImages = true;
+    if (mime === 'application/pdf') result.hasPdf = true;
