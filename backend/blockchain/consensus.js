@@ -134,3 +134,7 @@ function getChainStats(chain) {
   const totalTxs = chain.reduce((sum, b) => sum + b.transactions.length, 0);
   const avgBlockTime = chain.length > 1
     ? Math.round((latest.timestamp - genesis.timestamp) / (chain.length - 1))
+    : 0;
+
+  const difficulties = chain.map(b => b.difficulty || C.BLOCKCHAIN.DIFFICULTY);
+  const avgDifficulty = difficulties.reduce((s, d) => s + d, 0) / difficulties.length;
