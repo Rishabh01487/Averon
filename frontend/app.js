@@ -166,3 +166,7 @@ async function enterApp() {
   } catch {}
 
   // Load initial page
+  navigateTo('home');
+
+  // Refresh account
+  try {
