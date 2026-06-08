@@ -102,3 +102,6 @@ function generateTokens(user) {
   const accessPayload = {
     userId: user.id,
     email: user.email,
+    role: user.role,
+    walletAddress: user.wallet_address,
+  };
