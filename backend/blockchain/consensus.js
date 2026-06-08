@@ -61,3 +61,8 @@ function validateChain(chain) {
     if (currentBlock.index !== previousBlock.index + 1) {
       return { valid: false, error: 'Index discontinuity', block: i, expected: previousBlock.index + 1, got: currentBlock.index };
     }
+
+    // Hash chain linkage
+    if (currentBlock.previousHash !== previousBlock.hash) {
+      return { valid: false, error: 'Previous hash mismatch', block: i };
+    }
