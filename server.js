@@ -402,3 +402,111 @@ app.get('/api/portfolio', authenticate, (req, res) => {
     balance, walletAddress: wallet?.address, coinValue: parseFloat((balance * price).toFixed(2)),
     tokens, myAssets, myOrders, activity, notifications, price,
   });
+});
+
+// ── Blockchain Explorer ──────────────────────────────────────────────────────
+
+app.get('/api/blockchain/info', (req, res) => res.json(blockchain.getInfo()));
+
+app.get('/api/blockchain/blocks', (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit) || 20, 50);
+  const blocks = blockchain.getRecentBlocks(limit).map(b => b.toJSON());
+  res.json({ blocks, total: blockchain.chain.length });
+});
+
+app.get('/api/blockchain/block/:index', (req, res) => {
+  const block = blockchain.getBlock(parseInt(req.params.index));
+  if (!block) return res.status(404).json({ error: 'Block not found' });
+  res.json(block.toJSON());
+});
+
+app.get('/api/blockchain/tx/:hash', (req, res) => {
+  const tx = blockchain.findTransaction(req.params.hash);
+  if (!tx) return res.status(404).json({ error: 'Transaction not found' });
+  res.json(tx);
+});
+
+app.get('/api/blockchain/validate', (req, res) => res.json(blockchain.isChainValid()));
+
+app.get('/api/blockchain/address/:address', (req, res) => {
+  const balance = blockchain.getBalance(req.params.address);
+  const history = blockchain.getTransactionHistory(req.params.address);
+  res.json({ address: req.params.address, balance, transactions: history });
+});
+
+// ── Admin ────────────────────────────────────────────────────────────────────
+
+app.get('/api/admin/stats', authenticate, requireRole(C.ROLES.ADMIN), (req, res) => {
+  const stats = DB.getDashboardStats();
+  const chainInfo = blockchain.getInfo();
+  const auditIntegrity = verifyAuditChain();
+  const recentAudit = DB.query('SELECT * FROM audit_log ORDER BY created_at DESC LIMIT 50');
+  const pendingAssets = DB.query(`SELECT * FROM assets WHERE status IN ('${C.ASSET_STATUS.VERIFIED}','${C.ASSET_STATUS.FLAGGED}','${C.ASSET_STATUS.COMPLIANCE_REVIEW}')`);
+  const systemConfig = DB.query('SELECT * FROM system_config');
+  const frozenUsers = DB.query('SELECT id, name, email FROM users WHERE is_frozen = 1');
+
+  res.json({ stats, chainInfo, auditIntegrity, recentAudit, pendingAssets, systemConfig, frozenUsers });
+});
+
+app.post('/api/admin/freeze/:userId', authenticate, requireRole(C.ROLES.ADMIN), (req, res) => {
+  DB.run('UPDATE users SET is_frozen = 1 WHERE id = ?', [req.params.userId]);
+  logAudit('ACCOUNT_FROZEN', { targetUser: req.params.userId }, { userId: req.user.userId });
+  res.json({ success: true });
+});
+
+app.post('/api/admin/unfreeze/:userId', authenticate, requireRole(C.ROLES.ADMIN), (req, res) => {
+  DB.run('UPDATE users SET is_frozen = 0 WHERE id = ?', [req.params.userId]);
+  logAudit('ACCOUNT_UNFROZEN', { targetUser: req.params.userId }, { userId: req.user.userId });
+  res.json({ success: true });
+});
+
+app.post('/api/admin/config', authenticate, requireRole(C.ROLES.ADMIN), (req, res) => {
+  const { key, value } = req.body;
+  DB.setConfig(key, value, req.user.userId);
+  logAudit('SYSTEM_CONFIG_CHANGE', { key, value }, { userId: req.user.userId });
+  res.json({ success: true });
+});
+
+// ── Economy ──────────────────────────────────────────────────────────────────
+
+app.get('/api/economy', (req, res) => res.json(DB.getDashboardStats()));
+app.get('/api/economy/price-history', (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit) || 100, 500);
+  const history = DB.query('SELECT price, volume, recorded_at FROM price_history ORDER BY recorded_at DESC LIMIT ?', [limit]);
+  res.json(history.reverse());
+});
+
+// ── Timers ───────────────────────────────────────────────────────────────────
+
+function startTimers() {
+  // Price fluctuation
+  setInterval(() => {
+    const p = DB.getPrice();
+    const swing = (Math.random() - 0.5) * C.PRICE.PRICE_FLUCTUATION_RANGE;
+    const newP = parseFloat(Math.max(C.PRICE.MIN_PRICE, p * (1 + swing)).toFixed(4));
+    DB.setPrice(newP);
+    eventBus.emit(EVENTS.PRICE_UPDATED, { price: newP });
+  }, C.PRICE.PRICE_FLUCTUATION_INTERVAL_MS);
+
+  // Deadline checker
+  setInterval(() => assetService.checkDeadlines(), 60000);
+
+  // Session cleanup
+  setInterval(() => DB.run('DELETE FROM sessions WHERE expires_at < ?', [Date.now()]), C.AUTH.SESSION_CLEANUP_INTERVAL_MS);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// START
+// ══════════════════════════════════════════════════════════════════════════════
+
+(async () => {
+  await DB.initDatabase();
+  initAudit(DB);
+
+  blockchain = new Blockchain(DATA_DIR);
+  walletManager = new WalletManager(DATA_DIR);
+  systemWallet = walletManager.getSystemWallet();
+
+  escrowService = new EscrowService(DB, blockchain, walletManager);
+  assetService = new AssetService(DB, blockchain, walletManager, escrowService);
+  tradingEngine = new TradingEngine(DB, blockchain, walletManager);
