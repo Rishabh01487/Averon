@@ -166,3 +166,7 @@ async function analyzeWithGemini(asset, documents, docInfo) {
 ASSET: "${asset.title}" | Category: ${asset.category} | Raise: ₹${asset.raise_amount}
 Description: ${asset.description || 'None'}
 Documents: ${documents.length} file(s), ${(docInfo.totalSize / 1024).toFixed(0)}KB total
+${parts.length > 1 ? 'Document images attached above.' : 'No images available.'}
+
+Respond ONLY with this JSON (no markdown):
+{"verified":true,"estimated_value":50000,"risk_score":30,"risk_level":"LOW","analysis":"summary","concerns":"","confidence":80}` });
