@@ -34,3 +34,7 @@ function sanitizeObject(obj) {
 
 const rules = {
   required: (val) => val !== undefined && val !== null && val !== '',
+  string: (val) => typeof val === 'string',
+  number: (val) => typeof val === 'number' && !isNaN(val),
+  email: (val) => typeof val === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
+  minLength: (min) => (val) => typeof val === 'string' && val.length >= min,
