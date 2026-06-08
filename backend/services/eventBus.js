@@ -33,3 +33,8 @@ class EventBus {
 
 // Singleton
 const eventBus = new EventBus();
+
+// Event names
+const EVENTS = {
+  BLOCK_MINED: 'BLOCK_MINED',
+  TRADE_EXECUTED: 'TRADE_EXECUTED',
