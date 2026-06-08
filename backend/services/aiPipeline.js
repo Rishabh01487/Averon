@@ -50,3 +50,7 @@ async function analyzeAsset(asset, documents, dbModule) {
       console.warn('Gemini failed:', e.message);
       analysis = analyzeWithFallback(asset, documents, stage1);
       stages.push({ stage: 'AI Analysis', source: 'fallback', error: e.message });
+    }
+  } else {
+    analysis = analyzeWithFallback(asset, documents, stage1);
+    stages.push({ stage: 'AI Analysis', source: 'fallback' });
