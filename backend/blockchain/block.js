@@ -102,3 +102,7 @@ class Block {
 
   /**
    * Get a Merkle proof for a specific transaction.
+   */
+  getMerkleProof(txHash) {
+    const tree = MerkleTree.fromTransactions(this.transactions);
+    const index = this.transactions.findIndex(tx => {
