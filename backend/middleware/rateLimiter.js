@@ -29,3 +29,8 @@ function createRateLimiter(config) {
     entries = entries.filter(t => t > windowStart);
     entries.push(now);
     windows.set(key, entries);
+
+    // Set rate limit headers
+    res.set('X-RateLimit-Limit', max);
+    res.set('X-RateLimit-Remaining', Math.max(0, max - entries.length));
+    res.set('X-RateLimit-Reset', Math.ceil((windowStart + windowMs) / 1000));
