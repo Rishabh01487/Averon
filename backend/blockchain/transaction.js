@@ -46,3 +46,6 @@ class Transaction {
 
     const sign = crypto.createSign('SHA256');
     sign.update(this.hash);
+    sign.end();
+    this.signature = sign.sign(privateKeyPem, 'hex');
+  }
