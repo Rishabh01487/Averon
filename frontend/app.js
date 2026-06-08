@@ -82,3 +82,7 @@ function loadSession() {
   } catch {}
   return false;
 }
+
+function logout() {
+  state.user = null;
+  state.accessToken = null;
