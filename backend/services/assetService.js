@@ -166,3 +166,7 @@ class AssetService {
 
     // Transition to funding if first investment
     if (asset.status === C.ASSET_STATUS.ACTIVE) {
+      this.transition(assetId, C.ASSET_STATUS.FUNDING, userId, 'First token purchase');
+    }
+
+    // Update funded amount
