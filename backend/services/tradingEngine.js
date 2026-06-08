@@ -186,3 +186,6 @@ class TradingEngine {
   checkCircuitBreaker(currentPrice) {
     const enabled = this.db.getConfig('circuit_breaker_enabled') === 'true';
     if (!enabled) return;
+
+    const threshold = parseFloat(this.db.getConfig('circuit_breaker_percent') || C.TRADING.CIRCUIT_BREAKER_PERCENT);
+    const now = Date.now();
