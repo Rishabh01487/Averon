@@ -146,3 +146,7 @@ module.exports = {
   TRADING: {
     ORDER_TYPES: ['market', 'limit'],
     ORDER_SIDES: ['buy', 'sell'],
+    ORDER_DURATIONS: ['GTC', 'GTD', 'IOC', 'FOK'], // Good-til-cancel, Good-til-date, Immediate-or-cancel, Fill-or-kill
+    CIRCUIT_BREAKER_PERCENT: 10,     // Halt if price moves 10% in 1 hour
+    CIRCUIT_BREAKER_WINDOW_MS: 60 * 60 * 1000,
+    MAX_OPEN_ORDERS_PER_USER: 50,
