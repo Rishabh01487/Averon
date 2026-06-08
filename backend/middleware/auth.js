@@ -78,3 +78,7 @@ const HASH_DIGEST = 'sha512';
 
 async function hashPassword(password) {
   return new Promise((resolve, reject) => {
+    const salt = crypto.randomBytes(32).toString('hex');
+    crypto.pbkdf2(password, salt, HASH_ITERATIONS, HASH_KEYLEN, HASH_DIGEST, (err, key) => {
+      if (err) reject(err);
+      resolve(`${salt}:${HASH_ITERATIONS}:${key.toString('hex')}`);
