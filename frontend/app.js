@@ -490,3 +490,7 @@ async function uploadDocuments() {
 }
 
 async function startAIAnalysis() {
+  if (!state.currentAssetId) return;
+  $('aiProgress').classList.remove('hidden');
+  $('aiResult').classList.add('hidden');
+  $('startAnalysisBtn').disabled = true;
