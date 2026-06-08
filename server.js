@@ -506,3 +506,7 @@ function startTimers() {
   blockchain = new Blockchain(DATA_DIR);
   walletManager = new WalletManager(DATA_DIR);
   systemWallet = walletManager.getSystemWallet();
+
+  escrowService = new EscrowService(DB, blockchain, walletManager);
+  assetService = new AssetService(DB, blockchain, walletManager, escrowService);
+  tradingEngine = new TradingEngine(DB, blockchain, walletManager);
