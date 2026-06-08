@@ -233,3 +233,8 @@ body {
 .ai-stat { padding: 12px; background: rgba(0,0,0,0.2); border-radius: var(--radius-sm); text-align: center; }
 .ai-stat .val { font-size: 22px; font-weight: 800; }
 .ai-stat .label { font-size: 11px; color: var(--text-muted); }
+
+.launch-summary { padding: 24px; background: var(--bg-input); border-radius: var(--radius); margin-bottom: 16px; }
+.launch-result { margin-top: 16px; padding: 20px; background: var(--green-dim); border: 1px solid rgba(16,185,129,0.3); border-radius: var(--radius); }
+
+/* ═══ MARKETPLACE ═══ */
