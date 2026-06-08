@@ -378,3 +378,7 @@ app.post('/api/market/order', authenticate, financialLimiter, validate('placeOrd
 
 app.delete('/api/market/order/:id', authenticate, (req, res) => {
   try {
+    const result = tradingEngine.cancelOrder(parseInt(req.params.id), req.user.userId);
+    res.json(result);
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
