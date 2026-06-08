@@ -89,3 +89,8 @@ function auditMiddleware(req, res, next) {
  */
 function verifyAuditChain() {
   if (!_db) return { valid: false, error: 'Database not initialized' };
+
+  const entries = _db.query('SELECT * FROM audit_log ORDER BY id ASC');
+  if (entries.length === 0) return { valid: true, entries: 0 };
+
+  let prevHash = '0000000000000000000000000000000000000000000000000000000000000000';
