@@ -138,3 +138,6 @@ class Blockchain {
 
     // Mark transactions as confirmed
     for (const tx of txsToMine) {
+      tx.status = 'confirmed';
+      tx.blockIndex = newBlock.index;
+    }
