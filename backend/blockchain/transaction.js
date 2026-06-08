@@ -122,3 +122,7 @@ class Transaction {
   static fromJSON(json) {
     const tx = new Transaction(json.from, json.to, json.amount, json.type, json.data);
     tx.timestamp = json.timestamp;
+    tx.nonce = json.nonce;
+    tx.fee = json.fee || 0;
+    tx.signature = json.signature || '';
+    tx.signerPublicKey = json.signerPublicKey || '';
