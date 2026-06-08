@@ -62,3 +62,7 @@ class Blockchain {
   }
 
   save() {
+    try {
+      const data = {
+        version: C.PLATFORM_VERSION,
+        difficulty: this.difficulty,
