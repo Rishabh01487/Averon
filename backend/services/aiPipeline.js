@@ -194,3 +194,7 @@ Respond ONLY with this JSON (no markdown):
     riskLevel: r.risk_level || 'MEDIUM',
     analysis: r.analysis || 'AI analysis completed.',
     concerns: r.concerns || '',
+    confidence: r.confidence || 70,
+    source: 'gemini',
+    raw: text,
+  };
