@@ -362,3 +362,7 @@ function createSchema() {
   db.run(`CREATE INDEX IF NOT EXISTS idx_audit_time ON audit_log(created_at)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_notif_user ON notifications(user_id)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_fee_user ON fee_ledger(user_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_activity_user ON activity_log(user_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_status_history_asset ON asset_status_history(asset_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_escrow_tx ON escrow_transactions(escrow_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_doc_hash ON asset_documents(doc_hash)`);
