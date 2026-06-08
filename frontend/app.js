@@ -422,3 +422,7 @@ function initWizard() {
   $('startAnalysisBtn')?.addEventListener('click', startAIAnalysis);
   $('confirmLaunchBtn')?.addEventListener('click', confirmLaunch);
 }
+
+function handleFiles(files) {
+  for (const f of files) {
+    if (state.selectedFiles.length >= 10) break;
