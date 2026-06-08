@@ -14,3 +14,7 @@ class EscrowService {
 
   /**
    * Create an escrow account for an asset.
+   */
+  createEscrow(assetId) {
+    const address = `ESCROW_${assetId}_${Date.now().toString(36)}`;
+    this.db.run(
