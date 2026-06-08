@@ -278,3 +278,7 @@ class AssetService {
     return {
       ...asset,
       documents: docs.map(d => ({ id: d.id, name: d.original_name, type: d.mimetype, size: d.size, url: '/uploads/' + asset.id + '/' + d.filename })),
+      tokens: tokens.map(t => ({ id: t.id, index: t.token_index, price: t.price, owned: !!t.owner_id, ownerId: t.owner_id })),
+      tokens_sold: sold,
+      tokens_available: asset.token_count - sold,
+      progress: asset.token_count ? Math.round((sold / asset.token_count) * 100) : 0,
