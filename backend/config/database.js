@@ -38,3 +38,6 @@ async function initDatabase() {
   _persistTimer = setInterval(persist, 3000);
 
   return db;
+}
+
+// ── SCHEMA ───────────────────────────────────────────────────────────────────
