@@ -82,3 +82,7 @@ async function analyzeAsset(asset, documents, dbModule) {
     stages,
     raw: analysis.raw || null,
     duration: Date.now() - startTime,
+  };
+}
+
+// ── Stage 1: Document Processing ─────────────────────────────────────────────
