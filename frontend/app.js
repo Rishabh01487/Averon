@@ -502,3 +502,7 @@ async function startAIAnalysis() {
     $('aiResult').className = `ai-result ${result.verified ? 'verified' : 'rejected'}`;
     $('aiResult').innerHTML = `
       <h3>${result.verified ? '✅ Asset Verified' : '❌ Asset Rejected'}</h3>
+      <div class="ai-stat-grid">
+        <div class="ai-stat"><div class="val">₹${formatNum(result.estimatedValue)}</div><div class="label">Estimated Value</div></div>
+        <div class="ai-stat"><div class="val">${result.riskScore}%</div><div class="label">Risk Score (${result.riskLevel})</div></div>
+        <div class="ai-stat"><div class="val">${result.confidence}%</div><div class="label">Confidence</div></div>
