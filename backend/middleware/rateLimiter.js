@@ -18,3 +18,7 @@ setInterval(() => {
 }, 60000);
 
 function createRateLimiter(config) {
+  const { windowMs, max } = config;
+
+  return (req, res, next) => {
+    const key = `${req.ip}:${req.baseUrl || req.path}`;
