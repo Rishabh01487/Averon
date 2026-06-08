@@ -138,3 +138,7 @@ function createSchema() {
   db.run(`CREATE TABLE IF NOT EXISTS asset_documents (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     asset_id INTEGER NOT NULL,
+    filename TEXT NOT NULL,
+    original_name TEXT NOT NULL,
+    mimetype TEXT DEFAULT '',
+    size INTEGER DEFAULT 0,
