@@ -109,3 +109,8 @@ class EscrowService {
     const { Transaction } = require('../blockchain/transaction');
     const escrow = this.db.queryOne('SELECT * FROM escrow_accounts WHERE asset_id = ?', [assetId]);
     if (!escrow || escrow.balance <= 0) return { refunded: 0 };
+
+    // Find all token holders
+    const tokens = this.db.query('SELECT DISTINCT owner_id, COUNT(*) as count, SUM(price) as total FROM asset_tokens WHERE asset_id = ? AND owner_id IS NOT NULL GROUP BY owner_id', [assetId]);
+
+    let totalRefunded = 0;
