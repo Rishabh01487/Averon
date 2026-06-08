@@ -149,3 +149,8 @@ function initAuth() {
     }
   });
 }
+
+// ── ENTER APP ────────────────────────────────────────────────────────────────
+
+async function enterApp() {
+  $('authOverlay').classList.add('hidden');
