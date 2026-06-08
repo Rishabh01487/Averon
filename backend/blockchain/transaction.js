@@ -34,3 +34,6 @@ class Transaction {
       timestamp: this.timestamp,
       nonce: this.nonce,
       fee: this.fee,
+    });
+    return crypto.createHash('sha256').update(payload).digest('hex');
+  }
