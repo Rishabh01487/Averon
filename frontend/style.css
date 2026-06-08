@@ -202,3 +202,7 @@ body {
 .result-box { margin-top: 16px; padding: 16px; border-radius: var(--radius-sm); font-size: 13px; }
 .result-box.success { background: var(--green-dim); color: var(--green); border: 1px solid rgba(16,185,129,0.2); }
 .result-box.error { background: var(--red-dim); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+
+/* ═══ TOKENIZE WIZARD ═══ */
+.wizard-container { max-width: 700px; margin: 0 auto; }
+.wizard-steps { display: flex; gap: 4px; margin-bottom: 32px; }
