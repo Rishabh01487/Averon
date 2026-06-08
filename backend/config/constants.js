@@ -82,3 +82,7 @@ module.exports = {
   // Valid state transitions
   ASSET_TRANSITIONS: {
     draft: ['documents_uploaded'],
+    documents_uploaded: ['ai_analyzing'],
+    ai_analyzing: ['verified', 'rejected'],
+    verified: ['compliance_review'],
+    rejected: ['draft'],
