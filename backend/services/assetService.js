@@ -178,3 +178,7 @@ class AssetService {
 
     // Check if fully funded
     const sold = this.db.queryOne('SELECT COUNT(*) as c FROM asset_tokens WHERE asset_id = ? AND owner_id IS NOT NULL', [assetId])?.c || 0;
+    let funded = false;
+
+    if (sold >= asset.token_count) {
+      funded = true;
