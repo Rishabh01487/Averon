@@ -90,3 +90,7 @@ class WalletManager {
     this.wallets[userId] = wallet;
     this.save();
     return wallet;
+  }
+
+  getWallet(userId) {
+    return this.wallets[userId] || null;
