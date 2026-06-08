@@ -114,3 +114,7 @@ function verifyAuditChain() {
     details: corrupted.slice(0, 10), // Only return first 10
   };
 }
+
+/**
+ * Infer the audit action from HTTP method and path.
+ */
