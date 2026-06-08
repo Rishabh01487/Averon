@@ -514,3 +514,6 @@ function getDashboardStats() {
     userCount,
     priceHistory: priceHistory.map(h => h.price),
   };
+}
+
+// ── EXPORTS ──────────────────────────────────────────────────────────────────
