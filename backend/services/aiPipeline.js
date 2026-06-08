@@ -149,3 +149,8 @@ function detectDuplicates(documents, dbModule) {
 
 async function analyzeWithGemini(asset, documents, docInfo) {
   const parts = [];
+
+  for (const doc of documents) {
+    if (doc.mimetype?.startsWith('image/')) {
+      try {
+        const filePath = doc.path || doc.filepath;
