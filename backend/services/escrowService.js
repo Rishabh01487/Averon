@@ -126,3 +126,6 @@ class EscrowService {
         assetId, tokenCount: token.count,
       });
       this.blockchain.addTransaction(refundTx);
+
+      totalRefunded += refundAmount;
+      refunds.push({ userId: token.owner_id, amount: refundAmount, txHash: refundTx.hash });
