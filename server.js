@@ -110,3 +110,7 @@ app.post('/api/auth/register', authLimiter, validate('register'), async (req, re
   );
   DB.run('INSERT INTO wallets (user_id, public_key, private_key, address, created_at) VALUES (?,?,?,?,?)',
     [userId, wallet.publicKey, wallet.privateKey, wallet.address, now]);
+
+  // Update holder count
+  const count = DB.queryOne('SELECT COUNT(*) as c FROM users')?.c || 0;
+  DB.updateEconomy('holder_count', count);
