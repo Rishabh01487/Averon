@@ -86,3 +86,6 @@ class Transaction {
     const errors = [];
 
     // Amount checks
+    if (this.amount < 0) errors.push('Amount cannot be negative');
+    if (this.type === C.TX_TYPES.MINT && this.from !== 'SYSTEM') errors.push('Only SYSTEM can mint');
+    if (this.type === C.TX_TYPES.REWARD && this.from !== 'SYSTEM') errors.push('Only SYSTEM can issue rewards');
