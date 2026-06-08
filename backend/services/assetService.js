@@ -242,3 +242,7 @@ class AssetService {
 
         if (sold >= asset.token_count) {
           this.processFullyFunded(asset.id);
+          results.push({ type: 'funded', assetId: asset.id });
+        } else {
+          // Expired — refund
+          this.transition(asset.id, C.ASSET_STATUS.EXPIRED, 'system', 'Deadline reached');
