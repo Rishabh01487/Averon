@@ -14,3 +14,7 @@ setInterval(() => {
     const cleaned = entries.filter(t => now - t < 120000); // Keep 2 min window
     if (cleaned.length === 0) windows.delete(key);
     else windows.set(key, cleaned);
+  }
+}, 60000);
+
+function createRateLimiter(config) {
