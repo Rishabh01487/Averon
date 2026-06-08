@@ -94,3 +94,7 @@ function createSchema() {
     title TEXT NOT NULL,
     description TEXT DEFAULT '',
     category TEXT NOT NULL,
+    status TEXT DEFAULT '${C.ASSET_STATUS.DRAFT}',
+    
+    ai_verified INTEGER DEFAULT 0,
+    ai_valuation REAL DEFAULT 0,
