@@ -218,3 +218,7 @@ function analyzeWithFallback(asset, documents, docInfo) {
   const analysis = `${asset.category} asset analyzed from ${documents.length} document(s). ` +
     `Estimated value: ₹${estimatedValue.toLocaleString()}. ` +
     `Risk: ${riskLevel} (${riskScore}%). ` +
+    `${verified ? 'Documents appear sufficient for tokenization.' : 'Additional documentation recommended.'}`;
+
+  const concerns = [];
+  if (documents.length < 2) concerns.push('Limited documentation');
