@@ -162,3 +162,7 @@ async function enterApp() {
     state.config = await api('/api/config');
     state.categories = state.config.categories || [];
     $('livePrice').textContent = parseFloat(state.config.price).toFixed(2);
+    populateCategories();
+  } catch {}
+
+  // Load initial page
