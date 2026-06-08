@@ -18,3 +18,7 @@ function base64url(str) {
 
 function base64urlDecode(str) {
   return Buffer.from(str, 'base64url').toString('utf8');
+}
+
+function signJWT(payload, secret, expiresIn) {
+  const header = { alg: 'HS256', typ: 'JWT' };
