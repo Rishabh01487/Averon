@@ -154,3 +154,7 @@ class EscrowService {
 
   getEscrowInfo(assetId) {
     const escrow = this.db.queryOne('SELECT * FROM escrow_accounts WHERE asset_id = ?', [assetId]);
+    if (!escrow) return null;
+    const txs = this.db.query('SELECT * FROM escrow_transactions WHERE escrow_id = ? ORDER BY created_at DESC', [escrow.id]);
+    return { ...escrow, transactions: txs };
+  }
