@@ -210,3 +210,6 @@ class TradingEngine {
         console.log('  ✓ Circuit breaker reset');
       }, C.TRADING.CIRCUIT_BREAKER_WINDOW_MS);
     }
+  }
+
+  // ── Order Book ───────────────────────────────────────────────────────────
