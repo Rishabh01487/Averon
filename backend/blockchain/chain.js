@@ -42,3 +42,7 @@ class Blockchain {
 
     this.chain.push(genesis);
     this.save();
+    console.log('  ⛓  Genesis block created: ' + genesis.hash.substring(0, 16) + '...');
+  }
+
+  // ── Persistence ────────────────────────────────────────────────────────────
