@@ -206,3 +206,7 @@ function createSchema() {
     type TEXT NOT NULL,
     user_id TEXT,
     amount REAL NOT NULL,
+    tx_hash TEXT DEFAULT '',
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (escrow_id) REFERENCES escrow_accounts(id)
+  )`);
