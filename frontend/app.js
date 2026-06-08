@@ -522,3 +522,6 @@ window.goToLaunch = (aiResult) => {
       <div class="ai-stat"><div class="val">₹${formatNum(aiResult.tokenPriceInr)}</div><div class="label">Per Token (INR)</div></div>
       <div class="ai-stat"><div class="val">${aiResult.riskLevel}</div><div class="label">Risk Level</div></div>
     </div>
+    <p style="margin-top:16px;color:var(--text-secondary);font-size:14px">Confirming will create tokens on the Averon blockchain and open the asset for investment.</p>`;
+  setWizardStep(4);
+};
