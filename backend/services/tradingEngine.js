@@ -150,3 +150,7 @@ class TradingEngine {
 
         if (buy.remaining <= 0) break;
       }
+    }
+
+    // Update last trade price
+    if (trades.length > 0) {
