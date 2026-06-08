@@ -98,3 +98,7 @@ class Blockchain {
     }
 
     // Check if already in a block
+    for (const block of this.chain) {
+      if (block.transactions.find(tx => tx.hash === transaction.hash)) {
+        throw new Error('Transaction already confirmed');
+      }
