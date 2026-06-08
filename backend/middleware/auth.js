@@ -194,3 +194,7 @@ function cleanExpiredSessions(db) {
 }
 
 // ── EXPORTS ──────────────────────────────────────────────────────────────────
+
+module.exports = {
+  hashPassword, verifyPassword,
+  generateTokens, verifyAccessToken, verifyRefreshToken,
