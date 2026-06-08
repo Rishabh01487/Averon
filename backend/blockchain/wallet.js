@@ -94,3 +94,7 @@ class WalletManager {
 
   getWallet(userId) {
     return this.wallets[userId] || null;
+  }
+
+  getWalletByAddress(address) {
+    return Object.values(this.wallets).find(w => w.address === address) || null;
