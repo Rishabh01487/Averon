@@ -130,3 +130,7 @@ class Block {
   validateHash() {
     const target = '0'.repeat(this.difficulty);
     const recalculated = this.calculateHash();
+    return this.hash === recalculated && this.hash.startsWith(target);
+  }
+
+  /**
