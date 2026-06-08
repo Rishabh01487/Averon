@@ -154,3 +154,7 @@ async function analyzeWithGemini(asset, documents, docInfo) {
     if (doc.mimetype?.startsWith('image/')) {
       try {
         const filePath = doc.path || doc.filepath;
+        if (!fs.existsSync(filePath)) continue;
+        const data = fs.readFileSync(filePath);
+        parts.push({ inlineData: { mimeType: doc.mimetype, data: data.toString('base64') } });
+      } catch {}
