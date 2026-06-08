@@ -154,3 +154,7 @@ body {
 .section-header h2 { font-size: 18px; font-weight: 700; }
 
 .activity-feed { display: flex; flex-direction: column; gap: 8px; }
+.activity-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 13px;
