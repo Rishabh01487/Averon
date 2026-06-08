@@ -42,3 +42,7 @@ class MerkleTree {
         } else {
           // Odd number: duplicate last hash
           nextLayer.push(this.hashPair(layer[i], layer[i]));
+        }
+      }
+      this.layers.push(nextLayer);
+      layer = nextLayer;
