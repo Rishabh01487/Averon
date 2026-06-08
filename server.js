@@ -273,3 +273,8 @@ app.post('/api/assets/create', authenticate, validate('createAsset'), (req, res)
     res.status(201).json(result);
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
+
+app.post('/api/assets/:assetId/documents', authenticate, uploadLimiter, upload.array('documents', C.LIMITS.MAX_DOCUMENTS), (req, res) => {
+  const assetId = parseInt(req.params.assetId);
+  const asset = DB.queryOne('SELECT * FROM assets WHERE id = ? AND owner_id = ?', [assetId, req.user.userId]);
+  if (!asset) return res.status(404).json({ error: 'Asset not found or not owned' });
