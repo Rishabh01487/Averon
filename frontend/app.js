@@ -642,3 +642,7 @@ window.viewBlock = async (index) => {
 function initExplorer() {
   $('explorerSearchBtn')?.addEventListener('click', async () => {
     const q = $('explorerSearch').value.trim();
+    if (!q) return;
+
+    // Try as block index
+    if (/^\d+$/.test(q)) { viewBlock(parseInt(q)); return; }
