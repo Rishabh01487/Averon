@@ -706,3 +706,7 @@ async function loadPortfolio() {
       </div>`).join('') : '<div class="empty-state">No token holdings yet</div>';
 
     // My assets
+    $('myAssets').innerHTML = data.myAssets?.length ? data.myAssets.map(a => `
+      <div class="asset-card" style="cursor:pointer" onclick="viewAsset(${a.id}); navigateTo('assets')">
+        <div class="asset-card-header">
+          <span class="asset-title">${a.title}</span>
