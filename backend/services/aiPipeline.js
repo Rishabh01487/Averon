@@ -158,3 +158,7 @@ async function analyzeWithGemini(asset, documents, docInfo) {
         const data = fs.readFileSync(filePath);
         parts.push({ inlineData: { mimeType: doc.mimetype, data: data.toString('base64') } });
       } catch {}
+    }
+  }
+
+  parts.push({ text: `You are an expert asset valuation AI for the Averon blockchain tokenization platform.
