@@ -86,3 +86,7 @@ function createSchema() {
     created_at INTEGER NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
+
+  // ── Assets ───────────────────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS assets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
