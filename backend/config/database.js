@@ -474,3 +474,7 @@ function setPrice(newPrice) {
   run('INSERT INTO price_history (price, high, low, open, close, recorded_at) VALUES (?,?,?,?,?,?)',
     [newPrice, newPrice, newPrice, newPrice, newPrice, Date.now()]);
 }
+
+function updateEconomy(field, value) {
+  run(`UPDATE economy SET ${field} = ?, updated_at = ? WHERE id = 1`, [value, Date.now()]);
+}
