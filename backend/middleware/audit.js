@@ -66,3 +66,7 @@ function auditMiddleware(req, res, next) {
       const action = inferAction(req.method, req.path);
       if (action) {
         logAudit(action, {
+          body: sanitizeBodyForAudit(req.body),
+          params: req.params,
+          query: req.query,
+        }, {
