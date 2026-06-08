@@ -90,3 +90,7 @@ module.exports = {
     flagged: ['active', 'rejected'],
     active: ['funding', 'expired'],
     funding: ['funded', 'expired'],
+    funded: ['payout_pending'],
+    payout_pending: ['completed'],
+    expired: ['refunding'],
+    refunding: ['closed'],
