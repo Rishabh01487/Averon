@@ -217,3 +217,8 @@ app.post('/api/notifications/read', authenticate, (req, res) => {
 app.post('/api/buy-coins', authenticate, financialLimiter, validate('buyCoins'), (req, res) => {
   const { amountInr } = req.body;
   const userId = req.user.userId;
+
+  const wallet = DB.queryOne('SELECT * FROM wallets WHERE user_id = ?', [userId]);
+  if (!wallet) return res.status(404).json({ error: 'Wallet not found' });
+
+  const price = DB.getPrice();
