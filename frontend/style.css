@@ -178,3 +178,7 @@ body {
 .asset-title { font-size: 16px; font-weight: 700; line-height: 1.3; }
 .asset-status { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
 .status-active, .status-funding { background: var(--green-dim); color: var(--green); }
+.status-funded, .status-completed { background: var(--accent-dim); color: var(--accent); }
+.status-draft, .status-verified { background: var(--yellow-dim); color: var(--yellow); }
+.status-expired, .status-rejected, .status-closed { background: var(--red-dim); color: var(--red); }
+.status-ai_analyzing, .status-compliance_review { background: var(--yellow-dim); color: var(--yellow); }
