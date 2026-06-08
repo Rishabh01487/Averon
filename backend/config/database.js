@@ -457,3 +457,7 @@ function getConfig(key) {
   const row = queryOne('SELECT value FROM system_config WHERE key = ?', [key]);
   return row?.value ?? null;
 }
+
+function setConfig(key, value, updatedBy = 'system') {
+  run('UPDATE system_config SET value = ?, updated_by = ?, updated_at = ? WHERE key = ?', [String(value), updatedBy, Date.now(), key]);
+}
