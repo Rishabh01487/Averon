@@ -106,3 +106,7 @@ app.post('/api/auth/register', authLimiter, validate('register'), async (req, re
   const now = Date.now();
   DB.run(
     'INSERT INTO users (id, email, password_hash, name, organization, role, wallet_address, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?)',
+    [userId, email, passwordHash, name, organization || '', role, wallet.address, now, now]
+  );
+  DB.run('INSERT INTO wallets (user_id, public_key, private_key, address, created_at) VALUES (?,?,?,?,?)',
+    [userId, wallet.publicKey, wallet.privateKey, wallet.address, now]);
