@@ -22,3 +22,7 @@ class Block {
     this.merkleRoot = this.computeMerkleRoot();
     this.hash = this.calculateHash();
     this.size = 0; // Calculated after mining
+  }
+
+  computeMerkleRoot() {
+    if (this.transactions.length === 0) {
