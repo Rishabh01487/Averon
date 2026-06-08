@@ -206,3 +206,7 @@ class TradingEngine {
       setTimeout(() => {
         this.circuitBreakerTripped = false;
         this.priceAtCheckpoint = this.db.getPrice();
+        this.lastPriceCheck = Date.now();
+        console.log('  ✓ Circuit breaker reset');
+      }, C.TRADING.CIRCUIT_BREAKER_WINDOW_MS);
+    }
