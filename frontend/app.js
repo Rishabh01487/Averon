@@ -98,3 +98,7 @@ function initAuth() {
   // Tab switching
   $$('.auth-tab').forEach(tab => {
     tab.addEventListener('click', () => {
+      $$('.auth-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const isLogin = tab.dataset.tab === 'login';
+      $('loginForm').classList.toggle('hidden', !isLogin);
