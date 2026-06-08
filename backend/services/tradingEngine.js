@@ -46,3 +46,7 @@ class TradingEngine {
     if (type === 'market') {
       if (side === 'buy') {
         const bestSell = this.db.queryOne('SELECT price FROM coin_orders WHERE status = "open" AND side = "sell" ORDER BY price ASC LIMIT 1');
+        price = bestSell ? bestSell.price : this.db.getPrice();
+      } else {
+        const bestBuy = this.db.queryOne('SELECT price FROM coin_orders WHERE status = "open" AND side = "buy" ORDER BY price DESC LIMIT 1');
+        price = bestBuy ? bestBuy.price : this.db.getPrice();
