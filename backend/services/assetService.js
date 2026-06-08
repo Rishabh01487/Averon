@@ -34,3 +34,6 @@ class AssetService {
     this.db.run('UPDATE assets SET status = ?, updated_at = ? WHERE id = ?', [newStatus, Date.now(), assetId]);
 
     return { oldStatus: asset.status, newStatus };
+  }
+
+  // ── Create Asset ─────────────────────────────────────────────────────────
