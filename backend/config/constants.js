@@ -50,3 +50,7 @@ module.exports = {
     TRANSFER: 'TRANSFER',
     INVEST: 'INVEST',
     DIVEST: 'DIVEST',
+    PAYOUT: 'PAYOUT',
+    REFUND: 'REFUND',
+    FEE: 'FEE',
+    ASSET_CREATE: 'ASSET_CREATE',
