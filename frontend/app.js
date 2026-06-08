@@ -274,3 +274,7 @@ function drawPriceChart(prices) {
   ctx.strokeStyle = '#6366f1';
   ctx.lineWidth = 2;
   for (let i = 0; i < prices.length; i++) {
+    const x = (i / (prices.length - 1)) * w;
+    const y = h - ((prices[i] - min) / range) * h;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
