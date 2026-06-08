@@ -61,3 +61,8 @@ class MerkleTree {
    */
   getProof(leafIndex) {
     if (leafIndex < 0 || leafIndex >= this.leaves.length) return null;
+
+    const proof = [];
+    let idx = leafIndex;
+
+    for (let i = 0; i < this.layers.length - 1; i++) {
