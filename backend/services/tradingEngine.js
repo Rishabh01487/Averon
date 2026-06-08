@@ -234,3 +234,6 @@ class TradingEngine {
        ORDER BY t.created_at DESC LIMIT ?`, [limit]
     );
   }
+}
+
+module.exports = { TradingEngine };
