@@ -425,3 +425,8 @@ app.get('/api/blockchain/tx/:hash', (req, res) => {
   if (!tx) return res.status(404).json({ error: 'Transaction not found' });
   res.json(tx);
 });
+
+app.get('/api/blockchain/validate', (req, res) => res.json(blockchain.isChainValid()));
+
+app.get('/api/blockchain/address/:address', (req, res) => {
+  const balance = blockchain.getBalance(req.params.address);
