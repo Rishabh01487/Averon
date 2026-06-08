@@ -262,3 +262,7 @@ body {
 /* ═══ EXPLORER ═══ */
 .chain-stats { display: flex; gap: 16px; font-size: 13px; color: var(--text-secondary); flex-wrap: wrap; }
 .chain-stat { padding: 6px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; font-family: var(--mono); }
+.search-bar { display: flex; gap: 8px; margin-bottom: 24px; }
+.search-bar input { flex: 1; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 14px; font-family: var(--mono); }
+.search-bar input:focus { border-color: var(--accent); outline: none; }
+.explorer-result { margin-bottom: 24px; padding: 24px; background: var(--bg-card); border: 1px solid var(--accent); border-radius: var(--radius); }
