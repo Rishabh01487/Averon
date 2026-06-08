@@ -66,3 +66,7 @@ class EscrowService {
     // Deduct platform fee
     const feePercent = parseFloat(this.db.getConfig('capital_raise_fee_percent') || C.FEES.CAPITAL_RAISE_FEE_PERCENT);
     const fee = parseFloat((amount * feePercent / 100).toFixed(8));
+    const payout = parseFloat((amount - fee).toFixed(8));
+
+    // Blockchain: Escrow → Owner
+    const payoutTx = new Transaction(escrow.address, ownerWallet.address, payout, C.TX_TYPES.PAYOUT, {
