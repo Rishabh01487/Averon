@@ -138,3 +138,7 @@ function inferAction(method, path) {
 
 /**
  * Sanitize request body for audit (remove sensitive data).
+ */
+function sanitizeBodyForAudit(body) {
+  if (!body) return {};
+  const sanitized = { ...body };
