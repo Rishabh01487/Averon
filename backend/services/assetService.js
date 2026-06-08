@@ -282,3 +282,7 @@ class AssetService {
       tokens_sold: sold,
       tokens_available: asset.token_count - sold,
       progress: asset.token_count ? Math.round((sold / asset.token_count) * 100) : 0,
+      owner_name: owner?.name || 'Unknown',
+      owner_org: owner?.organization || '',
+      statusHistory: history,
+      escrow: escrow ? { address: escrow.address, balance: escrow.balance, status: escrow.status } : null,
