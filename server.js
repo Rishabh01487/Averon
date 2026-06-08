@@ -162,3 +162,7 @@ app.post('/api/auth/login', authLimiter, validate('login'), async (req, res) => 
   const tokens = generateTokens(user);
   const wallet = DB.queryOne('SELECT address FROM wallets WHERE user_id = ?', [user.id]);
   const balance = wallet ? blockchain.getBalance(wallet.address) : 0;
+
+  logAudit('LOGIN', { email }, { userId: user.id, ip: req.ip });
+
+  res.json({
