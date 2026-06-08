@@ -105,3 +105,8 @@ function generateTokens(user) {
     role: user.role,
     walletAddress: user.wallet_address,
   };
+
+  const accessToken = signJWT(accessPayload, JWT_SECRET, C.AUTH.JWT_ACCESS_EXPIRY);
+  const refreshToken = signJWT({ userId: user.id, type: 'refresh' }, JWT_REFRESH_SECRET, C.AUTH.JWT_REFRESH_EXPIRY);
+
+  return { accessToken, refreshToken };
