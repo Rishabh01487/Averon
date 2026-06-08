@@ -82,3 +82,7 @@ class AssetService {
     ));
     const tokenPriceInr = parseFloat((asset.raise_amount / tokenCount).toFixed(2));
     const tokenPriceAC = parseFloat((tokenPriceInr / currentPrice).toFixed(8));
+
+    // Create tokens
+    for (let i = 1; i <= tokenCount; i++) {
+      this.db.run('INSERT INTO asset_tokens (asset_id, token_index, price) VALUES (?,?,?)', [assetId, i, tokenPriceAC]);
