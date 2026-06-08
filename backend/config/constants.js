@@ -98,3 +98,7 @@ module.exports = {
   },
 
   // ── Asset Categories ───────────────────────────────────────────────────────
+  ASSET_CATEGORIES: [
+    'Stocks & Shares',
+    'Land & Real Estate',
+    'Agricultural Goods',
