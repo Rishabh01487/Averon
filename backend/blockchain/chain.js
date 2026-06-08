@@ -166,3 +166,6 @@ class Blockchain {
   }
 
   // ── Balance Calculation (UTXO-style) ───────────────────────────────────────
+
+  getBalance(address) {
+    let balance = 0;
