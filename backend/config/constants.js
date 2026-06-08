@@ -110,3 +110,7 @@ module.exports = {
     'Commodities',
     'Infrastructure',
     'Energy',
+    'Other',
+  ],
+
+  // ── Fees ───────────────────────────────────────────────────────────────────
