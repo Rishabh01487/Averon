@@ -118,3 +118,7 @@ class TradingEngine {
           'INSERT INTO coin_trades (buy_order_id, sell_order_id, buyer_id, seller_id, amount, price, total_value, buyer_fee, seller_fee, tx_hash, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
           [buy.id, sell.id, buy.user_id, sell.user_id, tradeAmount, tradePrice, totalValue, buyerFee, sellerFee, tradeTx.hash, Date.now()]
         );
+
+        // Collect fees
+        if (buyerFee + sellerFee > 0) {
+          this.db.run('INSERT INTO fee_ledger (user_id, fee_type, amount, reference_id, reference_type, created_at) VALUES (?,?,?,?,?,?)',
