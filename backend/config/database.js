@@ -190,3 +190,7 @@ function createSchema() {
   db.run(`CREATE TABLE IF NOT EXISTS escrow_accounts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     asset_id INTEGER UNIQUE NOT NULL,
+    address TEXT UNIQUE NOT NULL,
+    balance REAL DEFAULT 0,
+    status TEXT DEFAULT 'active',
+    total_received REAL DEFAULT 0,
