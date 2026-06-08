@@ -102,3 +102,7 @@ class TradingEngine {
         // Transfer coins: Escrow (sell order hold) → Buyer
         const buyer = this.db.queryOne('SELECT * FROM users WHERE id = ?', [buy.user_id]);
         this.db.run('UPDATE users SET averon_balance = averon_balance + ? WHERE id = ?',
+          [parseFloat((tradeAmount - buyerFee).toFixed(8)), buy.user_id]);
+
+        // Record blockchain trade
+        const tradeTx = new Transaction(
