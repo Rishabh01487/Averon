@@ -242,3 +242,7 @@ class Blockchain {
   getBlockByHash(hash) {
     return this.chain.find(b => b.hash === hash) || null;
   }
+
+  getBlocks(start = 0, limit = 20) {
+    return this.chain.slice(start, start + limit);
+  }
