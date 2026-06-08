@@ -46,3 +46,7 @@ class Wallet {
     return {
       userId: this.userId,
       address: this.address,
+      publicKey: this.publicKey,
+      privateKey: this.privateKey, // Only for storage — never send to client
+    };
+  }
