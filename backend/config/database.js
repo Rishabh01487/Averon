@@ -222,3 +222,7 @@ function createSchema() {
     filled REAL DEFAULT 0,
     remaining REAL NOT NULL,
     status TEXT DEFAULT 'open',
+    duration TEXT DEFAULT 'GTC',
+    expires_at INTEGER DEFAULT 0,
+    fee_paid REAL DEFAULT 0,
+    created_at INTEGER NOT NULL,
