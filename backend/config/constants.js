@@ -78,3 +78,7 @@ module.exports = {
     REFUNDING: 'refunding',
     CLOSED: 'closed',
   },
+
+  // Valid state transitions
+  ASSET_TRANSITIONS: {
+    draft: ['documents_uploaded'],
