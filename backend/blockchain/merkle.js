@@ -33,3 +33,8 @@ class MerkleTree {
 
     let layer = [...this.leaves];
     this.layers = [layer];
+
+    while (layer.length > 1) {
+      const nextLayer = [];
+      for (let i = 0; i < layer.length; i += 2) {
+        if (i + 1 < layer.length) {
