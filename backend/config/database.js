@@ -102,3 +102,7 @@ function createSchema() {
     ai_risk_level TEXT DEFAULT '',
     ai_confidence REAL DEFAULT 0,
     ai_analysis_summary TEXT DEFAULT '',
+    ai_concerns TEXT DEFAULT '',
+    ai_raw_response TEXT DEFAULT '',
+    ai_analyzed_at INTEGER DEFAULT 0,
+    
