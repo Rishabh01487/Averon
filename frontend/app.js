@@ -482,3 +482,7 @@ async function uploadDocuments() {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
+    toast(`${data.uploaded} document(s) uploaded`, 'success');
+    state.selectedFiles = [];
+    renderFileList();
+    setWizardStep(3);
