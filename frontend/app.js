@@ -222,3 +222,6 @@ function navigateTo(page) {
   $$('.page').forEach(p => p.classList.remove('active'));
   $$('.nav-link').forEach(l => l.classList.remove('active'));
   const pageEl = $(`page-${page}`);
+  if (pageEl) pageEl.classList.add('active');
+  const navEl = document.querySelector(`.nav-link[data-page="${page}"]`);
+  if (navEl) navEl.classList.add('active');
