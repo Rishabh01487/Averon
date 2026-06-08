@@ -130,3 +130,7 @@ function initAuth() {
     e.preventDefault();
     $('authError').classList.add('hidden');
     try {
+      const data = await api('/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: $('regName').value, organization: $('regOrg').value,
