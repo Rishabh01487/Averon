@@ -26,3 +26,6 @@ const { WalletManager } = require('./backend/blockchain/wallet');
 // ── Services ─────────────────────────────────────────────────────────────────
 const { analyzeAsset } = require('./backend/services/aiPipeline');
 const { EscrowService } = require('./backend/services/escrowService');
+const { AssetService } = require('./backend/services/assetService');
+const { TradingEngine } = require('./backend/services/tradingEngine');
+const { eventBus, EVENTS } = require('./backend/services/eventBus');
