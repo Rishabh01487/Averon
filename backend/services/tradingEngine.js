@@ -122,3 +122,6 @@ class TradingEngine {
         // Collect fees
         if (buyerFee + sellerFee > 0) {
           this.db.run('INSERT INTO fee_ledger (user_id, fee_type, amount, reference_id, reference_type, created_at) VALUES (?,?,?,?,?,?)',
+            [buy.user_id, 'trading', buyerFee, String(tradeTx.hash), 'trade', Date.now()]);
+          this.db.incrementEconomy('total_fees_collected', buyerFee + sellerFee);
+        }
