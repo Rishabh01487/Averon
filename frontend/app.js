@@ -293,3 +293,8 @@ function drawPriceChart(prices) {
 }
 
 // ── ASSETS ───────────────────────────────────────────────────────────────────
+
+async function loadAssets() {
+  try {
+    const params = new URLSearchParams();
+    const cat = $('assetFilterCategory')?.value;
