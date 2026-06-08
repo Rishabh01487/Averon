@@ -138,3 +138,7 @@ function getChainStats(chain) {
 
   const difficulties = chain.map(b => b.difficulty || C.BLOCKCHAIN.DIFFICULTY);
   const avgDifficulty = difficulties.reduce((s, d) => s + d, 0) / difficulties.length;
+
+  return {
+    blocks: chain.length,
+    transactions: totalTxs,
