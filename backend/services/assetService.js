@@ -10,3 +10,7 @@ class AssetService {
     this.db = db;
     this.blockchain = blockchain;
     this.walletManager = walletManager;
+    this.escrow = escrowService;
+  }
+
+  // ── State Machine ──────────────────────────────────────────────────────────
