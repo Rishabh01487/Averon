@@ -85,3 +85,8 @@ const authLimiter = createRateLimiter(C.RATE_LIMITS.AUTH);
 const financialLimiter = createRateLimiter(C.RATE_LIMITS.FINANCIAL);
 const uploadLimiter = createRateLimiter(C.RATE_LIMITS.UPLOAD);
 const adminLimiter = createRateLimiter(C.RATE_LIMITS.ADMIN);
+
+module.exports = {
+  createRateLimiter, createUserRateLimiter,
+  generalLimiter, authLimiter, financialLimiter, uploadLimiter, adminLimiter,
+};
