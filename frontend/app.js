@@ -742,3 +742,7 @@ window.cancelOrder = async (id) => {
 
 // Filter listeners
 document.addEventListener('change', (e) => {
+  if (e.target.id === 'assetFilterCategory' || e.target.id === 'assetFilterStatus') loadAssets();
+});
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
