@@ -198,3 +198,7 @@ function createSchema() {
     total_refunded REAL DEFAULT 0,
     created_at INTEGER NOT NULL,
     FOREIGN KEY (asset_id) REFERENCES assets(id)
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS escrow_transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
