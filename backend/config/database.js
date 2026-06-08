@@ -54,3 +54,7 @@ function createSchema() {
     wallet_address TEXT UNIQUE,
     averon_balance REAL DEFAULT 0,
     inr_spent REAL DEFAULT 0,
+    inr_withdrawn REAL DEFAULT 0,
+    is_frozen INTEGER DEFAULT 0,
+    login_attempts INTEGER DEFAULT 0,
+    locked_until INTEGER DEFAULT 0,
