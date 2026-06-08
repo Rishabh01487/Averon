@@ -50,3 +50,6 @@ function logAudit(action, details = {}, options = {}) {
      entry.ip_address, entry.user_agent, entry.request_method, entry.request_path,
      entry.response_code, entry.prev_hash, entry.entry_hash, entry.created_at]
   );
+
+  return entry;
+}
