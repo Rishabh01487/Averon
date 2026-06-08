@@ -65,3 +65,8 @@ let blockchain, walletManager, systemWallet, escrowService, assetService, tradin
 // ══════════════════════════════════════════════════════════════════════════════
 // API ROUTES
 // ══════════════════════════════════════════════════════════════════════════════
+
+// ── Health & Config ──────────────────────────────────────────────────────────
+
+app.get('/api/config', (req, res) => {
+  const stats = DB.getDashboardStats();
