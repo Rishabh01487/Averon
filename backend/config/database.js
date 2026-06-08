@@ -166,3 +166,7 @@ function createSchema() {
     asset_id INTEGER NOT NULL,
     valuation REAL NOT NULL,
     risk_score REAL NOT NULL,
+    confidence REAL NOT NULL,
+    source TEXT DEFAULT 'ai',
+    details TEXT DEFAULT '{}',
+    created_at INTEGER NOT NULL,
