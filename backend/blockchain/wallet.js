@@ -34,3 +34,7 @@ class Wallet {
   }
 
   static fromKeys(userId, publicKey, privateKey) {
+    const wallet = Object.create(Wallet.prototype);
+    wallet.userId = userId;
+    wallet.publicKey = publicKey;
+    wallet.privateKey = privateKey;
