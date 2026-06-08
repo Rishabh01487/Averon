@@ -42,3 +42,7 @@ function createRateLimiter(config) {
         error: 'Too many requests',
         code: 'RATE_LIMIT_EXCEEDED',
         retryAfter,
+        limit: max,
+        windowMs,
+      });
+    }
