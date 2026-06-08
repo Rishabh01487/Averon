@@ -602,3 +602,7 @@ async function loadExplorer() {
       <div class="block-card" onclick="viewBlock(${b.index})">
         <span class="block-index">#${b.index}</span>
         <span class="block-hash">${b.hash.substring(0, 20)}...</span>
+        <div class="block-meta">
+          <span class="block-tx-count">${b.transactionCount} txs</span>
+          <span>Nonce: ${b.nonce}</span>
+          <span>${timeAgo(b.timestamp)}</span>
