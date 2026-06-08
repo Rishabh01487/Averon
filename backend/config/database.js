@@ -482,3 +482,7 @@ function updateEconomy(field, value) {
 function incrementEconomy(field, amount) {
   run(`UPDATE economy SET ${field} = ${field} + ?, updated_at = ? WHERE id = 1`, [amount, Date.now()]);
 }
+
+function getEconomy() {
+  return queryOne('SELECT * FROM economy WHERE id = 1');
+}
