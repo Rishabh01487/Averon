@@ -138,3 +138,7 @@ class AssetService {
     if (available.length < count) throw new Error(`Only ${available.length} tokens available`);
 
     const totalCost = parseFloat((asset.token_price * count).toFixed(8));
+    const balance = this.blockchain.getBalance(walletData.address);
+    if (balance < totalCost) throw new Error(`Need ${totalCost.toFixed(4)} AC, have ${balance.toFixed(4)} AC`);
+
+    // Blockchain: User → Escrow
