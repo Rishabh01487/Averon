@@ -61,3 +61,8 @@ function createUserRateLimiter(config) {
     const key = `user:${req.user.userId}:${req.baseUrl || req.path}`;
     const now = Date.now();
     const windowStart = now - windowMs;
+
+    let entries = windows.get(key) || [];
+    entries = entries.filter(t => t > windowStart);
+    entries.push(now);
+    windows.set(key, entries);
