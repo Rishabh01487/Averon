@@ -254,3 +254,7 @@ class Blockchain {
   getPendingCount() {
     return this.pendingTransactions.length;
   }
+
+  // ── Validation ─────────────────────────────────────────────────────────────
+
+  isChainValid() {
