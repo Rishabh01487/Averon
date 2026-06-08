@@ -126,3 +126,7 @@ function inferAction(method, path) {
   if (path.includes('/assets') && method === 'POST') {
     if (path.includes('/analyze')) return 'AI_ANALYSIS_STARTED';
     if (path.includes('/confirm')) return 'ASSET_LISTED';
+    if (path.includes('/documents')) return 'DOCUMENT_UPLOAD';
+    if (path.includes('/tokens/buy')) return 'TOKEN_PURCHASED';
+    return 'ASSET_CREATED';
+  }
