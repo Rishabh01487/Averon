@@ -622,3 +622,7 @@ window.viewBlock = async (index) => {
         <div><strong>Previous:</strong> <span style="font-family:var(--mono);font-size:11px">${block.previousHash}</span></div>
         <div><strong>Merkle Root:</strong> <span style="font-family:var(--mono);font-size:11px">${block.merkleRoot}</span></div>
         <div><strong>Nonce:</strong> ${block.nonce} · <strong>Difficulty:</strong> ${block.difficulty}</div>
+        <div><strong>Miner:</strong> <span style="font-family:var(--mono);font-size:11px">${block.miner}</span></div>
+        <div><strong>Time:</strong> ${new Date(block.timestamp).toLocaleString()}</div>
+      </div>
+      <h4 style="margin-bottom:8px">${block.transactionCount} Transactions</h4>
