@@ -182,3 +182,7 @@ app.post('/api/auth/refresh', (req, res) => {
   if (!user) return res.status(401).json({ error: 'User not found' });
 
   const tokens = generateTokens(user);
+  res.json(tokens);
+});
+
+// ── Account ──────────────────────────────────────────────────────────────────
