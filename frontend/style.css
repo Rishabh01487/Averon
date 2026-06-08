@@ -69,3 +69,8 @@ body {
 .auth-tabs { display: flex; gap: 4px; background: var(--bg-input); border-radius: var(--radius-sm); padding: 4px; margin-bottom: 24px; }
 .auth-tab { flex: 1; padding: 10px; background: none; border: none; color: var(--text-secondary); font-size: 14px; font-weight: 500; border-radius: 6px; cursor: pointer; transition: var(--transition); }
 .auth-tab.active { background: var(--accent); color: white; }
+
+.auth-form { display: flex; flex-direction: column; gap: 16px; }
+.auth-form.hidden { display: none; }
+.auth-note { font-size: 12px; color: var(--text-muted); padding: 12px; background: var(--accent-dim); border-radius: var(--radius-sm); border: 1px solid rgba(99,102,241,0.2); }
+.auth-error { margin-top: 12px; padding: 12px; background: var(--red-dim); color: var(--red); border-radius: var(--radius-sm); font-size: 13px; }
