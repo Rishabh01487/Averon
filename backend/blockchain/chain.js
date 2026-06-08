@@ -118,3 +118,7 @@ class Blockchain {
 
     // Add mining reward
     const rewardTx = new Transaction('SYSTEM', minerAddress, this.miningReward, C.TX_TYPES.REWARD, {
+      blockIndex: this.chain.length,
+    });
+    rewardTx.status = 'confirmed';
+    txsToMine.push(rewardTx);
