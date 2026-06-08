@@ -106,3 +106,7 @@ class Transaction {
       hash: this.hash,
       from: this.from,
       to: this.to,
+      amount: this.amount,
+      type: this.type,
+      data: this.data,
+      timestamp: this.timestamp,
