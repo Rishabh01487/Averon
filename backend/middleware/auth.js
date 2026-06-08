@@ -82,3 +82,6 @@ async function hashPassword(password) {
     crypto.pbkdf2(password, salt, HASH_ITERATIONS, HASH_KEYLEN, HASH_DIGEST, (err, key) => {
       if (err) reject(err);
       resolve(`${salt}:${HASH_ITERATIONS}:${key.toString('hex')}`);
+    });
+  });
+}
