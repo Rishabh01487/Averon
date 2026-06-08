@@ -86,3 +86,7 @@ async function analyzeAsset(asset, documents, dbModule) {
 }
 
 // ── Stage 1: Document Processing ─────────────────────────────────────────────
+
+function processDocuments(documents) {
+  const result = {
+    totalFiles: documents.length,
