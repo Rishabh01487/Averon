@@ -54,3 +54,7 @@ class Block {
     this.difficulty = difficulty || this.difficulty;
     const target = '0'.repeat(this.difficulty);
     const startTime = Date.now();
+
+    while (!this.hash.startsWith(target)) {
+      this.nonce++;
+      this.hash = this.calculateHash();
