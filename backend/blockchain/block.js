@@ -110,3 +110,7 @@ class Block {
       return h === txHash;
     });
     if (index === -1) return null;
+    return { proof: tree.getProof(index), root: this.merkleRoot };
+  }
+
+  /**
