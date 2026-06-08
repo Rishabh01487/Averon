@@ -114,3 +114,7 @@ class AssetService {
       const block = this.blockchain.minePendingTransactions(this.walletManager.getSystemWallet().address);
       txHash = assetTx.hash;
       blockIdx = block?.index || 0;
+      this.db.run('UPDATE assets SET tx_hash = ?, block_index = ? WHERE id = ?', [txHash, blockIdx, assetId]);
+    }
+
+    this.db.run('INSERT INTO activity_log (user_id, action, details, tx_hash, block_index, created_at) VALUES (?,?,?,?,?,?)',
