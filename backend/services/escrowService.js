@@ -57,3 +57,8 @@ class EscrowService {
 
     const asset = this.db.queryOne('SELECT * FROM assets WHERE id = ?', [assetId]);
     if (!asset) throw new Error('Asset not found');
+
+    const ownerWallet = this.db.queryOne('SELECT address FROM wallets WHERE user_id = ?', [asset.owner_id]);
+    if (!ownerWallet) throw new Error('Owner wallet not found');
+
+    const amount = escrow.balance;
