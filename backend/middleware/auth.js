@@ -165,3 +165,8 @@ function requireRole(...roles) {
 function requireAdmin(req, res, next) {
   return requireRole(C.ROLES.ADMIN)(req, res, next);
 }
+
+// ── Session Management ───────────────────────────────────────────────────────
+
+function createSession(db, userId, refreshToken, req) {
+  const { run } = db;
