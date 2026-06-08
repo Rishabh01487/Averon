@@ -246,3 +246,7 @@ body {
 .ob-side { max-height: 200px; overflow-y: auto; }
 .ob-row { display: flex; justify-content: space-between; padding: 4px 0; position: relative; }
 .ob-sells .ob-row { color: var(--red); }
+.ob-buys .ob-row { color: var(--green); }
+.ob-spread { text-align: center; padding: 8px; font-size: 13px; color: var(--text-muted); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+.order-tabs { display: flex; gap: 4px; margin-bottom: 16px; background: var(--bg-input); border-radius: var(--radius-sm); padding: 3px; }
