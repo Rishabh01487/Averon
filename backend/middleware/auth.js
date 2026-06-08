@@ -186,3 +186,7 @@ function revokeSession(db, sessionId) {
 }
 
 function revokeAllUserSessions(db, userId) {
+  db.run('UPDATE sessions SET is_revoked = 1 WHERE user_id = ?', [userId]);
+}
+
+function cleanExpiredSessions(db) {
