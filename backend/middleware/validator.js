@@ -42,3 +42,6 @@ const rules = {
   min: (min) => (val) => typeof val === 'number' && val >= min,
   max: (max) => (val) => typeof val === 'number' && val <= max,
   oneOf: (values) => (val) => values.includes(val),
+  pattern: (regex) => (val) => typeof val === 'string' && regex.test(val),
+  alphanumeric: (val) => typeof val === 'string' && /^[a-zA-Z0-9_]+$/.test(val),
+};
