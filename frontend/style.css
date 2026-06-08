@@ -94,3 +94,7 @@ body {
 /* ═══ BUTTONS ═══ */
 .btn-primary {
   padding: 12px 24px; background: var(--accent); color: white; border: none;
+  border-radius: var(--radius-sm); font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: var(--transition); font-family: var(--font);
+}
+.btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(99,102,241,0.3); }
