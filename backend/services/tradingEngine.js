@@ -110,3 +110,7 @@ class TradingEngine {
           buyerWallet?.address || buy.user_id,
           tradeAmount, C.TX_TYPES.TRADE,
           { buyOrderId: buy.id, sellOrderId: sell.id, price: tradePrice }
+        );
+        this.blockchain.addTransaction(tradeTx);
+
+        // Record in database
