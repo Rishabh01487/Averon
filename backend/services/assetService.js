@@ -78,3 +78,7 @@ class AssetService {
 
     // Calculate token structure
     let tokenCount = Math.max(C.LIMITS.MIN_TOKEN_COUNT, Math.min(C.LIMITS.MAX_TOKEN_COUNT,
+      aiResult.suggestedTokens || Math.round(asset.raise_amount / Math.max(100, asset.raise_amount / 20))
+    ));
+    const tokenPriceInr = parseFloat((asset.raise_amount / tokenCount).toFixed(2));
+    const tokenPriceAC = parseFloat((tokenPriceInr / currentPrice).toFixed(8));
