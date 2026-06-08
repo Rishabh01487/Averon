@@ -254,3 +254,7 @@ async function loadDashboard() {
       <div class="activity-item">
         <span class="activity-action">${a.action}</span>
         <span class="activity-details">${a.details || ''}</span>
+        <span class="activity-time">${timeAgo(a.created_at)}</span>
+      </div>`).join('') || '<div class="empty-state">No activity yet</div>';
+  } catch {}
+}
