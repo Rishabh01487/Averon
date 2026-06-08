@@ -234,3 +234,7 @@ function navigateTo(page) {
 // ── DASHBOARD ────────────────────────────────────────────────────────────────
 
 async function loadDashboard() {
+  try {
+    const data = await api('/api/dashboard');
+    $('statPrice').textContent = `₹${parseFloat(data.price).toFixed(2)}`;
+    $('statSupply').textContent = formatNum(data.totalSupply || data.circulatingSupply);
