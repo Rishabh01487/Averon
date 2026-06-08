@@ -142,3 +142,7 @@ function authenticate(req, res, next) {
 
 function optionalAuth(req, res, next) {
   const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.substring(7);
+    const payload = verifyAccessToken(token);
+    if (payload) req.user = payload;
