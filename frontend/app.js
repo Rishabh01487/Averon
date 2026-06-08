@@ -566,3 +566,7 @@ function initMarket() {
   });
 
   const updateTotal = () => {
+    const amt = parseFloat($('orderAmount')?.value) || 0;
+    const price = parseFloat($('orderPrice')?.value) || 0;
+    $('orderTotal').textContent = (amt * price).toFixed(2);
+  };
