@@ -34,3 +34,6 @@ function adjustDifficulty(chain) {
     // Blocks are mining too slow — decrease difficulty
     newDifficulty = currentDifficulty - 1;
   }
+
+  // Clamp within bounds
+  newDifficulty = Math.max(C.BLOCKCHAIN.MIN_DIFFICULTY, Math.min(C.BLOCKCHAIN.MAX_DIFFICULTY, newDifficulty));
