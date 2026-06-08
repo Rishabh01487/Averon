@@ -90,3 +90,7 @@ class AssetService {
 
     // Create escrow
     this.escrow.createEscrow(assetId);
+
+    // Update asset
+    this.db.run('UPDATE assets SET token_count = ?, token_price = ?, updated_at = ? WHERE id = ?',
+      [tokenCount, tokenPriceAC, Date.now(), assetId]);
