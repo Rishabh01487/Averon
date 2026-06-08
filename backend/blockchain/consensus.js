@@ -150,3 +150,7 @@ function getChainStats(chain) {
     averageBlockTime: avgBlockTime,
     chainAge: Date.now() - genesis.timestamp,
     totalSize: chain.reduce((s, b) => s + (b.size || 0), 0),
+  };
+}
+
+module.exports = { adjustDifficulty, validateChain, selectChain, detectFork, getChainStats };
