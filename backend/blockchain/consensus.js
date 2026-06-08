@@ -54,3 +54,7 @@ function validateChain(chain) {
 
   // Validate each subsequent block
   for (let i = 1; i < chain.length; i++) {
+    const currentBlock = chain[i];
+    const previousBlock = chain[i - 1];
+
+    // Index continuity
