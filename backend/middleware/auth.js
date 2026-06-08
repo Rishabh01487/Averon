@@ -177,3 +177,8 @@ function createSession(db, userId, refreshToken, req) {
 
   run('INSERT INTO sessions (id, user_id, refresh_token, device_info, ip_address, expires_at, created_at) VALUES (?,?,?,?,?,?,?)',
     [sessionId, userId, refreshToken, deviceInfo, ip, expiresAt, Date.now()]);
+
+  return sessionId;
+}
+
+function revokeSession(db, sessionId) {
