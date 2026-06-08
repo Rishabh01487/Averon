@@ -385,3 +385,7 @@ function initBuyPage() {
     const price = parseFloat(state.config?.price) || 1;
     $('buyEstimate').textContent = `${(inr / price).toFixed(4)} AC`;
   });
+
+  $('buyCoinsBtn')?.addEventListener('click', async () => {
+    const amountInr = parseFloat($('buyAmountInr').value);
+    if (!amountInr || amountInr < 10) return toast('Minimum ₹10', 'error');
