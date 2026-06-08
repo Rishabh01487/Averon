@@ -46,3 +46,7 @@ function adjustDifficulty(chain) {
  */
 function validateChain(chain) {
   if (chain.length === 0) return { valid: false, error: 'Empty chain' };
+
+  // Validate genesis block
+  const genesis = chain[0];
+  if (genesis.index !== 0) return { valid: false, error: 'Genesis block must have index 0', block: 0 };
