@@ -310,3 +310,6 @@ app.post('/api/assets/:id/analyze', authenticate, (req, res) => {
   if (!asset) return res.status(404).json({ error: 'Asset not found or not owned' });
 
   // Transition to analyzing
+  try { assetService.transition(assetId, C.ASSET_STATUS.AI_ANALYZING, req.user.userId, 'AI analysis triggered'); } catch {}
+
+  const docs = DB.query('SELECT * FROM asset_documents WHERE asset_id = ?', [assetId]);
