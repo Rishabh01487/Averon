@@ -126,3 +126,7 @@ function createSchema() {
     compliance_status TEXT DEFAULT 'pending',
     compliance_notes TEXT DEFAULT '',
     compliance_checked_at INTEGER DEFAULT 0,
+    
+    deadline INTEGER DEFAULT 0,
+    cooling_off_until INTEGER DEFAULT 0,
+    
