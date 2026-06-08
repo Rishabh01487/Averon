@@ -42,3 +42,7 @@ class AssetService {
     const { title, description, category, raiseAmount, days } = data;
 
     // Validate category
+    if (!C.ASSET_CATEGORIES.includes(category)) throw new Error('Invalid category');
+
+    // Validate raise amount
+    if (raiseAmount < C.LIMITS.MIN_RAISE_AMOUNT) throw new Error(`Minimum raise: ₹${C.LIMITS.MIN_RAISE_AMOUNT}`);
