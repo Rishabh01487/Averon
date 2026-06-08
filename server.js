@@ -281,3 +281,8 @@ app.post('/api/assets/:assetId/documents', authenticate, uploadLimiter, upload.a
 
   const assetDir = path.join(UPLOADS_DIR, String(assetId));
   if (!fs.existsSync(assetDir)) fs.mkdirSync(assetDir, { recursive: true });
+
+  const docs = [];
+  for (const file of (req.files || [])) {
+    const newPath = path.join(assetDir, file.filename);
+    if (file.path !== newPath) try { fs.renameSync(file.path, newPath); } catch {}
