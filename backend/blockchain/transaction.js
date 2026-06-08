@@ -70,3 +70,7 @@ class Transaction {
     }
 
     try {
+      const verify = crypto.createVerify('SHA256');
+      verify.update(this.hash);
+      verify.end();
+      return verify.verify(this.signerPublicKey, this.signature, 'hex');
