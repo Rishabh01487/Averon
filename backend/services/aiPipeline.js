@@ -42,3 +42,7 @@ async function analyzeAsset(asset, documents, dbModule) {
 
   // Stage 3: AI/Fallback Analysis
   let analysis;
+  if (GEMINI_API_KEY && GEMINI_API_KEY.length > 10) {
+    try {
+      analysis = await analyzeWithGemini(asset, documents, stage1);
+      stages.push({ stage: 'AI Analysis', source: 'gemini', duration: Date.now() - startTime });
