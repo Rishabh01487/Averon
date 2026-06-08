@@ -29,3 +29,8 @@ module.exports = {
     UPLOAD: { windowMs: 60 * 1000, max: 10 },          // 10 uploads/min
     ADMIN: { windowMs: 60 * 1000, max: 200 },          // 200 req/min
   },
+
+  // ── Blockchain ─────────────────────────────────────────────────────────────
+  BLOCKCHAIN: {
+    DIFFICULTY: 2,
+    DIFFICULTY_ADJUSTMENT_INTERVAL: 10,  // blocks
