@@ -462,3 +462,7 @@ async function createAsset() {
   if (description.length < 20) return toast('Description too short (min 20 chars)', 'error');
 
   try {
+    const result = await api('/api/assets/create', { method: 'POST', body: JSON.stringify({ title, category, description, raiseAmount, days }) });
+    state.currentAssetId = result.assetId;
+    toast(`Asset created (#${result.assetId})`, 'success');
+    setWizardStep(2);
