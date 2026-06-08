@@ -126,3 +126,7 @@ class Transaction {
     tx.fee = json.fee || 0;
     tx.signature = json.signature || '';
     tx.signerPublicKey = json.signerPublicKey || '';
+    tx.hash = json.hash || tx.calculateHash();
+    tx.status = json.status || 'confirmed';
+    tx.blockIndex = json.blockIndex ?? -1;
+    tx.confirmations = json.confirmations || 0;
