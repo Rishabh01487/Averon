@@ -186,3 +186,7 @@ class Block {
     const block = new Block(json.index, json.previousHash, txs, json.timestamp);
     block.version = json.version || 1;
     block.nonce = json.nonce;
+    block.difficulty = json.difficulty || C.BLOCKCHAIN.DIFFICULTY;
+    block.miner = json.miner || '';
+    block.merkleRoot = json.merkleRoot || block.computeMerkleRoot();
+    block.hash = json.hash || block.calculateHash();
