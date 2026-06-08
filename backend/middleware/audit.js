@@ -42,3 +42,7 @@ function logAudit(action, details = {}, options = {}) {
 
   entry.prev_hash = _lastHash;
   entry.entry_hash = computeEntryHash(entry, _lastHash);
+  _lastHash = entry.entry_hash;
+
+  _db.run(
+    `INSERT INTO audit_log (user_id, action, resource_type, resource_id, details, ip_address, user_agent, request_method, request_path, response_code, prev_hash, entry_hash, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`,
