@@ -510,3 +510,7 @@ function startTimers() {
   escrowService = new EscrowService(DB, blockchain, walletManager);
   assetService = new AssetService(DB, blockchain, walletManager, escrowService);
   tradingEngine = new TradingEngine(DB, blockchain, walletManager);
+
+  startTimers();
+
+  const PORT = process.env.PORT || 4200;
