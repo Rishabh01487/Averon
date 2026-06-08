@@ -214,3 +214,7 @@ function createSchema() {
   // ── Trading ──────────────────────────────────────────────────────────────
   db.run(`CREATE TABLE IF NOT EXISTS coin_orders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,
+    type TEXT NOT NULL,
+    side TEXT NOT NULL,
+    amount REAL NOT NULL,
