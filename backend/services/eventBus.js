@@ -22,3 +22,7 @@ class EventBus {
     const cbs = this.listeners.get(event) || [];
     for (const cb of cbs) {
       try { cb(data); } catch (e) { console.error(`Event error [${event}]:`, e.message); }
+    }
+    // Also emit to wildcard listeners
+    const wildcards = this.listeners.get('*') || [];
+    for (const cb of wildcards) {
