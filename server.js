@@ -405,3 +405,8 @@ app.get('/api/portfolio', authenticate, (req, res) => {
 });
 
 // ── Blockchain Explorer ──────────────────────────────────────────────────────
+
+app.get('/api/blockchain/info', (req, res) => res.json(blockchain.getInfo()));
+
+app.get('/api/blockchain/blocks', (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit) || 20, 50);
