@@ -150,3 +150,7 @@ app.post('/api/auth/login', authLimiter, validate('login'), async (req, res) => 
     if (attempts >= C.AUTH.MAX_LOGIN_ATTEMPTS) {
       DB.run('UPDATE users SET login_attempts = ?, locked_until = ? WHERE id = ?',
         [attempts, Date.now() + C.AUTH.LOCKOUT_DURATION_MS, user.id]);
+    } else {
+      DB.run('UPDATE users SET login_attempts = ? WHERE id = ?', [attempts, user.id]);
+    }
+    return res.status(401).json({ error: 'Invalid credentials', code: 'AUTH_FAILED' });
