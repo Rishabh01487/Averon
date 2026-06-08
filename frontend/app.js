@@ -466,3 +466,7 @@ async function createAsset() {
     state.currentAssetId = result.assetId;
     toast(`Asset created (#${result.assetId})`, 'success');
     setWizardStep(2);
+  } catch {}
+}
+
+async function uploadDocuments() {
