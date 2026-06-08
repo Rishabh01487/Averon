@@ -177,3 +177,8 @@ app.post('/api/auth/refresh', (req, res) => {
 
   const payload = verifyRefreshToken(refreshToken);
   if (!payload) return res.status(401).json({ error: 'Invalid refresh token' });
+
+  const user = DB.queryOne('SELECT * FROM users WHERE id = ?', [payload.userId]);
+  if (!user) return res.status(401).json({ error: 'User not found' });
+
+  const tokens = generateTokens(user);
