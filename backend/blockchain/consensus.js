@@ -42,3 +42,7 @@ function adjustDifficulty(chain) {
 }
 
 /**
+ * Determine if a chain is valid by checking every block.
+ */
+function validateChain(chain) {
+  if (chain.length === 0) return { valid: false, error: 'Empty chain' };
