@@ -430,3 +430,7 @@ function handleFiles(files) {
   }
   renderFileList();
 }
+
+function renderFileList() {
+  $('fileList').innerHTML = state.selectedFiles.map((f, i) => `
+    <div class="file-item">
