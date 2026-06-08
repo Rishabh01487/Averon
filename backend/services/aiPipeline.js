@@ -234,3 +234,7 @@ function analyzeWithFallback(asset, documents, docInfo) {
 // ── Stage 4: Fraud Detection ─────────────────────────────────────────────────
 
 function checkFraudIndicators(asset, analysis, duplicateResult) {
+  const flags = [];
+  let hasCriticalFraud = false;
+
+  if (duplicateResult.hasDuplicates) {
