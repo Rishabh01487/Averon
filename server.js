@@ -82,3 +82,7 @@ app.get('/api/config', (req, res) => {
 app.get('/api/dashboard', (req, res) => {
   const stats = DB.getDashboardStats();
   const activity = DB.query('SELECT a.*, u.name as user_name FROM activity_log a LEFT JOIN users u ON a.user_id = u.id ORDER BY a.created_at DESC LIMIT 30');
+  res.json({ ...stats, recentActivity: activity });
+});
+
+// ── Auth ─────────────────────────────────────────────────────────────────────
