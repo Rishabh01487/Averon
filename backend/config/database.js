@@ -386,3 +386,7 @@ function seedDefaults() {
     ['min_documents_required', String(C.LIMITS.MIN_DOCUMENTS), 'Min documents for listing'],
     ['cooling_off_period_ms', String(C.LIMITS.COOLING_OFF_PERIOD_MS), 'Cooling off period after listing'],
     ['auto_approve_min_confidence', String(C.AI.MIN_CONFIDENCE_FOR_AUTO_APPROVE), 'Min AI confidence for auto-approve'],
+  ];
+  for (const [key, value, desc] of defaults) {
+    const exists = queryOne('SELECT key FROM system_config WHERE key = ?', [key]);
+    if (!exists) run('INSERT INTO system_config (key, value, description, updated_at) VALUES (?, ?, ?, ?)', [key, value, desc, Date.now()]);
