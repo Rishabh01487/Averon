@@ -93,3 +93,8 @@ function logout() {
 }
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
+
+function initAuth() {
+  // Tab switching
+  $$('.auth-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
