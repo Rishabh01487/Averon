@@ -58,3 +58,7 @@ function logAudit(action, details = {}, options = {}) {
  * Express middleware that auto-logs all state-changing requests.
  */
 function auditMiddleware(req, res, next) {
+  // Only audit state-changing methods
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+    const originalSend = res.send;
+    res.send = function (body) {
