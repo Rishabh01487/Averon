@@ -98,3 +98,7 @@ function verifyAuditChain() {
 
   for (const entry of entries) {
     const expectedHash = computeEntryHash(entry, prevHash);
+    if (entry.entry_hash !== expectedHash) {
+      corrupted.push({ id: entry.id, expected: expectedHash, actual: entry.entry_hash });
+    }
+    if (entry.prev_hash !== prevHash) {
