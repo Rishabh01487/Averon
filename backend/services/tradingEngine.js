@@ -78,3 +78,7 @@ class TradingEngine {
 
     for (const buy of buyOrders) {
       if (buy.remaining <= 0) continue;
+
+      for (const sell of sellOrders) {
+        if (sell.remaining <= 0) continue;
+        if (buy.user_id === sell.user_id) continue; // No self-trade
