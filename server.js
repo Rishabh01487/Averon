@@ -213,3 +213,7 @@ app.post('/api/notifications/read', authenticate, (req, res) => {
 });
 
 // ── Buy Averon Coin ──────────────────────────────────────────────────────────
+
+app.post('/api/buy-coins', authenticate, financialLimiter, validate('buyCoins'), (req, res) => {
+  const { amountInr } = req.body;
+  const userId = req.user.userId;
