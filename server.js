@@ -86,3 +86,6 @@ app.get('/api/dashboard', (req, res) => {
 });
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
+
+app.post('/api/auth/register', authLimiter, validate('register'), async (req, res) => {
+  const { email, password, name, organization } = req.body;
