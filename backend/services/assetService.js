@@ -54,3 +54,7 @@ class AssetService {
     const { lastId } = this.db.run(
       'INSERT INTO assets (owner_id, title, description, category, raise_amount, deadline, status, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?)',
       [userId, title, description || '', category, parseFloat(raiseAmount), deadline, C.ASSET_STATUS.DRAFT, now, now]
+    );
+
+    // Log status change
+    this.db.run('INSERT INTO asset_status_history (asset_id, old_status, new_status, changed_by, reason, created_at) VALUES (?,?,?,?,?,?)',
