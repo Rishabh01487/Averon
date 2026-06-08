@@ -262,3 +262,7 @@ function createSchema() {
     market_cap REAL DEFAULT 0,
     tvl REAL DEFAULT 0,
     updated_at INTEGER
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS price_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
