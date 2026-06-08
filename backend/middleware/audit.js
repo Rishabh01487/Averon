@@ -86,3 +86,6 @@ function auditMiddleware(req, res, next) {
 
 /**
  * Verify the integrity of the audit chain.
+ */
+function verifyAuditChain() {
+  if (!_db) return { valid: false, error: 'Database not initialized' };
