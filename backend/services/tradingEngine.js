@@ -74,3 +74,7 @@ class TradingEngine {
   matchOrders() {
     const trades = [];
     const buyOrders = this.db.query('SELECT * FROM coin_orders WHERE status = "open" AND side = "buy" ORDER BY price DESC, created_at ASC');
+    const sellOrders = this.db.query('SELECT * FROM coin_orders WHERE status = "open" AND side = "sell" ORDER BY price ASC, created_at ASC');
+
+    for (const buy of buyOrders) {
+      if (buy.remaining <= 0) continue;
