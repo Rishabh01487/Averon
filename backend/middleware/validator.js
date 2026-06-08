@@ -66,3 +66,7 @@ const schemas = {
     description: [{ rule: rules.required, msg: 'Description is required' }, { rule: rules.minLength(20), msg: 'Description too short (min 20 chars)' }, { rule: rules.maxLength(5000), msg: 'Description too long' }],
     category: [{ rule: rules.required, msg: 'Category is required' }, { rule: rules.oneOf(C.ASSET_CATEGORIES), msg: 'Invalid category' }],
     raiseAmount: [{ rule: rules.required, msg: 'Raise amount is required' }, { rule: rules.number, msg: 'Raise amount must be a number' }, { rule: rules.min(C.LIMITS.MIN_RAISE_AMOUNT), msg: `Minimum raise: ₹${C.LIMITS.MIN_RAISE_AMOUNT}` }, { rule: rules.max(C.LIMITS.MAX_RAISE_AMOUNT), msg: `Maximum raise: ₹${C.LIMITS.MAX_RAISE_AMOUNT.toLocaleString()}` }],
+    days: [{ rule: rules.number, msg: 'Days must be a number' }, { rule: rules.min(1), msg: 'Minimum 1 day' }, { rule: rules.max(C.LIMITS.MAX_LISTING_DAYS), msg: `Maximum ${C.LIMITS.MAX_LISTING_DAYS} days` }],
+  },
+
+  buyCoins: {
