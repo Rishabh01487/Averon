@@ -190,3 +190,6 @@ app.post('/api/auth/refresh', (req, res) => {
 app.get('/api/account', authenticate, (req, res) => {
   const user = DB.queryOne('SELECT * FROM users WHERE id = ?', [req.user.userId]);
   if (!user) return res.status(404).json({ error: 'User not found' });
+  const wallet = DB.queryOne('SELECT address FROM wallets WHERE user_id = ?', [user.id]);
+  const balance = wallet ? blockchain.getBalance(wallet.address) : 0;
+  DB.run('UPDATE users SET averon_balance = ? WHERE id = ?', [balance, user.id]);
