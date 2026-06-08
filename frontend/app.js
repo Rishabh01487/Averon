@@ -118,3 +118,7 @@ function initAuth() {
       state.user = data.user;
       state.accessToken = data.accessToken;
       state.refreshToken = data.refreshToken;
+      saveSession();
+      enterApp();
+    } catch (e) {
+      $('authError').textContent = e.message;
