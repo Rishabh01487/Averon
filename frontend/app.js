@@ -102,3 +102,7 @@ function initAuth() {
       tab.classList.add('active');
       const isLogin = tab.dataset.tab === 'login';
       $('loginForm').classList.toggle('hidden', !isLogin);
+      $('registerForm').classList.toggle('hidden', isLogin);
+      $('authError').classList.add('hidden');
+    });
+  });
