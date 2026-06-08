@@ -33,3 +33,8 @@ class Blockchain {
       version: C.PLATFORM_VERSION,
     });
     genesisTx.status = 'confirmed';
+
+    const genesis = new Block(0, '0', [genesisTx], C.BLOCKCHAIN.GENESIS_TIMESTAMP);
+    genesis.miner = 'GENESIS';
+    genesis.difficulty = this.difficulty;
+    genesis.mine(this.difficulty);
