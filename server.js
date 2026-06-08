@@ -198,3 +198,7 @@ app.get('/api/account', authenticate, (req, res) => {
     id: user.id, name: user.name, email: user.email, role: user.role,
     walletAddress: wallet?.address, balance, inrSpent: user.inr_spent,
     createdAt: user.created_at,
+  });
+});
+
+app.get('/api/notifications', authenticate, (req, res) => {
