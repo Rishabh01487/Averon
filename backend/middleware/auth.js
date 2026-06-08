@@ -90,3 +90,7 @@ async function verifyPassword(password, hash) {
   return new Promise((resolve, reject) => {
     const [salt, iterations, key] = hash.split(':');
     crypto.pbkdf2(password, salt, parseInt(iterations), HASH_KEYLEN, HASH_DIGEST, (err, derivedKey) => {
+      if (err) reject(err);
+      resolve(derivedKey.toString('hex') === key);
+    });
+  });
