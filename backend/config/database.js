@@ -414,3 +414,7 @@ function query(sql, params = []) {
     if (params.length) stmt.bind(params);
     const results = [];
     while (stmt.step()) results.push(stmt.getAsObject());
+    stmt.free();
+    return results;
+  } catch (e) {
+    console.error('SQL Query Error:', e.message, '\n  SQL:', sql, '\n  Params:', params);
