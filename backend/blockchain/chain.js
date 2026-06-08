@@ -66,3 +66,7 @@ class Blockchain {
       const data = {
         version: C.PLATFORM_VERSION,
         difficulty: this.difficulty,
+        chain: this.chain.map(b => b.toJSON()),
+        pending: this.pendingTransactions.map(tx => tx.toJSON()),
+        savedAt: Date.now(),
+      };
