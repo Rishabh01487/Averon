@@ -150,3 +150,7 @@ class Block {
 
     // Timestamp
     if (previousBlock && !this.validateTimestamp(previousBlock.timestamp)) errors.push('Invalid timestamp');
+
+    // Transaction validation
+    const txValidation = this.validateTransactions();
+    if (!txValidation.valid) errors.push(...txValidation.errors.map(e => `TX ${e.txIndex}: ${e.error || e.errors?.join(', ')}`));
