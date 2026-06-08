@@ -294,3 +294,7 @@ class Blockchain {
           supply += tx.amount;
         }
       }
+    }
+    return parseFloat(supply.toFixed(8));
+  }
+}
