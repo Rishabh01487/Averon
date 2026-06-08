@@ -178,3 +178,7 @@ function createSchema() {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     asset_id INTEGER NOT NULL,
     token_index INTEGER NOT NULL,
+    price REAL NOT NULL,
+    owner_id TEXT DEFAULT NULL,
+    purchased_at INTEGER DEFAULT NULL,
+    tx_hash TEXT DEFAULT '',
