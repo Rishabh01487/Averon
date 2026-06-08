@@ -70,3 +70,7 @@ class TradingEngine {
   }
 
   // ── Order Matching (Price-Time Priority) ─────────────────────────────────
+
+  matchOrders() {
+    const trades = [];
+    const buyOrders = this.db.query('SELECT * FROM coin_orders WHERE status = "open" AND side = "buy" ORDER BY price DESC, created_at ASC');
