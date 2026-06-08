@@ -138,3 +138,7 @@ class EscrowService {
         [escrow.id, 'REFUND', token.owner_id, refundAmount, refundTx.hash, Date.now()]);
 
       // Notify
+      this.db.run('INSERT INTO notifications (user_id, type, title, message, created_at) VALUES (?,?,?,?,?)',
+        [token.owner_id, 'REFUND', 'Investment Refunded',
+         `Your investment of ${refundAmount.toFixed(4)} AC in "${this.db.queryOne('SELECT title FROM assets WHERE id = ?', [assetId])?.title}" has been refunded.`,
+         Date.now()]);
