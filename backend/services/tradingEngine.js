@@ -26,3 +26,7 @@ class TradingEngine {
     if (this.circuitBreakerTripped) throw new Error('Trading halted — circuit breaker active');
 
     // Check open order limit
+    const openCount = this.db.queryOne('SELECT COUNT(*) as c FROM coin_orders WHERE user_id = ? AND status = "open"', [userId])?.c || 0;
+    if (openCount >= C.TRADING.MAX_OPEN_ORDERS_PER_USER) throw new Error('Maximum open orders reached');
+
+    // Validate
