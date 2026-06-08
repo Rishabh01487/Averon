@@ -594,3 +594,7 @@ async function loadExplorer() {
     $('chainStats').innerHTML = `
       <span class="chain-stat">Blocks: ${info.blocks}</span>
       <span class="chain-stat">TXs: ${info.transactions}</span>
+      <span class="chain-stat">Difficulty: ${info.difficulty}</span>
+      <span class="chain-stat">Pending: ${info.pendingTransactions}</span>`;
+
+    const data = await api('/api/blockchain/blocks?limit=20');
