@@ -30,3 +30,7 @@ async function api(path, opts = {}) {
         const retry = await fetch(API + path, { headers, ...opts });
         return retry.json();
       } else {
+        logout();
+        return null;
+      }
+    }
