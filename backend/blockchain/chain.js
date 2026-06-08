@@ -181,3 +181,8 @@ class Blockchain {
     for (const tx of this.pendingTransactions) {
       if (tx.from === address) balance -= (tx.amount + (tx.fee || 0));
     }
+
+    return parseFloat(Math.max(0, balance).toFixed(8));
+  }
+
+  /**
