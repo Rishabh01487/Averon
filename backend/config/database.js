@@ -78,3 +78,7 @@ function createSchema() {
   )`);
 
   // ── Wallets ──────────────────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS wallets (
+    user_id TEXT PRIMARY KEY,
+    public_key TEXT NOT NULL,
+    private_key TEXT NOT NULL,
