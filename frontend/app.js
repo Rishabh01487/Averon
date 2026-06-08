@@ -106,3 +106,7 @@ function initAuth() {
       $('authError').classList.add('hidden');
     });
   });
+
+  $('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    $('authError').classList.add('hidden');
