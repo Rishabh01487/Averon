@@ -274,3 +274,7 @@ class AssetService {
     const owner = this.db.queryOne('SELECT name, organization FROM users WHERE id = ?', [asset.owner_id]);
     const history = this.db.query('SELECT * FROM asset_status_history WHERE asset_id = ? ORDER BY created_at DESC', [asset.id]);
     const escrow = this.db.queryOne('SELECT * FROM escrow_accounts WHERE asset_id = ?', [asset.id]);
+
+    return {
+      ...asset,
+      documents: docs.map(d => ({ id: d.id, name: d.original_name, type: d.mimetype, size: d.size, url: '/uploads/' + asset.id + '/' + d.filename })),
