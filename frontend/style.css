@@ -62,3 +62,6 @@ body {
 }
 
 .auth-header { text-align: center; margin-bottom: 32px; }
+.logo-large { font-size: 42px; font-weight: 900; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.auth-subtitle { color: var(--text-secondary); margin-top: 8px; font-size: 15px; }
+.auth-tagline { color: var(--text-muted); font-size: 12px; font-family: var(--mono); margin-top: 4px; }
