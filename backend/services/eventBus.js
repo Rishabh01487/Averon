@@ -14,3 +14,6 @@ class EventBus {
   }
 
   off(event, callback) {
+    const cbs = this.listeners.get(event);
+    if (cbs) this.listeners.set(event, cbs.filter(cb => cb !== callback));
+  }
