@@ -146,3 +146,7 @@ function sanitizeBodyForAudit(body) {
   delete sanitized.privateKey;
   delete sanitized.secret;
   // Truncate long fields
+  for (const [key, val] of Object.entries(sanitized)) {
+    if (typeof val === 'string' && val.length > 500) {
+      sanitized[key] = val.substring(0, 500) + '...[truncated]';
+    }
