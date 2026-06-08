@@ -26,3 +26,6 @@ function sanitizeObject(obj) {
     } else {
       sanitized[key] = value;
     }
+  }
+  return sanitized;
+}
