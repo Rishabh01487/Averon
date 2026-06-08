@@ -177,3 +177,7 @@ async function enterApp() {
 
   // Check notifications
   loadNotifications();
+
+  // Start price polling
+  setInterval(pollPrice, 10000);
+}
