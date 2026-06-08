@@ -454,3 +454,6 @@ function setWizardStep(step) {
 async function createAsset() {
   const title = $('assetTitle').value;
   const category = $('assetCategory').value;
+  const description = $('assetDescription').value;
+  const raiseAmount = parseFloat($('assetRaise').value);
+  const days = parseInt($('assetDays').value) || 30;
