@@ -94,3 +94,7 @@ class MerkleTree {
    * @param {string} leafHash - Hash of the leaf
    * @param {array} proof - Array from getProof()
    * @param {string} root - Expected Merkle root
+   * @returns {boolean}
+   */
+  static verify(leafHash, proof, root) {
+    let hash = leafHash;
