@@ -62,3 +62,7 @@ class Block {
       // Safety: prevent infinite loop (max 10 million attempts)
       if (this.nonce > 10000000) {
         throw new Error('Mining exceeded maximum attempts');
+      }
+    }
+
+    this.size = this.calculateSize();
