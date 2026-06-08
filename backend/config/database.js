@@ -358,3 +358,7 @@ function createSchema() {
   db.run(`CREATE INDEX IF NOT EXISTS idx_trades_seller ON coin_trades(seller_id)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_price_time ON price_history(recorded_at)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_audit_user ON audit_log(user_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_audit_action ON audit_log(action)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_audit_time ON audit_log(created_at)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_notif_user ON notifications(user_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_fee_user ON fee_ledger(user_id)`);
