@@ -146,3 +146,7 @@ class Blockchain {
     for (const block of this.chain) {
       for (const tx of block.transactions) {
         tx.confirmations = newBlock.index - tx.blockIndex;
+      }
+    }
+
+    // Add to chain
