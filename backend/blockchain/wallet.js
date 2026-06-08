@@ -129,3 +129,5 @@ class WalletManager {
     return { userId: w.userId, address: w.address, publicKey: w.publicKey };
   }
 }
+
+module.exports = { Wallet, WalletManager };
