@@ -162,3 +162,7 @@ function createSchema() {
   )`);
 
   db.run(`CREATE TABLE IF NOT EXISTS asset_valuations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    asset_id INTEGER NOT NULL,
+    valuation REAL NOT NULL,
+    risk_score REAL NOT NULL,
