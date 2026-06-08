@@ -10,3 +10,7 @@ const multer = require('multer');
 const crypto = require('crypto');
 
 // ── Config & Constants ───────────────────────────────────────────────────────
+const C = require('./backend/config/constants');
+const DB = require('./backend/config/database');
+
+// ── Middleware ────────────────────────────────────────────────────────────────
