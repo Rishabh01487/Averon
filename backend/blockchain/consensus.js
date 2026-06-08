@@ -98,3 +98,7 @@ function validateChain(chain) {
  * Used when resolving forks.
  */
 function selectChain(currentChain, candidateChain) {
+  const currentValid = validateChain(currentChain);
+  const candidateValid = validateChain(candidateChain);
+
+  if (!candidateValid.valid) return { winner: 'current', reason: 'Candidate chain is invalid' };
