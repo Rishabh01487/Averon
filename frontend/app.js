@@ -314,3 +314,7 @@ async function loadAssets() {
         <div class="asset-meta">
           <div><span class="label">Raise:</span> <span class="val">₹${formatNum(a.raise_amount)}</span></div>
           <div><span class="label">Tokens:</span> <span class="val">${a.tokens_sold || 0}/${a.token_count || 0}</span></div>
+        </div>
+        ${a.token_count ? `<div class="progress-bar"><div class="progress-fill" style="width:${a.progress}%"></div></div>` : ''}
+      </div>`).join('') || '<div class="empty-state">No assets listed yet. <span class="link" onclick="navigateTo(\'tokenize\')">Tokenize your first asset →</span></div>';
+  } catch {}
