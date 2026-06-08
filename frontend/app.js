@@ -69,3 +69,8 @@ function saveSession() {
     user: state.user, accessToken: state.accessToken, refreshToken: state.refreshToken,
   }));
 }
+
+function loadSession() {
+  try {
+    const s = JSON.parse(localStorage.getItem('averon_session'));
+    if (s?.accessToken) {
