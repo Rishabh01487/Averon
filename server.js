@@ -462,3 +462,7 @@ app.post('/api/admin/unfreeze/:userId', authenticate, requireRole(C.ROLES.ADMIN)
 
 app.post('/api/admin/config', authenticate, requireRole(C.ROLES.ADMIN), (req, res) => {
   const { key, value } = req.body;
+  DB.setConfig(key, value, req.user.userId);
+  logAudit('SYSTEM_CONFIG_CHANGE', { key, value }, { userId: req.user.userId });
+  res.json({ success: true });
+});
