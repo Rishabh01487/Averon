@@ -369,3 +369,8 @@ async function buyAssetTokens(assetId) {
 }
 
 // ── BUY COIN ─────────────────────────────────────────────────────────────────
+
+async function loadBuyPage() {
+  try {
+    const acc = await api('/api/account');
+    const price = parseFloat(acc.balance !== undefined ? state.config?.price : 1);
