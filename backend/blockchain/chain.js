@@ -298,3 +298,5 @@ class Blockchain {
     return parseFloat(supply.toFixed(8));
   }
 }
+
+module.exports = { Blockchain, Transaction, Block, MerkleTree };
