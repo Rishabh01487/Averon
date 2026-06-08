@@ -66,3 +66,6 @@ class MerkleTree {
     let idx = leafIndex;
 
     for (let i = 0; i < this.layers.length - 1; i++) {
+      const layer = this.layers[i];
+      const isRight = idx % 2 === 1;
+      const siblingIdx = isRight ? idx - 1 : idx + 1;
