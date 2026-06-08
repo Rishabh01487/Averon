@@ -154,3 +154,7 @@ class TradingEngine {
 
     // Update last trade price
     if (trades.length > 0) {
+      const lastTradePrice = trades[trades.length - 1].price;
+      this.db.setPrice(lastTradePrice);
+      this.checkCircuitBreaker(lastTradePrice);
+    }
