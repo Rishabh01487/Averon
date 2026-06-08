@@ -38,3 +38,7 @@ class MerkleTree {
       const nextLayer = [];
       for (let i = 0; i < layer.length; i += 2) {
         if (i + 1 < layer.length) {
+          nextLayer.push(this.hashPair(layer[i], layer[i + 1]));
+        } else {
+          // Odd number: duplicate last hash
+          nextLayer.push(this.hashPair(layer[i], layer[i]));
