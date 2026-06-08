@@ -210,3 +210,6 @@ app.get('/api/notifications', authenticate, (req, res) => {
 app.post('/api/notifications/read', authenticate, (req, res) => {
   DB.run('UPDATE notifications SET is_read = 1 WHERE user_id = ?', [req.user.userId]);
   res.json({ success: true });
+});
+
+// ── Buy Averon Coin ──────────────────────────────────────────────────────────
