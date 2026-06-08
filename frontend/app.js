@@ -170,3 +170,7 @@ async function enterApp() {
 
   // Refresh account
   try {
+    const acc = await api('/api/account');
+    state.user = { ...state.user, ...acc };
+    saveSession();
+  } catch {}
