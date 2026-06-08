@@ -374,3 +374,7 @@ app.post('/api/market/order', authenticate, financialLimiter, validate('placeOrd
     eventBus.emit(EVENTS.ORDER_PLACED, result);
     res.json(result);
   } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+app.delete('/api/market/order/:id', authenticate, (req, res) => {
+  try {
