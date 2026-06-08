@@ -434,3 +434,111 @@ function handleFiles(files) {
 function renderFileList() {
   $('fileList').innerHTML = state.selectedFiles.map((f, i) => `
     <div class="file-item">
+      <span>${f.name} (${(f.size / 1024).toFixed(0)} KB)</span>
+      <span class="file-remove" onclick="removeFile(${i})">✕</span>
+    </div>`).join('');
+  $('uploadDocsBtn').disabled = state.selectedFiles.length === 0;
+}
+window.removeFile = (i) => { state.selectedFiles.splice(i, 1); renderFileList(); };
+
+function setWizardStep(step) {
+  $$('.wizard-step').forEach((s, i) => {
+    s.classList.remove('active', 'done');
+    if (i + 1 < step) s.classList.add('done');
+    if (i + 1 === step) s.classList.add('active');
+  });
+  $$('.wiz-panel').forEach(p => p.classList.remove('active'));
+  $(`wizStep${step}`)?.classList.add('active');
+}
+
+async function createAsset() {
+  const title = $('assetTitle').value;
+  const category = $('assetCategory').value;
+  const description = $('assetDescription').value;
+  const raiseAmount = parseFloat($('assetRaise').value);
+  const days = parseInt($('assetDays').value) || 30;
+
+  if (!title || !category || !description || !raiseAmount) return toast('Fill all fields', 'error');
+  if (description.length < 20) return toast('Description too short (min 20 chars)', 'error');
+
+  try {
+    const result = await api('/api/assets/create', { method: 'POST', body: JSON.stringify({ title, category, description, raiseAmount, days }) });
+    state.currentAssetId = result.assetId;
+    toast(`Asset created (#${result.assetId})`, 'success');
+    setWizardStep(2);
+  } catch {}
+}
+
+async function uploadDocuments() {
+  if (!state.currentAssetId || state.selectedFiles.length === 0) return;
+
+  const formData = new FormData();
+  for (const file of state.selectedFiles) formData.append('documents', file);
+
+  $('uploadDocsBtn').disabled = true;
+  try {
+    const res = await fetch(`/api/assets/${state.currentAssetId}/documents`, {
+      method: 'POST', headers: { 'Authorization': `Bearer ${state.accessToken}` }, body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    toast(`${data.uploaded} document(s) uploaded`, 'success');
+    state.selectedFiles = [];
+    renderFileList();
+    setWizardStep(3);
+  } catch (e) { toast(e.message, 'error'); } finally { $('uploadDocsBtn').disabled = false; }
+}
+
+async function startAIAnalysis() {
+  if (!state.currentAssetId) return;
+  $('aiProgress').classList.remove('hidden');
+  $('aiResult').classList.add('hidden');
+  $('startAnalysisBtn').disabled = true;
+
+  try {
+    const result = await api(`/api/assets/${state.currentAssetId}/analyze`, { method: 'POST' });
+    $('aiProgress').classList.add('hidden');
+    $('aiResult').classList.remove('hidden');
+    $('aiResult').className = `ai-result ${result.verified ? 'verified' : 'rejected'}`;
+    $('aiResult').innerHTML = `
+      <h3>${result.verified ? '✅ Asset Verified' : '❌ Asset Rejected'}</h3>
+      <div class="ai-stat-grid">
+        <div class="ai-stat"><div class="val">₹${formatNum(result.estimatedValue)}</div><div class="label">Estimated Value</div></div>
+        <div class="ai-stat"><div class="val">${result.riskScore}%</div><div class="label">Risk Score (${result.riskLevel})</div></div>
+        <div class="ai-stat"><div class="val">${result.confidence}%</div><div class="label">Confidence</div></div>
+      </div>
+      <p style="margin-top:12px;font-size:13px;color:var(--text-secondary)">${result.analysis}</p>
+      ${result.concerns ? `<p style="margin-top:8px;font-size:12px;color:var(--yellow)">⚠️ ${result.concerns}</p>` : ''}
+      <p style="margin-top:8px;font-size:11px;color:var(--text-muted)">Source: ${result.source} · ${result.duration}ms · ${(result.stages||[]).length} stages</p>
+      ${result.verified ? `<button class="btn-primary" style="margin-top:16px" onclick="goToLaunch(${JSON.stringify(result).replace(/"/g, '&quot;')})">Proceed to Launch →</button>` : '<p style="margin-top:12px;color:var(--red)">Please improve documentation and re-submit.</p>'}`;
+  } catch (e) { $('aiProgress').classList.add('hidden'); toast(e.message, 'error'); } finally { $('startAnalysisBtn').disabled = false; }
+}
+
+window.goToLaunch = (aiResult) => {
+  state.aiResult = aiResult;
+  $('launchSummary').innerHTML = `
+    <div class="ai-stat-grid">
+      <div class="ai-stat"><div class="val">${aiResult.suggestedTokens}</div><div class="label">Tokens</div></div>
+      <div class="ai-stat"><div class="val">₹${formatNum(aiResult.tokenPriceInr)}</div><div class="label">Per Token (INR)</div></div>
+      <div class="ai-stat"><div class="val">${aiResult.riskLevel}</div><div class="label">Risk Level</div></div>
+    </div>
+    <p style="margin-top:16px;color:var(--text-secondary);font-size:14px">Confirming will create tokens on the Averon blockchain and open the asset for investment.</p>`;
+  setWizardStep(4);
+};
+
+async function confirmLaunch() {
+  if (!state.currentAssetId) return;
+  $('confirmLaunchBtn').disabled = true;
+  try {
+    const result = await api(`/api/assets/${state.currentAssetId}/confirm`, { method: 'POST', body: JSON.stringify({ aiResult: state.aiResult || {} }) });
+    $('launchResult').classList.remove('hidden');
+    $('launchResult').innerHTML = `
+      <h3>🚀 Asset Live on Blockchain!</h3>
+      <p>${result.tokenCount} tokens created at ${result.tokenPriceAC?.toFixed(4)} AC each</p>
+      <p style="font-family:var(--mono);font-size:12px;margin-top:8px">TX: ${result.txHash?.substring(0,32)}... · Block #${result.blockIndex}</p>
+      <button class="btn-primary" style="margin-top:16px" onclick="viewAsset(${state.currentAssetId}); navigateTo('assets')">View Asset →</button>`;
+    toast('Asset launched successfully!', 'success');
+  } catch {} finally { $('confirmLaunchBtn').disabled = false; }
+}
+
+// ── MARKETPLACE ──────────────────────────────────────────────────────────────
