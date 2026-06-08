@@ -438,3 +438,7 @@ app.get('/api/blockchain/address/:address', (req, res) => {
 
 app.get('/api/admin/stats', authenticate, requireRole(C.ROLES.ADMIN), (req, res) => {
   const stats = DB.getDashboardStats();
+  const chainInfo = blockchain.getInfo();
+  const auditIntegrity = verifyAuditChain();
+  const recentAudit = DB.query('SELECT * FROM audit_log ORDER BY created_at DESC LIMIT 50');
+  const pendingAssets = DB.query(`SELECT * FROM assets WHERE status IN ('${C.ASSET_STATUS.VERIFIED}','${C.ASSET_STATUS.FLAGGED}','${C.ASSET_STATUS.COMPLIANCE_REVIEW}')`);
