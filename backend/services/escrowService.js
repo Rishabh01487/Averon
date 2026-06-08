@@ -18,3 +18,7 @@ class EscrowService {
   createEscrow(assetId) {
     const address = `ESCROW_${assetId}_${Date.now().toString(36)}`;
     this.db.run(
+      'INSERT INTO escrow_accounts (asset_id, address, status, created_at) VALUES (?,?,?,?)',
+      [assetId, address, 'active', Date.now()]
+    );
+    this.db.run('UPDATE assets SET escrow_address = ? WHERE id = ?', [address, assetId]);
