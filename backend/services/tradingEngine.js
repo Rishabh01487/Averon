@@ -46,3 +46,111 @@ class TradingEngine {
     if (type === 'market') {
       if (side === 'buy') {
         const bestSell = this.db.queryOne('SELECT price FROM coin_orders WHERE status = "open" AND side = "sell" ORDER BY price ASC LIMIT 1');
+        price = bestSell ? bestSell.price : this.db.getPrice();
+      } else {
+        const bestBuy = this.db.queryOne('SELECT price FROM coin_orders WHERE status = "open" AND side = "buy" ORDER BY price DESC LIMIT 1');
+        price = bestBuy ? bestBuy.price : this.db.getPrice();
+      }
+    }
+
+    const now = Date.now();
+    const { lastId } = this.db.run(
+      'INSERT INTO coin_orders (user_id, type, side, amount, price, filled, remaining, status, duration, created_at, updated_at) VALUES (?,?,?,?,?,0,?,?,?,?,?)',
+      [userId, type, side, amount, price, amount, 'open', 'GTC', now, now]
+    );
+
+    // Log
+    this.db.run('INSERT INTO activity_log (user_id, action, details, amount, created_at) VALUES (?,?,?,?,?)',
+      [userId, 'ORDER_PLACED', `${side.toUpperCase()} ${amount} AC @ ₹${price?.toFixed(4)}`, amount, now]);
+
+    // Try matching
+    const matches = this.matchOrders();
+
+    return { orderId: lastId, matches, side, amount, price };
+  }
+
+  // ── Order Matching (Price-Time Priority) ─────────────────────────────────
+
+  matchOrders() {
+    const trades = [];
+    const buyOrders = this.db.query('SELECT * FROM coin_orders WHERE status = "open" AND side = "buy" ORDER BY price DESC, created_at ASC');
+    const sellOrders = this.db.query('SELECT * FROM coin_orders WHERE status = "open" AND side = "sell" ORDER BY price ASC, created_at ASC');
+
+    for (const buy of buyOrders) {
+      if (buy.remaining <= 0) continue;
+
+      for (const sell of sellOrders) {
+        if (sell.remaining <= 0) continue;
+        if (buy.user_id === sell.user_id) continue; // No self-trade
+        if (buy.price < sell.price) break; // No match possible at this price level
+
+        const tradeAmount = Math.min(buy.remaining, sell.remaining);
+        const tradePrice = sell.price; // Seller's price (maker gets their price)
+        const totalValue = parseFloat((tradeAmount * tradePrice).toFixed(4));
+
+        if (tradeAmount <= 0) continue;
+
+        // Calculate fees
+        const feeRate = parseFloat(this.db.getConfig('trading_fee_percent') || C.FEES.TRADING_FEE_PERCENT) / 100;
+        const buyerFee = parseFloat((tradeAmount * feeRate).toFixed(8));
+        const sellerFee = parseFloat((totalValue * feeRate).toFixed(8));
+
+        // Execute trade
+        const buyerWallet = this.db.queryOne('SELECT address FROM wallets WHERE user_id = ?', [buy.user_id]);
+        const sellerWallet = this.db.queryOne('SELECT address FROM wallets WHERE user_id = ?', [sell.user_id]);
+
+        // Transfer coins: Escrow (sell order hold) → Buyer
+        const buyer = this.db.queryOne('SELECT * FROM users WHERE id = ?', [buy.user_id]);
+        this.db.run('UPDATE users SET averon_balance = averon_balance + ? WHERE id = ?',
+          [parseFloat((tradeAmount - buyerFee).toFixed(8)), buy.user_id]);
+
+        // Record blockchain trade
+        const tradeTx = new Transaction(
+          sellerWallet?.address || sell.user_id,
+          buyerWallet?.address || buy.user_id,
+          tradeAmount, C.TX_TYPES.TRADE,
+          { buyOrderId: buy.id, sellOrderId: sell.id, price: tradePrice }
+        );
+        this.blockchain.addTransaction(tradeTx);
+
+        // Record in database
+        this.db.run(
+          'INSERT INTO coin_trades (buy_order_id, sell_order_id, buyer_id, seller_id, amount, price, total_value, buyer_fee, seller_fee, tx_hash, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+          [buy.id, sell.id, buy.user_id, sell.user_id, tradeAmount, tradePrice, totalValue, buyerFee, sellerFee, tradeTx.hash, Date.now()]
+        );
+
+        // Collect fees
+        if (buyerFee + sellerFee > 0) {
+          this.db.run('INSERT INTO fee_ledger (user_id, fee_type, amount, reference_id, reference_type, created_at) VALUES (?,?,?,?,?,?)',
+            [buy.user_id, 'trading', buyerFee, String(tradeTx.hash), 'trade', Date.now()]);
+          this.db.incrementEconomy('total_fees_collected', buyerFee + sellerFee);
+        }
+
+        // Update orders
+        const newBuyFilled = buy.filled + tradeAmount;
+        const newBuyRemaining = buy.remaining - tradeAmount;
+        this.db.run('UPDATE coin_orders SET filled = ?, remaining = ?, status = ?, updated_at = ? WHERE id = ?',
+          [newBuyFilled, newBuyRemaining, newBuyRemaining <= 0 ? 'filled' : 'open', Date.now(), buy.id]);
+
+        const newSellFilled = sell.filled + tradeAmount;
+        const newSellRemaining = sell.remaining - tradeAmount;
+        this.db.run('UPDATE coin_orders SET filled = ?, remaining = ?, status = ?, updated_at = ? WHERE id = ?',
+          [newSellFilled, newSellRemaining, newSellRemaining <= 0 ? 'filled' : 'open', Date.now(), sell.id]);
+
+        // Update economy
+        this.db.incrementEconomy('total_trades', 1);
+        this.db.incrementEconomy('total_volume', tradeAmount);
+
+        trades.push({ buyerId: buy.user_id, sellerId: sell.user_id, amount: tradeAmount, price: tradePrice, totalValue, txHash: tradeTx.hash });
+
+        buy.filled = newBuyFilled;
+        buy.remaining = newBuyRemaining;
+        sell.filled = newSellFilled;
+        sell.remaining = newSellRemaining;
+
+        if (buy.remaining <= 0) break;
+      }
+    }
+
+    // Update last trade price
+    if (trades.length > 0) {
