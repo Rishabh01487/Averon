@@ -49,3 +49,8 @@ class Transaction {
     sign.end();
     this.signature = sign.sign(privateKeyPem, 'hex');
   }
+
+  /**
+   * Set the signer's public key (for verification).
+   */
+  setSignerPublicKey(publicKeyPem) {
