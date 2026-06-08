@@ -58,3 +58,7 @@ body {
 .auth-container {
   width: 420px; max-width: 95vw; padding: 48px 40px;
   background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+}
+
+.auth-header { text-align: center; margin-bottom: 32px; }
