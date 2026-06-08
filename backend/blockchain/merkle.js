@@ -10,3 +10,6 @@ class MerkleTree {
   constructor(leaves = []) {
     this.leaves = leaves.map(l => this.hashLeaf(l));
     this.layers = [];
+    this.root = '';
+    if (this.leaves.length > 0) this.build();
+  }
