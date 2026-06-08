@@ -46,3 +46,7 @@ class EscrowService {
 
     return { escrowId: escrow.id, newBalance, txHash };
   }
+
+  /**
+   * Release escrow to asset owner (when fully funded).
+   */
