@@ -450,3 +450,6 @@ app.get('/api/admin/stats', authenticate, requireRole(C.ROLES.ADMIN), (req, res)
 
 app.post('/api/admin/freeze/:userId', authenticate, requireRole(C.ROLES.ADMIN), (req, res) => {
   DB.run('UPDATE users SET is_frozen = 1 WHERE id = ?', [req.params.userId]);
+  logAudit('ACCOUNT_FROZEN', { targetUser: req.params.userId }, { userId: req.user.userId });
+  res.json({ success: true });
+});
