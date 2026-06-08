@@ -129,3 +129,8 @@ app.post('/api/auth/register', authLimiter, validate('register'), async (req, re
     ...tokens,
   });
 });
+
+app.post('/api/auth/login', authLimiter, validate('login'), async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = DB.queryOne('SELECT * FROM users WHERE email = ?', [email]);
