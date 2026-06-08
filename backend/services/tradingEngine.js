@@ -37,3 +37,7 @@ class TradingEngine {
       const wallet = this.db.queryOne('SELECT address FROM wallets WHERE user_id = ?', [userId]);
       const balance = wallet ? this.blockchain.getBalance(wallet.address) : 0;
       if (balance < amount) throw new Error(`Insufficient balance: ${balance.toFixed(4)} AC`);
+
+      // Lock the coins (deduct from available balance)
+      this.db.run('UPDATE users SET averon_balance = averon_balance - ? WHERE id = ?', [amount, userId]);
+    }
