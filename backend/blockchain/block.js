@@ -94,3 +94,7 @@ class Block {
 
   /**
    * Verify the Merkle root matches the transactions.
+   */
+  verifyMerkleRoot() {
+    const computed = this.computeMerkleRoot();
+    return computed === this.merkleRoot;
