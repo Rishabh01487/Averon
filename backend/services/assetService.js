@@ -261,3 +261,8 @@ class AssetService {
 
     return results;
   }
+
+  // ── Queries ──────────────────────────────────────────────────────────────
+
+  getAsset(assetId) {
+    const asset = this.db.queryOne('SELECT * FROM assets WHERE id = ?', [assetId]);
