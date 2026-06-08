@@ -22,3 +22,7 @@ class Blockchain {
     this.load();
     if (this.chain.length === 0) {
       this.createGenesisBlock();
+    }
+  }
+
+  // ── Genesis Block ──────────────────────────────────────────────────────────
