@@ -142,3 +142,7 @@ body {
 .stat-card {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 20px; transition: var(--transition);
+}
+.stat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.hero-stat { grid-column: span 2; }
+.stat-icon { font-size: 24px; margin-bottom: 8px; }
