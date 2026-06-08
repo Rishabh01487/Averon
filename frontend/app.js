@@ -125,3 +125,8 @@ function initAuth() {
       $('authError').classList.remove('hidden');
     }
   });
+
+  $('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    $('authError').classList.add('hidden');
+    try {
