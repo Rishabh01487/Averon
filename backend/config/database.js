@@ -314,3 +314,7 @@ function createSchema() {
     request_method TEXT DEFAULT '',
     request_path TEXT DEFAULT '',
     response_code INTEGER DEFAULT 0,
+    prev_hash TEXT DEFAULT '',
+    entry_hash TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+  )`);
