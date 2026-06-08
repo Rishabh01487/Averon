@@ -61,3 +61,8 @@ class WalletManager {
     this.wallets = {};
     this.load();
   }
+
+  load() {
+    try {
+      if (fs.existsSync(this.walletsPath)) {
+        const data = JSON.parse(fs.readFileSync(this.walletsPath, 'utf8'));
