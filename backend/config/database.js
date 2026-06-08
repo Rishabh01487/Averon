@@ -30,3 +30,6 @@ async function initDatabase() {
   }
 
   // Enable WAL-like behavior (not actual WAL in sql.js, but we persist frequently)
+  createSchema();
+  seedDefaults();
+  persist();
