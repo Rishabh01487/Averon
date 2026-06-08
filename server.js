@@ -330,3 +330,6 @@ app.post('/api/assets/:id/analyze', authenticate, (req, res) => {
       // Store valuation record
       DB.run('INSERT INTO asset_valuations (asset_id, valuation, risk_score, confidence, source, details, created_at) VALUES (?,?,?,?,?,?,?)',
         [assetId, result.estimatedValue, result.riskScore, result.confidence, result.source, JSON.stringify(result.stages || []), Date.now()]);
+
+      DB.run('INSERT INTO activity_log (user_id, action, details, created_at) VALUES (?,?,?,?)',
+        [asset.owner_id, 'AI_ANALYSIS', `AI ${result.verified ? 'verified' : 'rejected'} — Risk: ${result.riskLevel} (${result.riskScore}%)`, Date.now()]);
