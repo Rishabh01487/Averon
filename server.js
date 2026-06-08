@@ -89,3 +89,8 @@ app.get('/api/dashboard', (req, res) => {
 
 app.post('/api/auth/register', authLimiter, validate('register'), async (req, res) => {
   const { email, password, name, organization } = req.body;
+
+  const existing = DB.queryOne('SELECT id FROM users WHERE email = ?', [email]);
+  if (existing) return res.status(409).json({ error: 'Email already registered', code: 'EMAIL_EXISTS' });
+
+  const userId = 'usr_' + crypto.randomBytes(8).toString('hex');
