@@ -350,3 +350,7 @@ function createSchema() {
   db.run(`CREATE INDEX IF NOT EXISTS idx_assets_category ON assets(category)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_docs_asset ON asset_documents(asset_id)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_tokens_asset ON asset_tokens(asset_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_tokens_owner ON asset_tokens(owner_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_escrow_asset ON escrow_accounts(asset_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_orders_user ON coin_orders(user_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_orders_status ON coin_orders(status)`);
