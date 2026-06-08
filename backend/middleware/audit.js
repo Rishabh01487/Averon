@@ -30,3 +30,7 @@ function logAudit(action, details = {}, options = {}) {
     user_id: options.userId || '',
     action,
     resource_type: options.resourceType || '',
+    resource_id: String(options.resourceId || ''),
+    details: JSON.stringify(details),
+    ip_address: options.ip || '',
+    user_agent: options.userAgent || '',
