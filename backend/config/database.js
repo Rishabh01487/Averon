@@ -421,3 +421,8 @@ function query(sql, params = []) {
     return [];
   }
 }
+
+function queryOne(sql, params = []) {
+  const results = query(sql, params);
+  return results.length > 0 ? results[0] : null;
+}
