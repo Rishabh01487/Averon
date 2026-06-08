@@ -166,3 +166,7 @@ app.post('/api/auth/login', authLimiter, validate('login'), async (req, res) => 
   logAudit('LOGIN', { email }, { userId: user.id, ip: req.ip });
 
   res.json({
+    user: { id: user.id, name: user.name, email: user.email, role: user.role, walletAddress: wallet?.address, balance },
+    ...tokens,
+  });
+});
