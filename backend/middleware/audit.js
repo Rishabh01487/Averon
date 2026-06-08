@@ -10,3 +10,7 @@ let _lastHash = '000000000000000000000000000000000000000000000000000000000000000
 
 function initAudit(database) {
   _db = database;
+  // Load the last hash from the audit log
+  const last = _db.queryOne('SELECT entry_hash FROM audit_log ORDER BY id DESC LIMIT 1');
+  if (last) _lastHash = last.entry_hash;
+}
