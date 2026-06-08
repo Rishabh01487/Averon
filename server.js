@@ -486,3 +486,7 @@ function startTimers() {
     const newP = parseFloat(Math.max(C.PRICE.MIN_PRICE, p * (1 + swing)).toFixed(4));
     DB.setPrice(newP);
     eventBus.emit(EVENTS.PRICE_UPDATED, { price: newP });
+  }, C.PRICE.PRICE_FLUCTUATION_INTERVAL_MS);
+
+  // Deadline checker
+  setInterval(() => assetService.checkDeadlines(), 60000);
