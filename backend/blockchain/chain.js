@@ -46,3 +46,7 @@ class Blockchain {
   }
 
   // ── Persistence ────────────────────────────────────────────────────────────
+
+  load() {
+    try {
+      if (fs.existsSync(this.chainPath)) {
