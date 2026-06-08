@@ -482,3 +482,7 @@ function startTimers() {
   // Price fluctuation
   setInterval(() => {
     const p = DB.getPrice();
+    const swing = (Math.random() - 0.5) * C.PRICE.PRICE_FLUCTUATION_RANGE;
+    const newP = parseFloat(Math.max(C.PRICE.MIN_PRICE, p * (1 + swing)).toFixed(4));
+    DB.setPrice(newP);
+    eventBus.emit(EVENTS.PRICE_UPDATED, { price: newP });
