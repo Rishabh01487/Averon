@@ -30,3 +30,7 @@ class AssetService {
 
     this.db.run('INSERT INTO asset_status_history (asset_id, old_status, new_status, changed_by, reason, created_at) VALUES (?,?,?,?,?,?)',
       [assetId, asset.status, newStatus, changedBy, reason, Date.now()]);
+
+    this.db.run('UPDATE assets SET status = ?, updated_at = ? WHERE id = ?', [newStatus, Date.now(), assetId]);
+
+    return { oldStatus: asset.status, newStatus };
