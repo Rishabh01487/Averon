@@ -110,3 +110,7 @@ function createSchema() {
     raise_amount REAL NOT NULL,
     token_count INTEGER DEFAULT 0,
     token_price REAL DEFAULT 0,
+    funded_amount REAL DEFAULT 0,
+    funded_at INTEGER DEFAULT 0,
+    
+    payout_status TEXT DEFAULT 'none',
