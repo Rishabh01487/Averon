@@ -710,3 +710,7 @@ async function loadPortfolio() {
       <div class="asset-card" style="cursor:pointer" onclick="viewAsset(${a.id}); navigateTo('assets')">
         <div class="asset-card-header">
           <span class="asset-title">${a.title}</span>
+          <span class="asset-status status-${a.status}">${a.status.replace(/_/g,' ')}</span>
+        </div>
+        <div class="asset-meta"><div>₹${formatNum(a.raise_amount)}</div><div>${a.token_count || 0} tokens</div></div>
+      </div>`).join('') : '<div class="empty-state">No assets listed. <span class="link" onclick="navigateTo(\'tokenize\')">Tokenize an asset →</span></div>';
