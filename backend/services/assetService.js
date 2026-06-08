@@ -102,3 +102,7 @@ class AssetService {
 
     // Record on blockchain
     const wallet = this.walletManager.getWallet(userId);
+    const walletData = this.db.queryOne('SELECT address FROM wallets WHERE user_id = ?', [userId]);
+    let txHash = '', blockIdx = 0;
+
+    if (wallet && walletData) {
