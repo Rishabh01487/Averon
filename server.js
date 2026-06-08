@@ -70,3 +70,7 @@ let blockchain, walletManager, systemWallet, escrowService, assetService, tradin
 
 app.get('/api/config', (req, res) => {
   const stats = DB.getDashboardStats();
+  const chainInfo = blockchain.getInfo();
+  res.json({
+    platform: C.PLATFORM_NAME, version: C.PLATFORM_VERSION,
+    price: stats.price, economy: stats, blockchain: chainInfo,
