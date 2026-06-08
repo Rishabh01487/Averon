@@ -366,3 +366,7 @@ function createSchema() {
   db.run(`CREATE INDEX IF NOT EXISTS idx_status_history_asset ON asset_status_history(asset_id)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_escrow_tx ON escrow_transactions(escrow_id)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_doc_hash ON asset_documents(doc_hash)`);
+}
+
+function seedDefaults() {
+  const eco = queryOne('SELECT id FROM economy WHERE id = 1');
