@@ -126,3 +126,7 @@ class AssetService {
   // ── Buy Tokens ───────────────────────────────────────────────────────────
 
   buyTokens(assetId, userId, count) {
+    const asset = this.db.queryOne('SELECT * FROM assets WHERE id = ?', [assetId]);
+    if (!asset) throw new Error('Asset not found');
+    if (asset.status !== C.ASSET_STATUS.ACTIVE && asset.status !== C.ASSET_STATUS.FUNDING) throw new Error('Asset not active');
+    if (asset.owner_id === userId) throw new Error('Cannot buy own tokens');
