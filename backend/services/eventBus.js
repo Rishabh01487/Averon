@@ -30,3 +30,6 @@ class EventBus {
     }
   }
 }
+
+// Singleton
+const eventBus = new EventBus();
