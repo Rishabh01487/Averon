@@ -418,3 +418,7 @@ function initWizard() {
   fileInput.addEventListener('change', e => handleFiles(e.target.files));
 
   $('createAssetBtn')?.addEventListener('click', createAsset);
+  $('uploadDocsBtn')?.addEventListener('click', uploadDocuments);
+  $('startAnalysisBtn')?.addEventListener('click', startAIAnalysis);
+  $('confirmLaunchBtn')?.addEventListener('click', confirmLaunch);
+}
