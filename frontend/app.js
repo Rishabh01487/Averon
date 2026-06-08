@@ -318,3 +318,7 @@ async function loadAssets() {
         ${a.token_count ? `<div class="progress-bar"><div class="progress-fill" style="width:${a.progress}%"></div></div>` : ''}
       </div>`).join('') || '<div class="empty-state">No assets listed yet. <span class="link" onclick="navigateTo(\'tokenize\')">Tokenize your first asset →</span></div>';
   } catch {}
+}
+
+async function viewAsset(id) {
+  try {
