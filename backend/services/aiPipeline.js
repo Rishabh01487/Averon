@@ -106,3 +106,7 @@ function processDocuments(documents) {
 
   result.quality = Math.min(100, (
     (result.totalFiles / 3) * 30 +
+    (result.totalSize > 100000 ? 25 : result.totalSize > 50000 ? 15 : 5) +
+    (result.hasImages ? 25 : 0) +
+    (result.hasPdf ? 20 : 0)
+  ));
