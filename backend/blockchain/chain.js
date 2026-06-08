@@ -82,3 +82,6 @@ class Blockchain {
     // Validate transaction
     if (transaction.from !== 'SYSTEM') {
       if (!transaction.isValid()) {
+        throw new Error('Invalid transaction signature');
+      }
+    }
