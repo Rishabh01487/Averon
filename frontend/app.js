@@ -530,3 +530,7 @@ async function confirmLaunch() {
   if (!state.currentAssetId) return;
   $('confirmLaunchBtn').disabled = true;
   try {
+    const result = await api(`/api/assets/${state.currentAssetId}/confirm`, { method: 'POST', body: JSON.stringify({ aiResult: state.aiResult || {} }) });
+    $('launchResult').classList.remove('hidden');
+    $('launchResult').innerHTML = `
+      <h3>🚀 Asset Live on Blockchain!</h3>
