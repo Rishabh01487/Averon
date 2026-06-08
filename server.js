@@ -50,3 +50,7 @@ app.use('/uploads', express.static(UPLOADS_DIR));
 
 // File upload config
 const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = path.join(UPLOADS_DIR, req.params.assetId || 'temp');
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
