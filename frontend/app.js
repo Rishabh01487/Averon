@@ -61,3 +61,8 @@ function timeAgo(ts) {
   return `${Math.floor(s / 86400)}d ago`;
 }
 function formatNum(n) { return parseFloat(n || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 }); }
+
+// ── SESSION ──────────────────────────────────────────────────────────────────
+
+function saveSession() {
+  localStorage.setItem('averon_session', JSON.stringify({
