@@ -134,3 +134,7 @@ function initAuth() {
         method: 'POST',
         body: JSON.stringify({
           name: $('regName').value, organization: $('regOrg').value,
+          email: $('regEmail').value, password: $('regPassword').value,
+        }),
+      });
+      state.user = data.user;
