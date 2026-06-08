@@ -26,3 +26,7 @@ async function initDatabase() {
     console.log('  💾 Loaded existing database');
   } else {
     db = new SQL.Database();
+    console.log('  💾 Created new database');
+  }
+
+  // Enable WAL-like behavior (not actual WAL in sql.js, but we persist frequently)
