@@ -178,3 +178,7 @@ Respond ONLY with this JSON (no markdown):
       contents: [{ parts }],
       generationConfig: { temperature: C.AI.TEMPERATURE, maxOutputTokens: 512 },
     }),
+    signal: AbortSignal.timeout(C.AI.TIMEOUT_MS),
+  });
+
+  if (!res.ok) throw new Error(`Gemini ${res.status}`);
