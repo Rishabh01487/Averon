@@ -18,3 +18,7 @@ class Blockchain {
     this.pendingTransactions = [];
     this.difficulty = C.BLOCKCHAIN.DIFFICULTY;
     this.miningReward = C.BLOCKCHAIN.MINING_REWARD;
+
+    this.load();
+    if (this.chain.length === 0) {
+      this.createGenesisBlock();
