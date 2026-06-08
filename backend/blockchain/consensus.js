@@ -126,3 +126,7 @@ function detectFork(chain, newBlock) {
 /**
  * Get chain statistics.
  */
+function getChainStats(chain) {
+  if (chain.length === 0) return {};
+
+  const genesis = chain[0];
