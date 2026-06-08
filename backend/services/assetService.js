@@ -162,3 +162,7 @@ class AssetService {
 
     // Update balance
     const newBalance = this.blockchain.getBalance(walletData.address);
+    this.db.run('UPDATE users SET averon_balance = ? WHERE id = ?', [newBalance, userId]);
+
+    // Transition to funding if first investment
+    if (asset.status === C.ASSET_STATUS.ACTIVE) {
