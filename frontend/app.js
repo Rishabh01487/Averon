@@ -378,3 +378,7 @@ async function loadBuyPage() {
     $('buyBalance').textContent = `${parseFloat(acc.balance).toFixed(4)} AC`;
   } catch {}
 }
+
+function initBuyPage() {
+  $('buyAmountInr')?.addEventListener('input', () => {
+    const inr = parseFloat($('buyAmountInr').value) || 0;
