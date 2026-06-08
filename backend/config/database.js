@@ -142,3 +142,7 @@ function createSchema() {
     original_name TEXT NOT NULL,
     mimetype TEXT DEFAULT '',
     size INTEGER DEFAULT 0,
+    filepath TEXT NOT NULL,
+    doc_type TEXT DEFAULT 'unknown',
+    doc_hash TEXT DEFAULT '',
+    is_verified INTEGER DEFAULT 0,
