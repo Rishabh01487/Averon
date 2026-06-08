@@ -189,3 +189,8 @@ class TradingEngine {
 
     const threshold = parseFloat(this.db.getConfig('circuit_breaker_percent') || C.TRADING.CIRCUIT_BREAKER_PERCENT);
     const now = Date.now();
+
+    if (now - this.lastPriceCheck > C.TRADING.CIRCUIT_BREAKER_WINDOW_MS) {
+      this.lastPriceCheck = now;
+      this.priceAtCheckpoint = currentPrice;
+      this.circuitBreakerTripped = false;
