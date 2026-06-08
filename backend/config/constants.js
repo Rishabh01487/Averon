@@ -62,3 +62,7 @@ module.exports = {
 
   // ── Asset Status State Machine ─────────────────────────────────────────────
   ASSET_STATUS: {
+    DRAFT: 'draft',
+    DOCUMENTS_UPLOADED: 'documents_uploaded',
+    AI_ANALYZING: 'ai_analyzing',
+    VERIFIED: 'verified',
