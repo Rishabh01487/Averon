@@ -442,3 +442,7 @@ app.get('/api/admin/stats', authenticate, requireRole(C.ROLES.ADMIN), (req, res)
   const auditIntegrity = verifyAuditChain();
   const recentAudit = DB.query('SELECT * FROM audit_log ORDER BY created_at DESC LIMIT 50');
   const pendingAssets = DB.query(`SELECT * FROM assets WHERE status IN ('${C.ASSET_STATUS.VERIFIED}','${C.ASSET_STATUS.FLAGGED}','${C.ASSET_STATUS.COMPLIANCE_REVIEW}')`);
+  const systemConfig = DB.query('SELECT * FROM system_config');
+  const frozenUsers = DB.query('SELECT id, name, email FROM users WHERE is_frozen = 1');
+
+  res.json({ stats, chainInfo, auditIntegrity, recentAudit, pendingAssets, systemConfig, frozenUsers });
