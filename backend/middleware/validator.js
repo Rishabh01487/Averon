@@ -126,3 +126,6 @@ function validate(schemaName) {
 
 // Global sanitizer middleware
 function sanitizeBody(req, res, next) {
+  if (req.body) req.body = sanitizeObject(req.body);
+  next();
+}
