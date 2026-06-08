@@ -306,3 +306,111 @@ function createSchema() {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id TEXT DEFAULT '',
     action TEXT NOT NULL,
+    resource_type TEXT DEFAULT '',
+    resource_id TEXT DEFAULT '',
+    details TEXT DEFAULT '{}',
+    ip_address TEXT DEFAULT '',
+    user_agent TEXT DEFAULT '',
+    request_method TEXT DEFAULT '',
+    request_path TEXT DEFAULT '',
+    response_code INTEGER DEFAULT 0,
+    prev_hash TEXT DEFAULT '',
+    entry_hash TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+  )`);
+
+  // ── System Config ────────────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS system_config (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    description TEXT DEFAULT '',
+    updated_by TEXT DEFAULT '',
+    updated_at INTEGER NOT NULL
+  )`);
+
+  // ── Activity Log ─────────────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS activity_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT DEFAULT '',
+    action TEXT NOT NULL,
+    details TEXT DEFAULT '',
+    tx_hash TEXT DEFAULT '',
+    block_index INTEGER DEFAULT 0,
+    amount REAL DEFAULT 0,
+    created_at INTEGER NOT NULL
+  )`);
+
+  // ── Indexes ──────────────────────────────────────────────────────────────
+  db.run(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_users_wallet ON users(wallet_address)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(refresh_token)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_assets_owner ON assets(owner_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_assets_status ON assets(status)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_assets_category ON assets(category)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_docs_asset ON asset_documents(asset_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_tokens_asset ON asset_tokens(asset_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_tokens_owner ON asset_tokens(owner_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_escrow_asset ON escrow_accounts(asset_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_orders_user ON coin_orders(user_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_orders_status ON coin_orders(status)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_trades_buyer ON coin_trades(buyer_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_trades_seller ON coin_trades(seller_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_price_time ON price_history(recorded_at)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_audit_user ON audit_log(user_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_audit_action ON audit_log(action)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_audit_time ON audit_log(created_at)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_notif_user ON notifications(user_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_fee_user ON fee_ledger(user_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_activity_user ON activity_log(user_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_status_history_asset ON asset_status_history(asset_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_escrow_tx ON escrow_transactions(escrow_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_doc_hash ON asset_documents(doc_hash)`);
+}
+
+function seedDefaults() {
+  const eco = queryOne('SELECT id FROM economy WHERE id = 1');
+  if (!eco) {
+    run('INSERT INTO economy (id, price, updated_at) VALUES (1, ?, ?)', [C.PRICE.INITIAL_PRICE, Date.now()]);
+    run('INSERT INTO price_history (price, high, low, open, close, recorded_at) VALUES (?, ?, ?, ?, ?, ?)',
+      [C.PRICE.INITIAL_PRICE, C.PRICE.INITIAL_PRICE, C.PRICE.INITIAL_PRICE, C.PRICE.INITIAL_PRICE, C.PRICE.INITIAL_PRICE, Date.now()]);
+  }
+
+  // Default system configs
+  const defaults = [
+    ['trading_fee_percent', String(C.FEES.TRADING_FEE_PERCENT), 'Trading fee percentage'],
+    ['listing_fee_ac', String(C.FEES.LISTING_FEE_AC), 'Asset listing fee in AC'],
+    ['capital_raise_fee_percent', String(C.FEES.CAPITAL_RAISE_FEE_PERCENT), 'Capital raise fee percentage'],
+    ['circuit_breaker_enabled', 'true', 'Enable trading circuit breaker'],
+    ['circuit_breaker_percent', String(C.TRADING.CIRCUIT_BREAKER_PERCENT), 'Circuit breaker threshold %'],
+    ['min_documents_required', String(C.LIMITS.MIN_DOCUMENTS), 'Min documents for listing'],
+    ['cooling_off_period_ms', String(C.LIMITS.COOLING_OFF_PERIOD_MS), 'Cooling off period after listing'],
+    ['auto_approve_min_confidence', String(C.AI.MIN_CONFIDENCE_FOR_AUTO_APPROVE), 'Min AI confidence for auto-approve'],
+  ];
+  for (const [key, value, desc] of defaults) {
+    const exists = queryOne('SELECT key FROM system_config WHERE key = ?', [key]);
+    if (!exists) run('INSERT INTO system_config (key, value, description, updated_at) VALUES (?, ?, ?, ?)', [key, value, desc, Date.now()]);
+  }
+}
+
+// ── PERSISTENCE ──────────────────────────────────────────────────────────────
+
+function persist() {
+  if (!db) return;
+  try {
+    const data = db.export();
+    fs.writeFileSync(DB_PATH, Buffer.from(data));
+  } catch (e) {
+    console.error('DB persist error:', e.message);
+  }
+}
+
+// ── QUERY HELPERS ────────────────────────────────────────────────────────────
+
+function query(sql, params = []) {
+  if (!db) return [];
+  try {
+    const stmt = db.prepare(sql);
+    if (params.length) stmt.bind(params);
+    const results = [];
+    while (stmt.step()) results.push(stmt.getAsObject());
