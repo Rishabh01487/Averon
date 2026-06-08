@@ -61,3 +61,7 @@ const upload = multer({ storage, limits: { fileSize: C.LIMITS.MAX_FILE_SIZE_BYTE
 
 // ── Service instances (initialized after DB) ─────────────────────────────────
 let blockchain, walletManager, systemWallet, escrowService, assetService, tradingEngine;
+
+// ══════════════════════════════════════════════════════════════════════════════
+// API ROUTES
+// ══════════════════════════════════════════════════════════════════════════════
