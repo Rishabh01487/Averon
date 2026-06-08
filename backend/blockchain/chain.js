@@ -141,3 +141,8 @@ class Blockchain {
       tx.status = 'confirmed';
       tx.blockIndex = newBlock.index;
     }
+
+    // Update confirmation counts for previous blocks
+    for (const block of this.chain) {
+      for (const tx of block.transactions) {
+        tx.confirmations = newBlock.index - tx.blockIndex;
