@@ -198,3 +198,6 @@ Respond ONLY with this JSON (no markdown):
     source: 'gemini',
     raw: text,
   };
+}
+
+// ── Stage 3b: Fallback Analysis ──────────────────────────────────────────────
