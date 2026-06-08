@@ -58,3 +58,7 @@ class TradingEngine {
       'INSERT INTO coin_orders (user_id, type, side, amount, price, filled, remaining, status, duration, created_at, updated_at) VALUES (?,?,?,?,?,0,?,?,?,?,?)',
       [userId, type, side, amount, price, amount, 'open', 'GTC', now, now]
     );
+
+    // Log
+    this.db.run('INSERT INTO activity_log (user_id, action, details, amount, created_at) VALUES (?,?,?,?,?)',
+      [userId, 'ORDER_PLACED', `${side.toUpperCase()} ${amount} AC @ ₹${price?.toFixed(4)}`, amount, now]);
