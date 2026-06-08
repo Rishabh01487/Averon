@@ -50,3 +50,7 @@ class Blockchain {
   load() {
     try {
       if (fs.existsSync(this.chainPath)) {
+        const data = JSON.parse(fs.readFileSync(this.chainPath, 'utf8'));
+        this.chain = data.chain.map(b => Block.fromJSON(b));
+        this.pendingTransactions = (data.pending || []).map(tx => Transaction.fromJSON(tx));
+        this.difficulty = data.difficulty || C.BLOCKCHAIN.DIFFICULTY;
