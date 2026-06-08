@@ -577,3 +577,8 @@ function initMarket() {
     const amount = parseFloat($('orderAmount').value);
     const price = parseFloat($('orderPrice').value);
     if (!amount || !price) return toast('Fill amount and price', 'error');
+
+    try {
+      await api('/api/market/order', { method: 'POST', body: JSON.stringify({ side: state.orderSide, type: 'limit', amount, price }) });
+      toast(`${state.orderSide.toUpperCase()} order placed`, 'success');
+      loadMarket();
