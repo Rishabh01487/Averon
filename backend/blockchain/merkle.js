@@ -110,3 +110,7 @@ class MerkleTree {
 
   /**
    * Build a Merkle tree from transaction hashes.
+   */
+  static fromTransactions(transactions) {
+    const hashes = transactions.map(tx => {
+      if (typeof tx === 'string') return tx;
