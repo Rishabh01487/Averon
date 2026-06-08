@@ -222,3 +222,7 @@ function analyzeWithFallback(asset, documents, docInfo) {
 
   const concerns = [];
   if (documents.length < 2) concerns.push('Limited documentation');
+  if (riskScore > 60) concerns.push('Elevated risk score');
+  if (asset.raise_amount > estimatedValue) concerns.push('Raise exceeds estimated value');
+
+  return {
