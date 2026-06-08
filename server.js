@@ -302,3 +302,7 @@ app.post('/api/assets/:assetId/documents', authenticate, uploadLimiter, upload.a
   }
 
   res.json({ uploaded: docs.length, documents: docs });
+});
+
+app.post('/api/assets/:id/analyze', authenticate, (req, res) => {
+  const assetId = parseInt(req.params.id);
