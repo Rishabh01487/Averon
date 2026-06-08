@@ -162,3 +162,7 @@ module.exports = {
     PRICE_FLUCTUATION_INTERVAL_MS: 15 * 1000,
     PRICE_FLUCTUATION_RANGE: 0.005,  // ±0.5% natural fluctuation
     FUNDED_ASSET_BOOST_MIN: 0.02,    // +2% min boost per funded asset
+    FUNDED_ASSET_BOOST_MAX: 0.05,    // +5% max boost
+  },
+
+  // ── AI Analysis ────────────────────────────────────────────────────────────
