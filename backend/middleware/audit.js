@@ -94,3 +94,7 @@ function verifyAuditChain() {
   if (entries.length === 0) return { valid: true, entries: 0 };
 
   let prevHash = '0000000000000000000000000000000000000000000000000000000000000000';
+  let corrupted = [];
+
+  for (const entry of entries) {
+    const expectedHash = computeEntryHash(entry, prevHash);
