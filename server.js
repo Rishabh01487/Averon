@@ -433,3 +433,8 @@ app.get('/api/blockchain/address/:address', (req, res) => {
   const history = blockchain.getTransactionHistory(req.params.address);
   res.json({ address: req.params.address, balance, transactions: history });
 });
+
+// ── Admin ────────────────────────────────────────────────────────────────────
+
+app.get('/api/admin/stats', authenticate, requireRole(C.ROLES.ADMIN), (req, res) => {
+  const stats = DB.getDashboardStats();
