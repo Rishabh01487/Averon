@@ -86,3 +86,7 @@ module.exports = {
     ai_analyzing: ['verified', 'rejected'],
     verified: ['compliance_review'],
     rejected: ['draft'],
+    compliance_review: ['active', 'flagged'],
+    flagged: ['active', 'rejected'],
+    active: ['funding', 'expired'],
+    funding: ['funded', 'expired'],
