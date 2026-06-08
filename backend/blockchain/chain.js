@@ -210,3 +210,7 @@ class Blockchain {
    * Find a transaction by hash across the entire chain.
    */
   findTransaction(hash) {
+    for (const block of this.chain) {
+      for (const tx of block.transactions) {
+        if (tx.hash === hash) {
+          return {
