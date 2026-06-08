@@ -90,3 +90,7 @@ const schemas = {
 function validate(schemaName) {
   return (req, res, next) => {
     const schema = schemas[schemaName];
+    if (!schema) return next();
+
+    // Sanitize input first
+    req.body = sanitizeObject(req.body);
