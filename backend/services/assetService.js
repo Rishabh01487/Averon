@@ -94,3 +94,7 @@ class AssetService {
     // Update asset
     this.db.run('UPDATE assets SET token_count = ?, token_price = ?, updated_at = ? WHERE id = ?',
       [tokenCount, tokenPriceAC, Date.now(), assetId]);
+
+    // Transition: verified → compliance_review → active (auto-pass for now)
+    this.transition(assetId, C.ASSET_STATUS.COMPLIANCE_REVIEW, 'system', 'Auto compliance check');
+    this.db.run('UPDATE assets SET compliance_status = "passed", compliance_checked_at = ? WHERE id = ?', [Date.now(), assetId]);
