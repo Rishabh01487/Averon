@@ -610,3 +610,7 @@ async function loadExplorer() {
       </div>`).join('');
   } catch {}
 }
+
+window.viewBlock = async (index) => {
+  try {
+    const block = await api(`/api/blockchain/block/${index}`);
