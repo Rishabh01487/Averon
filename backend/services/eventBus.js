@@ -17,3 +17,8 @@ class EventBus {
     const cbs = this.listeners.get(event);
     if (cbs) this.listeners.set(event, cbs.filter(cb => cb !== callback));
   }
+
+  emit(event, data) {
+    const cbs = this.listeners.get(event) || [];
+    for (const cb of cbs) {
+      try { cb(data); } catch (e) { console.error(`Event error [${event}]:`, e.message); }
