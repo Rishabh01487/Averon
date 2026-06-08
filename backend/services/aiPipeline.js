@@ -38,3 +38,7 @@ async function analyzeAsset(asset, documents, dbModule) {
 
   // Stage 2: Duplicate detection
   const stage2 = detectDuplicates(documents, dbModule);
+  stages.push({ stage: 'Duplicate Check', ...stage2 });
+
+  // Stage 3: AI/Fallback Analysis
+  let analysis;
