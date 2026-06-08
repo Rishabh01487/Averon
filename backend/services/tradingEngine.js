@@ -158,3 +158,6 @@ class TradingEngine {
       this.db.setPrice(lastTradePrice);
       this.checkCircuitBreaker(lastTradePrice);
     }
+
+    return trades;
+  }
