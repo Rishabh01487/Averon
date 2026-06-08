@@ -282,3 +282,7 @@ class Blockchain {
     if (!block) return null;
     return block.getMerkleProof(txHash);
   }
+
+  /**
+   * Get total minted supply.
+   */
