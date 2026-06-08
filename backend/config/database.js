@@ -130,3 +130,7 @@ function createSchema() {
     deadline INTEGER DEFAULT 0,
     cooling_off_until INTEGER DEFAULT 0,
     
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    FOREIGN KEY (owner_id) REFERENCES users(id)
+  )`);
