@@ -654,3 +654,7 @@ function initExplorer() {
       $('explorerResult').innerHTML = `
         <h3>Transaction</h3>
         <div style="font-size:13px;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+          <div><strong>Type:</strong> ${tx.type}</div>
+          <div><strong>Amount:</strong> ${tx.amount} AC</div>
+          <div><strong>From:</strong> <span style="font-family:var(--mono);font-size:11px">${tx.from}</span></div>
+          <div><strong>To:</strong> <span style="font-family:var(--mono);font-size:11px">${tx.to}</span></div>
