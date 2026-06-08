@@ -122,3 +122,7 @@ function detectDuplicates(documents, dbModule) {
   if (dbModule) {
     for (const doc of documents) {
       if (!doc.path && !doc.filepath) continue;
+      try {
+        const filePath = doc.path || doc.filepath;
+        if (!fs.existsSync(filePath)) continue;
+        const content = fs.readFileSync(filePath);
