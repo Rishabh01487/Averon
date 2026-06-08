@@ -198,3 +198,6 @@ class AssetService {
   processFullyFunded(assetId) {
     this.transition(assetId, C.ASSET_STATUS.FUNDED, 'system', 'All tokens sold');
     this.transition(assetId, C.ASSET_STATUS.PAYOUT_PENDING, 'system', 'Processing payout');
+
+    // Release escrow to owner
+    const payoutResult = this.escrow.releaseFunds(assetId);
