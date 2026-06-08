@@ -98,3 +98,7 @@ function createSchema() {
     
     ai_verified INTEGER DEFAULT 0,
     ai_valuation REAL DEFAULT 0,
+    ai_risk_score REAL DEFAULT 0,
+    ai_risk_level TEXT DEFAULT '',
+    ai_confidence REAL DEFAULT 0,
+    ai_analysis_summary TEXT DEFAULT '',
