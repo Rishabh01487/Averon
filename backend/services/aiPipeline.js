@@ -190,3 +190,7 @@ Respond ONLY with this JSON (no markdown):
   return {
     verified: !!r.verified,
     estimatedValue: r.estimated_value || asset.raise_amount,
+    riskScore: Math.min(100, Math.max(0, r.risk_score || 50)),
+    riskLevel: r.risk_level || 'MEDIUM',
+    analysis: r.analysis || 'AI analysis completed.',
+    concerns: r.concerns || '',
