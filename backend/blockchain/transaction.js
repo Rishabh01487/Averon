@@ -97,3 +97,8 @@ class Transaction {
 
     // Type check
     if (!Object.values(C.TX_TYPES).includes(this.type)) errors.push('Invalid transaction type');
+
+    return { valid: errors.length === 0, errors };
+  }
+
+  toJSON() {
