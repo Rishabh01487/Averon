@@ -50,3 +50,7 @@ function signJWT(payload, secret, expiresIn) {
 
 function verifyJWT(token, secret) {
   try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+
+    const [headerB64, payloadB64, signature] = parts;
