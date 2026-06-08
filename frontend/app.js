@@ -158,3 +158,7 @@ async function enterApp() {
   $('userName').textContent = state.user?.name || '';
 
   // Load config
+  try {
+    state.config = await api('/api/config');
+    state.categories = state.config.categories || [];
+    $('livePrice').textContent = parseFloat(state.config.price).toFixed(2);
