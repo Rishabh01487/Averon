@@ -57,3 +57,7 @@ function createUserRateLimiter(config) {
 
   return (req, res, next) => {
     if (!req.user) return next(); // Skip if no user (will be caught by auth middleware)
+
+    const key = `user:${req.user.userId}:${req.baseUrl || req.path}`;
+    const now = Date.now();
+    const windowStart = now - windowMs;
