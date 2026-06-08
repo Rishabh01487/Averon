@@ -37,3 +37,8 @@ function adjustDifficulty(chain) {
 
   // Clamp within bounds
   newDifficulty = Math.max(C.BLOCKCHAIN.MIN_DIFFICULTY, Math.min(C.BLOCKCHAIN.MAX_DIFFICULTY, newDifficulty));
+
+  return newDifficulty;
+}
+
+/**
