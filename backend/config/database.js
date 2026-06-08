@@ -270,3 +270,7 @@ function createSchema() {
     volume REAL DEFAULT 0,
     high REAL DEFAULT 0,
     low REAL DEFAULT 0,
+    open REAL DEFAULT 0,
+    close REAL DEFAULT 0,
+    interval TEXT DEFAULT '1m',
+    recorded_at INTEGER NOT NULL
