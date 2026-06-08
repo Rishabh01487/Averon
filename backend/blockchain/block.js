@@ -141,3 +141,8 @@ class Block {
 
     // Hash validation
     if (!this.validateHash()) errors.push('Invalid hash or does not meet difficulty');
+
+    // Previous hash link
+    if (previousBlock && this.previousHash !== previousBlock.hash) errors.push('Previous hash mismatch');
+
+    // Merkle root
