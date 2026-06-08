@@ -65,3 +65,8 @@ class TradingEngine {
 
     // Try matching
     const matches = this.matchOrders();
+
+    return { orderId: lastId, matches, side, amount, price };
+  }
+
+  // ── Order Matching (Price-Time Priority) ─────────────────────────────────
