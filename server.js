@@ -298,3 +298,7 @@ app.post('/api/assets/:assetId/documents', authenticate, uploadLimiter, upload.a
 
   // Transition to documents_uploaded if in draft
   if (asset.status === C.ASSET_STATUS.DRAFT) {
+    assetService.transition(assetId, C.ASSET_STATUS.DOCUMENTS_UPLOADED, req.user.userId, 'Documents uploaded');
+  }
+
+  res.json({ uploaded: docs.length, documents: docs });
