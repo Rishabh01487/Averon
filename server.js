@@ -114,3 +114,6 @@ app.post('/api/auth/register', authLimiter, validate('register'), async (req, re
   // Update holder count
   const count = DB.queryOne('SELECT COUNT(*) as c FROM users')?.c || 0;
   DB.updateEconomy('holder_count', count);
+
+  const user = DB.queryOne('SELECT * FROM users WHERE id = ?', [userId]);
+  const tokens = generateTokens(user);
