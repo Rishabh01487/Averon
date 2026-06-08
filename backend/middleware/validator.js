@@ -54,3 +54,7 @@ const schemas = {
     password: [{ rule: rules.required, msg: 'Password is required' }, { rule: rules.minLength(C.AUTH.PASSWORD_MIN_LENGTH), msg: `Password must be at least ${C.AUTH.PASSWORD_MIN_LENGTH} characters` }],
     name: [{ rule: rules.required, msg: 'Name is required' }, { rule: rules.minLength(2), msg: 'Name too short' }, { rule: rules.maxLength(80), msg: 'Name too long' }],
     organization: [{ rule: rules.maxLength(100), msg: 'Organization name too long' }],
+  },
+
+  login: {
+    email: [{ rule: rules.required, msg: 'Email is required' }, { rule: rules.email, msg: 'Invalid email format' }],
