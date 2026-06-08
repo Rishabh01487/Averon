@@ -194,3 +194,7 @@ class Blockchain {
       for (const tx of block.transactions) {
         if (tx.from === address || tx.to === address) {
           txs.push({
+            ...tx.toJSON(),
+            direction: tx.to === address ? 'in' : 'out',
+            blockIndex: block.index,
+            blockHash: block.hash,
