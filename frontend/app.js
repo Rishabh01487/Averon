@@ -738,3 +738,7 @@ window.cancelOrder = async (id) => {
     toast('Order cancelled', 'success');
     loadPortfolio();
   } catch {}
+};
+
+// Filter listeners
+document.addEventListener('change', (e) => {
