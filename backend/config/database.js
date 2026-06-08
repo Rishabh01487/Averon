@@ -382,3 +382,7 @@ function seedDefaults() {
     ['listing_fee_ac', String(C.FEES.LISTING_FEE_AC), 'Asset listing fee in AC'],
     ['capital_raise_fee_percent', String(C.FEES.CAPITAL_RAISE_FEE_PERCENT), 'Capital raise fee percentage'],
     ['circuit_breaker_enabled', 'true', 'Enable trading circuit breaker'],
+    ['circuit_breaker_percent', String(C.TRADING.CIRCUIT_BREAKER_PERCENT), 'Circuit breaker threshold %'],
+    ['min_documents_required', String(C.LIMITS.MIN_DOCUMENTS), 'Min documents for listing'],
+    ['cooling_off_period_ms', String(C.LIMITS.COOLING_OFF_PERIOD_MS), 'Cooling off period after listing'],
+    ['auto_approve_min_confidence', String(C.AI.MIN_CONFIDENCE_FOR_AUTO_APPROVE), 'Min AI confidence for auto-approve'],
