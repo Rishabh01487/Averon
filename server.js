@@ -446,3 +446,7 @@ app.get('/api/admin/stats', authenticate, requireRole(C.ROLES.ADMIN), (req, res)
   const frozenUsers = DB.query('SELECT id, name, email FROM users WHERE is_frozen = 1');
 
   res.json({ stats, chainInfo, auditIntegrity, recentAudit, pendingAssets, systemConfig, frozenUsers });
+});
+
+app.post('/api/admin/freeze/:userId', authenticate, requireRole(C.ROLES.ADMIN), (req, res) => {
+  DB.run('UPDATE users SET is_frozen = 1 WHERE id = ?', [req.params.userId]);
