@@ -146,3 +146,6 @@ function optionalAuth(req, res, next) {
     const token = authHeader.substring(7);
     const payload = verifyAccessToken(token);
     if (payload) req.user = payload;
+  }
+  next();
+}
