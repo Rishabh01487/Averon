@@ -350,3 +350,7 @@ async function viewAsset(id) {
             <input type="number" id="buyTokenCount" value="1" min="1" max="${a.tokens_available}" style="width:80px;padding:8px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:white">
             <button class="btn-primary" onclick="buyAssetTokens(${a.id})">Buy Tokens (${a.token_price?.toFixed(4) || 0} AC each)</button>
             <span style="color:var(--text-muted);font-size:13px">${a.tokens_available} available</span>
+          </div>` : ''}
+          ${a.escrow ? `<div style="margin-top:12px;font-size:12px;color:var(--text-muted)">Escrow: ${a.escrow.address} · Balance: ${a.escrow.balance} AC</div>` : ''}
+          ${a.tx_hash ? `<div style="margin-top:8px;font-size:12px;color:var(--text-muted);font-family:var(--mono)">TX: ${a.tx_hash.substring(0,24)}... · Block #${a.block_index}</div>` : ''}
+        </div>
