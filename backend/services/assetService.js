@@ -294,3 +294,6 @@ class AssetService {
     const params = [];
 
     if (filters.status) { sql += ' AND status = ?'; params.push(filters.status); }
+    if (filters.category) { sql += ' AND category = ?'; params.push(filters.category); }
+    if (filters.ownerId) { sql += ' AND owner_id = ?'; params.push(filters.ownerId); }
+    if (filters.excludeStatus) { sql += ' AND status != ?'; params.push(filters.excludeStatus); }
