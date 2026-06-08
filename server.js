@@ -502,3 +502,7 @@ function startTimers() {
 (async () => {
   await DB.initDatabase();
   initAudit(DB);
+
+  blockchain = new Blockchain(DATA_DIR);
+  walletManager = new WalletManager(DATA_DIR);
+  systemWallet = walletManager.getSystemWallet();
