@@ -233,3 +233,8 @@ class Blockchain {
   getLatestBlock() {
     return this.chain[this.chain.length - 1];
   }
+
+  getBlock(index) {
+    if (index < 0 || index >= this.chain.length) return null;
+    return this.chain[index];
+  }
