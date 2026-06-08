@@ -218,3 +218,7 @@ function createSchema() {
     type TEXT NOT NULL,
     side TEXT NOT NULL,
     amount REAL NOT NULL,
+    price REAL,
+    filled REAL DEFAULT 0,
+    remaining REAL NOT NULL,
+    status TEXT DEFAULT 'open',
