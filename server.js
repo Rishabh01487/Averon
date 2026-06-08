@@ -233,3 +233,8 @@ app.post('/api/buy-coins', authenticate, financialLimiter, validate('buyCoins'),
   DB.run('UPDATE users SET averon_balance = ?, inr_spent = inr_spent + ? WHERE id = ?', [newBalance, amountInr, userId]);
   DB.incrementEconomy('total_supply', coinAmount);
   DB.incrementEconomy('circulating_supply', coinAmount);
+
+  // Recalculate price
+  const eco = DB.getEconomy();
+  const newPrice = parseFloat((C.PRICE.INITIAL_PRICE * (1 + (eco.total_supply || 0) / 10000) * (1 + (eco.total_assets_funded || 0) * 0.04)).toFixed(4));
+  DB.setPrice(newPrice);
