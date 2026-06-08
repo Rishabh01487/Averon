@@ -50,3 +50,7 @@ body {
   position: fixed; inset: 0; z-index: 1000;
   background: var(--bg-primary);
   display: flex; align-items: center; justify-content: center;
+  background-image: radial-gradient(ellipse at 30% 50%, rgba(99,102,241,0.08) 0%, transparent 60%),
+                    radial-gradient(ellipse at 70% 50%, rgba(16,185,129,0.06) 0%, transparent 60%);
+}
+.auth-overlay.hidden { display: none; }
