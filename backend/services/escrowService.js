@@ -70,3 +70,6 @@ class EscrowService {
 
     // Blockchain: Escrow → Owner
     const payoutTx = new Transaction(escrow.address, ownerWallet.address, payout, C.TX_TYPES.PAYOUT, {
+      assetId, fee, feePercent,
+    });
+    this.blockchain.addTransaction(payoutTx);
