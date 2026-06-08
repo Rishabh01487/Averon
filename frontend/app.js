@@ -362,3 +362,7 @@ async function buyAssetTokens(assetId) {
   const count = parseInt($('buyTokenCount')?.value) || 1;
   try {
     const result = await api(`/api/assets/${assetId}/tokens/buy`, { method: 'POST', body: JSON.stringify({ count }) });
+    toast(`✅ Bought ${result.tokensBought} tokens for ${result.totalCost.toFixed(4)} AC`, 'success');
+    viewAsset(assetId);
+    loadNotifications();
+  } catch {}
