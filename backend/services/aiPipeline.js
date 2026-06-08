@@ -238,3 +238,6 @@ function checkFraudIndicators(asset, analysis, duplicateResult) {
   let hasCriticalFraud = false;
 
   if (duplicateResult.hasDuplicates) {
+    flags.push(`Duplicate documents detected (also used in asset #${duplicateResult.duplicates[0]?.existingAssetId})`);
+    hasCriticalFraud = true;
+  }
