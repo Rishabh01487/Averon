@@ -194,3 +194,104 @@
               <p id="aiStatusText">Analyzing documents...</p>
             </div>
             <div id="aiResult" class="ai-result hidden"></div>
+          </div>
+
+          <!-- Step 4 -->
+          <div id="wizStep4" class="wiz-panel">
+            <h2>Confirm & Launch</h2>
+            <p class="subtitle">Review the AI recommendation and launch your tokenized asset.</p>
+            <div id="launchSummary" class="launch-summary"></div>
+            <button id="confirmLaunchBtn" class="btn-primary btn-full">Confirm & Launch on Blockchain →</button>
+            <div id="launchResult" class="launch-result hidden"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── MARKETPLACE ── -->
+      <section id="page-market" class="page">
+        <div class="market-layout">
+          <div class="market-panel">
+            <h2>Order Book</h2>
+            <div class="order-book">
+              <div class="ob-header"><span>Price (₹)</span><span>Amount (AC)</span><span>Total</span></div>
+              <div id="sellOrders" class="ob-side ob-sells"></div>
+              <div class="ob-spread" id="obSpread">Spread: —</div>
+              <div id="buyOrders" class="ob-side ob-buys"></div>
+            </div>
+          </div>
+          <div class="market-panel">
+            <h2>Place Order</h2>
+            <div class="order-tabs">
+              <button class="order-tab active" data-side="buy">Buy AC</button>
+              <button class="order-tab" data-side="sell">Sell AC</button>
+            </div>
+            <div class="field"><label>Amount (AC)</label><input type="number" id="orderAmount" placeholder="0.00" step="0.01" min="0.01"></div>
+            <div class="field"><label>Price per AC (₹)</label><input type="number" id="orderPrice" placeholder="0.00" step="0.01" min="0.001"></div>
+            <div class="order-total">Total: ₹<span id="orderTotal">0.00</span></div>
+            <button id="placeOrderBtn" class="btn-primary btn-full">Place Order</button>
+          </div>
+          <div class="market-panel">
+            <h2>Recent Trades</h2>
+            <div id="recentTrades" class="trade-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── EXPLORER ── -->
+      <section id="page-explorer" class="page">
+        <div class="page-header">
+          <h1>Blockchain Explorer</h1>
+          <div class="chain-stats" id="chainStats"></div>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="explorerSearch" placeholder="Search by block index, transaction hash, or wallet address...">
+          <button id="explorerSearchBtn" class="btn-primary btn-sm">Search</button>
+        </div>
+        <div id="explorerResult" class="explorer-result hidden"></div>
+        <div id="blockList" class="block-list"></div>
+      </section>
+
+      <!-- ── PORTFOLIO ── -->
+      <section id="page-portfolio" class="page">
+        <div class="portfolio-header">
+          <div class="portfolio-balance">
+            <div class="balance-label">Your Portfolio Value</div>
+            <div class="balance-value" id="portfolioValue">₹0.00</div>
+          </div>
+          <div class="portfolio-wallet">
+            <div class="wallet-label">Wallet</div>
+            <div class="wallet-address" id="portfolioWallet">—</div>
+          </div>
+          <div class="portfolio-balance">
+            <div class="balance-label">Averon Balance</div>
+            <div class="balance-value" id="portfolioBalance">0 AC</div>
+          </div>
+        </div>
+        <div class="portfolio-sections">
+          <div class="portfolio-section">
+            <h3>My Token Holdings</h3>
+            <div id="myTokens" class="token-holdings"></div>
+          </div>
+          <div class="portfolio-section">
+            <h3>My Listed Assets</h3>
+            <div id="myAssets" class="my-assets"></div>
+          </div>
+          <div class="portfolio-section">
+            <h3>Open Orders</h3>
+            <div id="myOrders" class="my-orders"></div>
+          </div>
+          <div class="portfolio-section">
+            <h3>Transaction History</h3>
+            <div id="myHistory" class="tx-history"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ═══ TOAST ═══ -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
