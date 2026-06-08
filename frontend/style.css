@@ -274,3 +274,7 @@ body {
 .block-hash { font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
 .block-meta { display: flex; gap: 16px; font-size: 12px; color: var(--text-secondary); }
 .block-tx-count { font-weight: 600; }
+
+/* ═══ PORTFOLIO ═══ */
+.portfolio-header { display: flex; gap: 16px; margin-bottom: 32px; flex-wrap: wrap; }
+.portfolio-balance, .portfolio-wallet { flex: 1; min-width: 200px; padding: 24px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); }
