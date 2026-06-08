@@ -98,3 +98,7 @@ class Block {
   verifyMerkleRoot() {
     const computed = this.computeMerkleRoot();
     return computed === this.merkleRoot;
+  }
+
+  /**
+   * Get a Merkle proof for a specific transaction.
