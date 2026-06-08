@@ -18,3 +18,7 @@ class Transaction {
     this.fee = 0;                   // Fee deducted (set by fee service)
     this.signature = '';            // ECDSA signature
     this.signerPublicKey = '';      // PEM public key of signer
+    this.hash = this.calculateHash();
+    this.status = 'pending';        // pending → confirmed → failed
+    this.blockIndex = -1;           // Set when mined into a block
+    this.confirmations = 0;         // Increases as more blocks are added
