@@ -210,3 +210,7 @@ function createSchema() {
     created_at INTEGER NOT NULL,
     FOREIGN KEY (escrow_id) REFERENCES escrow_accounts(id)
   )`);
+
+  // ── Trading ──────────────────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS coin_orders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
