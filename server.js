@@ -413,3 +413,8 @@ app.get('/api/blockchain/blocks', (req, res) => {
   const blocks = blockchain.getRecentBlocks(limit).map(b => b.toJSON());
   res.json({ blocks, total: blockchain.chain.length });
 });
+
+app.get('/api/blockchain/block/:index', (req, res) => {
+  const block = blockchain.getBlock(parseInt(req.params.index));
+  if (!block) return res.status(404).json({ error: 'Block not found' });
+  res.json(block.toJSON());
