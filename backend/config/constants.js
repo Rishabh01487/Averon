@@ -158,3 +158,7 @@ module.exports = {
     INITIAL_PRICE: 1.0,
     MIN_PRICE: 0.001,
     MAX_PRICE: 1000000,
+    CANDLE_INTERVALS: ['1m', '5m', '15m', '1h', '4h', '1d'],
+    PRICE_FLUCTUATION_INTERVAL_MS: 15 * 1000,
+    PRICE_FLUCTUATION_RANGE: 0.005,  // ±0.5% natural fluctuation
+    FUNDED_ASSET_BOOST_MIN: 0.02,    // +2% min boost per funded asset
