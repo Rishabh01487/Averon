@@ -73,3 +73,8 @@ class EscrowService {
       assetId, fee, feePercent,
     });
     this.blockchain.addTransaction(payoutTx);
+
+    // Blockchain: Escrow → Platform Fee Wallet
+    if (fee > 0) {
+      const feeWallet = this.walletManager.getPlatformFeeWallet();
+      const feeTx = new Transaction(escrow.address, feeWallet.address, fee, C.TX_TYPES.FEE, {
