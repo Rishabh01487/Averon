@@ -130,3 +130,7 @@ function getChainStats(chain) {
   if (chain.length === 0) return {};
 
   const genesis = chain[0];
+  const latest = chain[chain.length - 1];
+  const totalTxs = chain.reduce((sum, b) => sum + b.transactions.length, 0);
+  const avgBlockTime = chain.length > 1
+    ? Math.round((latest.timestamp - genesis.timestamp) / (chain.length - 1))
