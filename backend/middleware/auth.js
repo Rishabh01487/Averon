@@ -94,3 +94,6 @@ async function verifyPassword(password, hash) {
       resolve(derivedKey.toString('hex') === key);
     });
   });
+}
+
+// ── Token Generation ─────────────────────────────────────────────────────────
