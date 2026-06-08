@@ -62,3 +62,7 @@ function verifyJWT(token, secret) {
 
     const payload = JSON.parse(base64urlDecode(payloadB64));
     if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;
+
+    return payload;
+  } catch {
+    return null;
