@@ -90,3 +90,7 @@ class EscrowService {
 
     // Update escrow
     this.db.run('UPDATE escrow_accounts SET balance = 0, total_released = total_released + ?, status = "released" WHERE id = ?',
+      [amount, escrow.id]);
+
+    this.db.run('INSERT INTO escrow_transactions (escrow_id, type, user_id, amount, tx_hash, created_at) VALUES (?,?,?,?,?,?)',
+      [escrow.id, 'RELEASE', asset.owner_id, payout, payoutTx.hash, Date.now()]);
