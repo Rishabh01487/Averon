@@ -102,3 +102,7 @@ function processDocuments(documents) {
     result.types[mime] = (result.types[mime] || 0) + 1;
     if (mime.startsWith('image/')) result.hasImages = true;
     if (mime === 'application/pdf') result.hasPdf = true;
+  }
+
+  result.quality = Math.min(100, (
+    (result.totalFiles / 3) * 30 +
