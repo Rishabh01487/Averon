@@ -117,3 +117,8 @@ app.post('/api/auth/register', authLimiter, validate('register'), async (req, re
 
   const user = DB.queryOne('SELECT * FROM users WHERE id = ?', [userId]);
   const tokens = generateTokens(user);
+
+  logAudit('REGISTER', { email, role }, { userId, ip: req.ip });
+  eventBus.emit(EVENTS.USER_REGISTERED, { userId, name, wallet: wallet.address });
+
+  DB.run('INSERT INTO activity_log (user_id, action, details, created_at) VALUES (?,?,?,?)',
