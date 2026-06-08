@@ -58,3 +58,7 @@ class Transaction {
   }
 
   /**
+   * Verify the transaction's signature.
+   */
+  isValid() {
+    // System transactions (mints, rewards) don't require signatures
