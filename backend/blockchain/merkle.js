@@ -5,3 +5,8 @@
 // ══════════════════════════════════════════════════════════════════════════════
 
 const crypto = require('crypto');
+
+class MerkleTree {
+  constructor(leaves = []) {
+    this.leaves = leaves.map(l => this.hashLeaf(l));
+    this.layers = [];
