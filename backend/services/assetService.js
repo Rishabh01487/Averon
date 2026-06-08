@@ -306,3 +306,7 @@ class AssetService {
     return assets.map(a => {
       const sold = this.db.queryOne('SELECT COUNT(*) as c FROM asset_tokens WHERE asset_id = ? AND owner_id IS NOT NULL', [a.id])?.c || 0;
       return {
+        ...a,
+        tokens_sold: sold,
+        tokens_available: a.token_count - sold,
+        progress: a.token_count ? Math.round((sold / a.token_count) * 100) : 0,
