@@ -97,3 +97,8 @@ async function verifyPassword(password, hash) {
 }
 
 // ── Token Generation ─────────────────────────────────────────────────────────
+
+function generateTokens(user) {
+  const accessPayload = {
+    userId: user.id,
+    email: user.email,
