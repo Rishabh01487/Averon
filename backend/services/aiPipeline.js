@@ -130,3 +130,7 @@ function detectDuplicates(documents, dbModule) {
         doc.doc_hash = hash;
 
         // Check database for same hash
+        const existing = dbModule.queryOne('SELECT asset_id FROM asset_documents WHERE doc_hash = ? AND asset_id != ?',
+          [hash, doc.asset_id || 0]);
+        if (existing) {
+          duplicates.push({ filename: doc.original_name, existingAssetId: existing.asset_id });
