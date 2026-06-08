@@ -238,3 +238,7 @@ async function loadDashboard() {
     const data = await api('/api/dashboard');
     $('statPrice').textContent = `₹${parseFloat(data.price).toFixed(2)}`;
     $('statSupply').textContent = formatNum(data.totalSupply || data.circulatingSupply);
+    $('statAssets').textContent = data.assets?.total || 0;
+    $('statFunded').textContent = data.assets?.funded || 0;
+    $('statUsers').textContent = data.userCount || 0;
+    $('statTrades').textContent = data.totalTrades || 0;
