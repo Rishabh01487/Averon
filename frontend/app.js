@@ -262,3 +262,6 @@ async function loadDashboard() {
 function drawPriceChart(prices) {
   const canvas = $('priceChart');
   if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
