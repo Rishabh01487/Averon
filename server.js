@@ -333,3 +333,8 @@ app.post('/api/assets/:id/analyze', authenticate, (req, res) => {
 
       DB.run('INSERT INTO activity_log (user_id, action, details, created_at) VALUES (?,?,?,?)',
         [asset.owner_id, 'AI_ANALYSIS', `AI ${result.verified ? 'verified' : 'rejected'} — Risk: ${result.riskLevel} (${result.riskScore}%)`, Date.now()]);
+
+      res.json({ ...result, assetId, status: newStatus });
+    } catch (e) {
+      DB.run('UPDATE assets SET status = ?, updated_at = ? WHERE id = ?', [C.ASSET_STATUS.DOCUMENTS_UPLOADED, Date.now(), assetId]);
+      res.status(500).json({ error: 'AI analysis failed: ' + e.message });
