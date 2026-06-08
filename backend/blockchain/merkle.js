@@ -122,3 +122,7 @@ class MerkleTree {
 
   toJSON() {
     return {
+      root: this.root,
+      leafCount: this.leaves.length,
+      depth: this.layers.length,
+    };
