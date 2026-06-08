@@ -126,3 +126,7 @@ module.exports = {
   LIMITS: {
     MIN_INVESTMENT_INR: 10,
     MAX_SINGLE_RAISE_INR: 10000000,  // 1 crore
+    MAX_PORTFOLIO_CONCENTRATION: 0.3, // Max 30% in one asset
+    COOLING_OFF_PERIOD_MS: 0,         // 0 for dev, 24h for production
+    MIN_DOCUMENTS: 1,
+    MAX_DOCUMENTS: 10,
