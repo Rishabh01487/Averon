@@ -265,3 +265,7 @@ function drawPriceChart(prices) {
   const ctx = canvas.getContext('2d');
   const w = canvas.width, h = canvas.height;
   ctx.clearRect(0, 0, w, h);
+
+  const min = Math.min(...prices) * 0.98;
+  const max = Math.max(...prices) * 1.02;
+  const range = max - min || 1;
