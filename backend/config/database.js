@@ -338,3 +338,7 @@ function createSchema() {
     block_index INTEGER DEFAULT 0,
     amount REAL DEFAULT 0,
     created_at INTEGER NOT NULL
+  )`);
+
+  // ── Indexes ──────────────────────────────────────────────────────────────
+  db.run(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
