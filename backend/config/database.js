@@ -446,3 +446,7 @@ function runTransaction(fn) {
     const result = fn();
     db.run('COMMIT');
     persist();
+    return result;
+  } catch (e) {
+    db.run('ROLLBACK');
+    throw e;
