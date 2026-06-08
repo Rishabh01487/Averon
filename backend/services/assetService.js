@@ -70,3 +70,6 @@ class AssetService {
 
   tokenizeAsset(assetId, userId, aiResult) {
     const asset = this.db.queryOne('SELECT * FROM assets WHERE id = ?', [assetId]);
+    if (!asset) throw new Error('Asset not found');
+    if (asset.owner_id !== userId) throw new Error('Not the owner');
+    if (asset.status !== C.ASSET_STATUS.VERIFIED) throw new Error('Asset must be verified first');
