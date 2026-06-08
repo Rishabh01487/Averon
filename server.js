@@ -270,3 +270,6 @@ app.post('/api/assets/create', authenticate, validate('createAsset'), (req, res)
   try {
     const result = assetService.createAsset(req.user.userId, req.body);
     eventBus.emit(EVENTS.ASSET_CREATED, result);
+    res.status(201).json(result);
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
