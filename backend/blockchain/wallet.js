@@ -122,3 +122,7 @@ class WalletManager {
 
   /**
    * Get wallet info safe for client (no private key).
+   */
+  getPublicInfo(userId) {
+    const w = this.wallets[userId];
+    if (!w) return null;
