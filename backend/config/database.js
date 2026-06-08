@@ -294,3 +294,7 @@ function createSchema() {
     user_id TEXT NOT NULL,
     type TEXT NOT NULL,
     title TEXT NOT NULL,
+    message TEXT DEFAULT '',
+    data TEXT DEFAULT '{}',
+    is_read INTEGER DEFAULT 0,
+    created_at INTEGER NOT NULL,
