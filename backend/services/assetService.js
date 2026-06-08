@@ -73,3 +73,8 @@ class AssetService {
     if (!asset) throw new Error('Asset not found');
     if (asset.owner_id !== userId) throw new Error('Not the owner');
     if (asset.status !== C.ASSET_STATUS.VERIFIED) throw new Error('Asset must be verified first');
+
+    const currentPrice = this.db.getPrice();
+
+    // Calculate token structure
+    let tokenCount = Math.max(C.LIMITS.MIN_TOKEN_COUNT, Math.min(C.LIMITS.MAX_TOKEN_COUNT,
