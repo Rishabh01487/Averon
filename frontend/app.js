@@ -298,3 +298,6 @@ async function loadAssets() {
   try {
     const params = new URLSearchParams();
     const cat = $('assetFilterCategory')?.value;
+    const status = $('assetFilterStatus')?.value;
+    if (cat && cat !== 'all') params.set('category', cat);
+    if (status && status !== 'all') params.set('status', status);
