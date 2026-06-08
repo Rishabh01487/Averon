@@ -450,3 +450,7 @@ function setWizardStep(step) {
   $$('.wiz-panel').forEach(p => p.classList.remove('active'));
   $(`wizStep${step}`)?.classList.add('active');
 }
+
+async function createAsset() {
+  const title = $('assetTitle').value;
+  const category = $('assetCategory').value;
