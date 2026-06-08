@@ -278,3 +278,6 @@ app.post('/api/assets/:assetId/documents', authenticate, uploadLimiter, upload.a
   const assetId = parseInt(req.params.assetId);
   const asset = DB.queryOne('SELECT * FROM assets WHERE id = ? AND owner_id = ?', [assetId, req.user.userId]);
   if (!asset) return res.status(404).json({ error: 'Asset not found or not owned' });
+
+  const assetDir = path.join(UPLOADS_DIR, String(assetId));
+  if (!fs.existsSync(assetDir)) fs.mkdirSync(assetDir, { recursive: true });
