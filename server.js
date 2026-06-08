@@ -490,3 +490,7 @@ function startTimers() {
 
   // Deadline checker
   setInterval(() => assetService.checkDeadlines(), 60000);
+
+  // Session cleanup
+  setInterval(() => DB.run('DELETE FROM sessions WHERE expires_at < ?', [Date.now()]), C.AUTH.SESSION_CLEANUP_INTERVAL_MS);
+}
