@@ -30,3 +30,7 @@ class EscrowService {
    */
   lockFunds(assetId, userId, amount, txHash = '') {
     const escrow = this.db.queryOne('SELECT * FROM escrow_accounts WHERE asset_id = ?', [assetId]);
+    if (!escrow) throw new Error('Escrow not found');
+    if (escrow.status !== 'active') throw new Error('Escrow is not active');
+
+    const newBalance = parseFloat((escrow.balance + amount).toFixed(8));
