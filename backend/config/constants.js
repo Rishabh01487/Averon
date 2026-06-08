@@ -66,3 +66,7 @@ module.exports = {
     DOCUMENTS_UPLOADED: 'documents_uploaded',
     AI_ANALYZING: 'ai_analyzing',
     VERIFIED: 'verified',
+    REJECTED: 'rejected',
+    COMPLIANCE_REVIEW: 'compliance_review',
+    FLAGGED: 'flagged',
+    ACTIVE: 'active',
