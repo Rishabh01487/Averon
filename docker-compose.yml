@@ -1,0 +1,46 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# AVERON — Docker Compose
+# ══════════════════════════════════════════════════════════════════════════════
+# Start:        docker compose up -d
+# Stop:         docker compose down
+# Logs:         docker compose logs -f
+# Rebuild:      docker compose up -d --build
+# ══════════════════════════════════════════════════════════════════════════════
+
+services:
+  averon:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: averon
+    ports:
+      - "4200:4200"
+    volumes:
+      - averon-data:/app/data
+      - averon-uploads:/app/uploads
+      - ./logs:/app/logs
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - CLUSTER=true
+    restart: unless-stopped
+    stop_grace_period: 15s
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:4200/health',r=>{let b='';r.on('data',c=>b+=c);r.on('end',()=>{process.exit(JSON.parse(b).status==='healthy'?0:1)})}).on('error',()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 256M
+
+volumes:
+  averon-data:
+    driver: local
+  averon-uploads:
+    driver: local
