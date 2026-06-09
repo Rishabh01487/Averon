@@ -1,18 +1,37 @@
 {
   "name": "averon",
-  "version": "3.0.0",
-  "description": "Averon — Blockchain Asset Tokenization Platform with AI Analysis",
+  "version": "4.0.0",
+  "description": "Averon — Enterprise Blockchain Asset Tokenization Platform with AI Analysis",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node --watch server.js",
+    "production": "pm2-runtime start ecosystem.config.js --env production",
+    "stop": "pm2 stop averon",
+    "test": "node tests/blockchain.test.js && node tests/trading.test.js && node tests/api.test.js",
+    "test:blockchain": "node tests/blockchain.test.js",
+    "test:trading": "node tests/trading.test.js",
+    "test:api": "node tests/api.test.js",
+    "seed": "node scripts/seed.js",
+    "reset": "node scripts/reset.js",
+    "benchmark": "node scripts/benchmark.js",
+    "docker:build": "docker compose build",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "postinstall": "node -e \"try{require('ws')}catch{console.log('⚠ ws not installed — WebSocket unavailable')}\""
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "helmet": "^8.0.0",
     "multer": "^2.0.1",
     "razorpay": "^2.9.4",
-    "sql.js": "^1.11.0"
+    "sql.js": "^1.11.0",
+    "ws": "^8.18.0"
   }
 }

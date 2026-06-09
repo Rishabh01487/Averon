@@ -15,7 +15,7 @@ class MerkleTree {
   }
 
   hashLeaf(data) {
-    if (typeof data === 'string') return crypto.createHash('sha256').update(data).digest('hex');
+    if (typeof data === 'string') return data;
     return crypto.createHash('sha256').update(JSON.stringify(data)).digest('hex');
   }
 
