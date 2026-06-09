@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Averon — Admin Panel</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <div class="admin-container">
+    <aside class="admin-sidebar">
+      <h2>Averon</h2>
+      <div class="subtitle">Admin Panel</div>
+      <nav>
+        <a href="#" data-section="overview" class="active">📊 Overview</a>
+        <a href="#" data-section="users">👥 Users</a>
+        <a href="#" data-section="assets">🏛 Assets</a>
+        <a href="#" data-section="transactions">💳 Transactions</a>
+        <a href="#" data-section="chain">⛓ Blockchain</a>
+        <a href="#" data-section="finance">💰 Finance</a>
+        <a href="#" data-section="config">⚙ Config</a>
+        <a href="#" data-section="audit">📋 Audit</a>
+        <hr style="border-color: var(--border-color); margin: 16px 0;">
+        <a href="/" class="back-to-app">← Back to App</a>
+      </nav>
+    </aside>
+    <main class="admin-main">
+      <div class="admin-header">
+        <h1 id="pageTitle">System Overview</h1>
+        <p id="pageSubtitle">Real-time platform monitoring</p>
+      </div>
+      <div id="sectionContent"></div>
+    </main>
+  </div>
+  <div id="modalOverlay" class="modal-overlay hidden"></div>
+  <script src="ws.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

@@ -301,6 +301,180 @@ function createSchema() {
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
 
+  // ── Payment Gateway Config ─────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS payment_gateways (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT UNIQUE NOT NULL,
+    display_name TEXT NOT NULL,
+    provider TEXT NOT NULL,
+    is_active INTEGER DEFAULT 1,
+    config TEXT DEFAULT '{}',
+    priority INTEGER DEFAULT 0,
+    supported_currencies TEXT DEFAULT 'INR,USD',
+    min_amount REAL DEFAULT 0,
+    max_amount REAL DEFAULT 10000000,
+    fee_percent REAL DEFAULT 0,
+    fee_fixed REAL DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+  )`);
+
+  // ── Payment Orders ─────────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS payment_orders (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    gateway TEXT NOT NULL,
+    gateway_order_id TEXT DEFAULT '',
+    type TEXT NOT NULL,
+    status TEXT DEFAULT '${C.PAYMENT.ORDER_STATUS.CREATED}',
+    fiat_currency TEXT DEFAULT 'INR',
+    fiat_amount REAL NOT NULL,
+    coin_amount REAL DEFAULT 0,
+    exchange_rate REAL DEFAULT 0,
+    fee_fiat REAL DEFAULT 0,
+    fee_coin REAL DEFAULT 0,
+    net_fiat REAL DEFAULT 0,
+    net_coin REAL DEFAULT 0,
+    description TEXT DEFAULT '',
+    kyc_tier INTEGER DEFAULT 0,
+    gateway_response TEXT DEFAULT '{}',
+    verified_at INTEGER DEFAULT 0,
+    completed_at INTEGER DEFAULT 0,
+    refunded_at INTEGER DEFAULT 0,
+    refund_amount REAL DEFAULT 0,
+    tx_hash TEXT DEFAULT '',
+    failure_reason TEXT DEFAULT '',
+    expires_at INTEGER NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`);
+
+  db.run(`CREATE INDEX IF NOT EXISTS idx_payment_orders_user ON payment_orders(user_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_payment_orders_status ON payment_orders(status)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_payment_orders_gateway ON payment_orders(gateway_order_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_payment_orders_created ON payment_orders(created_at)`);
+
+  // ── Payment Transactions (audit trail) ─────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS payment_transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id TEXT NOT NULL,
+    type TEXT NOT NULL,
+    gateway TEXT NOT NULL,
+    gateway_tx_id TEXT DEFAULT '',
+    amount REAL NOT NULL,
+    currency TEXT DEFAULT 'INR',
+    status TEXT NOT NULL,
+    raw_response TEXT DEFAULT '{}',
+    ip_address TEXT DEFAULT '',
+    user_agent TEXT DEFAULT '',
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES payment_orders(id)
+  )`);
+
+  db.run(`CREATE INDEX IF NOT EXISTS idx_payment_tx_order ON payment_transactions(order_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_payment_tx_gateway ON payment_transactions(gateway_tx_id)`);
+
+  // ── KYC Records ────────────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS kyc_records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,
+    current_tier INTEGER DEFAULT 0,
+    doc_type TEXT DEFAULT '',
+    doc_number TEXT DEFAULT '',
+    doc_filepath TEXT DEFAULT '',
+    doc_status TEXT DEFAULT 'pending',
+    verified_by TEXT DEFAULT '',
+    verified_at INTEGER DEFAULT 0,
+    rejection_reason TEXT DEFAULT '',
+    submitted_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`);
+
+  db.run(`CREATE INDEX IF NOT EXISTS idx_kyc_user ON kyc_records(user_id)`);
+
+  // ── KYC Tier History ───────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS kyc_tier_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,
+    old_tier INTEGER DEFAULT 0,
+    new_tier INTEGER NOT NULL,
+    changed_by TEXT DEFAULT 'system',
+    reason TEXT DEFAULT '',
+    created_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`);
+
+  // ── Withdrawal Requests ───────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS withdrawal_requests (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    coin_amount REAL NOT NULL,
+    fiat_amount REAL NOT NULL,
+    exchange_rate REAL NOT NULL,
+    fee REAL DEFAULT 0,
+    net_amount REAL NOT NULL,
+    bank_account TEXT DEFAULT '',
+    ifsc_code TEXT DEFAULT '',
+    account_holder TEXT DEFAULT '',
+    status TEXT DEFAULT '${C.PAYMENT.SETTLEMENT_STATUS.PENDING}',
+    gateway TEXT DEFAULT '',
+    gateway_tx_id TEXT DEFAULT '',
+    processed_by TEXT DEFAULT '',
+    processed_at INTEGER DEFAULT 0,
+    failure_reason TEXT DEFAULT '',
+    tx_hash TEXT DEFAULT '',
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`);
+
+  db.run(`CREATE INDEX IF NOT EXISTS idx_withdrawal_user ON withdrawal_requests(user_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_withdrawal_status ON withdrawal_requests(status)`);
+
+  // ── Settlement Batches ────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS settlement_batches (
+    id TEXT PRIMARY KEY,
+    gateway TEXT NOT NULL,
+    total_amount REAL NOT NULL,
+    total_orders INTEGER DEFAULT 0,
+    status TEXT DEFAULT 'pending',
+    gateway_batch_id TEXT DEFAULT '',
+    processed_at INTEGER DEFAULT 0,
+    reconciled_at INTEGER DEFAULT 0,
+    raw_response TEXT DEFAULT '{}',
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+  )`);
+
+  // ── Reconciliation Log ─────────────────────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS reconciliation_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    batch_id TEXT DEFAULT '',
+    order_id TEXT DEFAULT '',
+    gateway TEXT NOT NULL,
+    internal_amount REAL DEFAULT 0,
+    gateway_amount REAL DEFAULT 0,
+    difference REAL DEFAULT 0,
+    status TEXT NOT NULL,
+    notes TEXT DEFAULT '',
+    created_at INTEGER NOT NULL
+  )`);
+
+  // ── Daily Transaction Limits Tracker ───────────────────────────────────
+  db.run(`CREATE TABLE IF NOT EXISTS daily_limits (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,
+    date TEXT NOT NULL,
+    total_bought REAL DEFAULT 0,
+    total_sold REAL DEFAULT 0,
+    tx_count INTEGER DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    UNIQUE(user_id, date),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`);
+
   // ── Audit Log ────────────────────────────────────────────────────────────
   db.run(`CREATE TABLE IF NOT EXISTS audit_log (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

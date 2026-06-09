@@ -9,15 +9,47 @@ const fs = require('fs');
 const multer = require('multer');
 const crypto = require('crypto');
 
+const cluster = require('cluster');
+const numCPUs = process.env.CLUSTER_WORKERS ? parseInt(process.env.CLUSTER_WORKERS) : (require('os').availableParallelism?.() || require('os').cpus().length);
+const isClusterMode = process.env.NODE_ENV === 'production' && process.env.CLUSTER !== 'false' && cluster.isPrimary;
+
+if (isClusterMode) {
+  console.log(`[Averon] Primary ${process.pid} spawning ${numCPUs} workers`);
+  for (let i = 0; i < numCPUs; i++) cluster.fork();
+  cluster.on('exit', (worker, code) => {
+    console.log(`[Averon] Worker ${worker.process.pid} died (code ${code}). Restarting...`);
+    cluster.fork();
+  });
+  process.on('SIGTERM', () => { for (const id in cluster.workers) cluster.workers[id].kill(); process.exit(0); });
+  process.on('SIGINT', () => { for (const id in cluster.workers) cluster.workers[id].kill(); process.exit(0); });
+  return;
+}
+
+// ── Global Error Boundaries ───────────────────────────────────────────────────
+process.on('uncaughtException', (err) => {
+  console.error(`[Averon] UNCAUGHT EXCEPTION: ${err.message}`, err.stack);
+  try { fs.appendFileSync(path.join(__dirname, 'data', 'crash.log'), `\n[${new Date().toISOString()}] ${err.stack || err.message}\n`); } catch {}
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error(`[Averon] UNHANDLED REJECTION: ${reason?.message || reason}`);
+  try { fs.appendFileSync(path.join(__dirname, 'data', 'crash.log'), `\n[${new Date().toISOString()}] UNHANDLED: ${reason?.stack || reason}\n`); } catch {}
+});
+
 // ── Config & Constants ───────────────────────────────────────────────────────
 const C = require('./backend/config/constants');
 const DB = require('./backend/config/database');
 
 // ── Middleware ────────────────────────────────────────────────────────────────
 const { hashPassword, verifyPassword, generateTokens, verifyAccessToken, verifyRefreshToken, authenticate, optionalAuth, requireRole } = require('./backend/middleware/auth');
+const { requireAdmin } = require('./backend/middleware/adminAuth');
 const { generalLimiter, authLimiter, financialLimiter, uploadLimiter } = require('./backend/middleware/rateLimiter');
 const { validate, sanitizeBody } = require('./backend/middleware/validator');
 const { initAudit, logAudit, auditMiddleware, verifyAuditChain } = require('./backend/middleware/audit');
+
+// ── Security ──────────────────────────────────────────────────────────────────
+const { setupSecurity } = require('./backend/config/security');
 
 // ── Blockchain ───────────────────────────────────────────────────────────────
 const { Blockchain, Transaction } = require('./backend/blockchain/chain');
@@ -28,6 +60,13 @@ const { analyzeAsset } = require('./backend/services/aiPipeline');
 const { EscrowService } = require('./backend/services/escrowService');
 const { AssetService } = require('./backend/services/assetService');
 const { TradingEngine } = require('./backend/services/tradingEngine');
+const { FeeService } = require('./backend/services/feeService');
+const { PriceService } = require('./backend/services/priceService');
+const { ComplianceService } = require('./backend/services/complianceService');
+const { PaymentService } = require('./backend/services/paymentService');
+const { KYCService } = require('./backend/services/kycService');
+const { SettlementService } = require('./backend/services/settlementService');
+const { WebSocketServer } = require('./backend/services/wsServer');
 const { eventBus, EVENTS } = require('./backend/services/eventBus');
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -40,6 +79,9 @@ app.use(sanitizeBody);
 app.use(generalLimiter);
 app.use(auditMiddleware);
 app.use(express.static(path.join(__dirname, 'frontend')));
+
+// Apply security headers
+setupSecurity(app);
 
 const DATA_DIR = path.join(__dirname, 'data');
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -61,6 +103,7 @@ const upload = multer({ storage, limits: { fileSize: C.LIMITS.MAX_FILE_SIZE_BYTE
 
 // ── Service instances (initialized after DB) ─────────────────────────────────
 let blockchain, walletManager, systemWallet, escrowService, assetService, tradingEngine;
+let feeService, priceService, complianceService, kycService, paymentService, settlementService;
 
 // ══════════════════════════════════════════════════════════════════════════════
 // API ROUTES
@@ -212,41 +255,123 @@ app.post('/api/notifications/read', authenticate, (req, res) => {
   res.json({ success: true });
 });
 
-// ── Buy Averon Coin ──────────────────────────────────────────────────────────
+// ── Payment Gateway ──────────────────────────────────────────────────────────
 
-app.post('/api/buy-coins', authenticate, financialLimiter, validate('buyCoins'), (req, res) => {
-  const { amountInr } = req.body;
-  const userId = req.user.userId;
+app.get('/api/payment/gateways', authenticate, (req, res) => {
+  const gateways = paymentService.getAvailableGateways(req.query.currency || 'INR');
+  res.json({ gateways });
+});
 
-  const wallet = DB.queryOne('SELECT * FROM wallets WHERE user_id = ?', [userId]);
-  if (!wallet) return res.status(404).json({ error: 'Wallet not found' });
+app.post('/api/payment/create-order', authenticate, financialLimiter, async (req, res) => {
+  const { gateway, amount, currency } = req.body;
+  if (!gateway || !amount) return res.status(400).json({ error: 'Gateway and amount required' });
+  try {
+    const order = await paymentService.createOrder(req.user.userId, gateway, parseFloat(amount), currency || 'INR');
+    res.status(201).json(order);
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
 
-  const price = DB.getPrice();
-  const coinAmount = parseFloat((amountInr / price).toFixed(8));
+app.post('/api/payment/verify', authenticate, async (req, res) => {
+  const { orderId, ...gatewayParams } = req.body;
+  if (!orderId) return res.status(400).json({ error: 'Order ID required' });
+  try {
+    const result = await paymentService.verifyPayment(orderId, gatewayParams);
+    eventBus.emit(EVENTS.COINS_MINTED, { userId: req.user.userId, amount: result.coinAmount, orderId });
+    eventBus.emit(EVENTS.PRICE_UPDATED, { price: DB.getPrice() });
+    res.json(result);
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
 
-  // Blockchain MINT
-  const mintTx = new Transaction('SYSTEM', wallet.address, coinAmount, C.TX_TYPES.MINT, { inr: amountInr, price });
-  blockchain.addTransaction(mintTx);
-  const block = blockchain.minePendingTransactions(systemWallet.address);
+app.post('/api/payment/refund', authenticate, requireRole(C.ROLES.ADMIN), async (req, res) => {
+  const { orderId, reason } = req.body;
+  try {
+    const result = paymentService.initiateRefund(orderId, reason || '');
+    res.json(result);
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
 
-  const newBalance = blockchain.getBalance(wallet.address);
-  DB.run('UPDATE users SET averon_balance = ?, inr_spent = inr_spent + ? WHERE id = ?', [newBalance, amountInr, userId]);
-  DB.incrementEconomy('total_supply', coinAmount);
-  DB.incrementEconomy('circulating_supply', coinAmount);
+app.get('/api/payment/orders', authenticate, (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit) || 50, 100);
+  res.json({ orders: paymentService.getUserOrders(req.user.userId, limit) });
+});
 
-  // Recalculate price
-  const eco = DB.getEconomy();
-  const newPrice = parseFloat((C.PRICE.INITIAL_PRICE * (1 + (eco.total_supply || 0) / 10000) * (1 + (eco.total_assets_funded || 0) * 0.04)).toFixed(4));
-  DB.setPrice(newPrice);
+app.get('/api/payment/orders/:id', authenticate, (req, res) => {
+  const order = paymentService.getOrder(req.params.id);
+  if (!order) return res.status(404).json({ error: 'Order not found' });
+  if (order.user_id !== req.user.userId && req.user.role !== C.ROLES.ADMIN) {
+    return res.status(403).json({ error: 'Access denied' });
+  }
+  res.json(order);
+});
 
-  DB.run('INSERT INTO activity_log (user_id, action, details, tx_hash, block_index, amount, created_at) VALUES (?,?,?,?,?,?,?)',
-    [userId, 'MINT', `Minted ${coinAmount.toFixed(4)} AC for ₹${amountInr}`, mintTx.hash, block?.index || 0, coinAmount, Date.now()]);
+// ── Webhook (no auth — gateway signature is the auth) ────────────────────────
 
-  eventBus.emit(EVENTS.COINS_MINTED, { userId, amount: coinAmount, inr: amountInr });
-  eventBus.emit(EVENTS.BLOCK_MINED, { blockIndex: block?.index });
-  eventBus.emit(EVENTS.PRICE_UPDATED, { price: newPrice });
+app.post('/api/webhook/:gateway', (req, res) => {
+  const rawBody = JSON.stringify(req.body);
+  const signature = req.headers['x-razorpay-signature'] || req.headers['stripe-signature'] || '';
+  paymentService.processWebhook(req.params.gateway, rawBody, signature)
+    .then(() => res.json({ received: true }))
+    .catch((e) => res.status(400).json({ error: e.message }));
+});
 
-  res.json({ success: true, coins: coinAmount, newBalance, newPrice, txHash: mintTx.hash, blockIndex: block?.index });
+// ── KYC ──────────────────────────────────────────────────────────────────────
+
+app.post('/api/kyc/submit', authenticate, uploadLimiter, upload.single('document'), (req, res) => {
+  const { docType, docNumber } = req.body;
+  if (!docType || !docNumber) return res.status(400).json({ error: 'Document type and number required' });
+  if (!req.file) return res.status(400).json({ error: 'Document file required' });
+  try {
+    const result = kycService.submitKYC(req.user.userId, docType, docNumber, req.file.path);
+    res.status(201).json(result);
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+app.get('/api/kyc/status', authenticate, (req, res) => {
+  res.json(kycService.getKYCStatus(req.user.userId));
+});
+
+app.get('/api/kyc/pending', authenticate, requireRole(C.ROLES.ADMIN), (req, res) => {
+  res.json({ pending: kycService.getPendingVerifications() });
+});
+
+app.post('/api/kyc/verify/:recordId', authenticate, requireRole(C.ROLES.ADMIN), (req, res) => {
+  const { approved, reason } = req.body;
+  try {
+    const result = kycService.verifyKYC(parseInt(req.params.recordId), req.user.userId, approved, reason || '');
+    res.json(result);
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// ── Withdrawals ──────────────────────────────────────────────────────────────
+
+app.post('/api/withdraw/request', authenticate, financialLimiter, (req, res) => {
+  try {
+    const result = settlementService.requestWithdrawal(req.user.userId, parseFloat(req.body.amount), req.body.bankDetails || {});
+    res.status(201).json(result);
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+app.get('/api/withdraw/history', authenticate, (req, res) => {
+  res.json({ withdrawals: settlementService.getUserWithdrawals(req.user.userId) });
+});
+
+app.get('/api/withdraw/pending', authenticate, requireRole(C.ROLES.ADMIN), (req, res) => {
+  res.json({ pending: settlementService.getPendingWithdrawals() });
+});
+
+app.post('/api/withdraw/process/:id', authenticate, requireRole(C.ROLES.ADMIN), (req, res) => {
+  try {
+    const result = settlementService.processWithdrawal(req.params.id, req.user.userId);
+    res.json(result);
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+app.post('/api/withdraw/complete/:id', authenticate, requireRole(C.ROLES.ADMIN), (req, res) => {
+  res.json(settlementService.completeWithdrawal(req.params.id));
+});
+
+app.post('/api/withdraw/fail/:id', authenticate, requireRole(C.ROLES.ADMIN), (req, res) => {
+  res.json(settlementService.failWithdrawal(req.params.id, req.body.reason || 'Manual rejection'));
 });
 
 // ── Assets ───────────────────────────────────────────────────────────────────
@@ -467,6 +592,25 @@ app.post('/api/admin/config', authenticate, requireRole(C.ROLES.ADMIN), (req, re
   res.json({ success: true });
 });
 
+// ── Health ────────────────────────────────────────────────────────────────────
+
+app.get('/health', (req, res) => {
+  let dbOk = false, chainOk = false;
+  try { dbOk = !!DB.queryOne('SELECT 1 as ok'); } catch {}
+  try { chainOk = blockchain?.isChainValid() === true; } catch {}
+  const healthy = dbOk && chainOk;
+  res.status(healthy ? 200 : 503).json({
+    status: healthy ? 'healthy' : 'degraded',
+    uptime: process.uptime(),
+    timestamp: Date.now(),
+    version: C.PLATFORM_VERSION,
+    memory: process.memoryUsage(),
+    database: dbOk ? 'connected' : 'error',
+    blockchain: chainOk ? 'valid' : 'invalid',
+    worker: cluster.isWorker ? `worker-${process.pid}` : `primary-${process.pid}`,
+  });
+});
+
 // ── Economy ──────────────────────────────────────────────────────────────────
 
 app.get('/api/economy', (req, res) => res.json(DB.getDashboardStats()));
@@ -479,25 +623,24 @@ app.get('/api/economy/price-history', (req, res) => {
 // ── Timers ───────────────────────────────────────────────────────────────────
 
 function startTimers() {
-  // Price fluctuation
-  setInterval(() => {
+  timerRefs.push(setInterval(() => {
     const p = DB.getPrice();
     const swing = (Math.random() - 0.5) * C.PRICE.PRICE_FLUCTUATION_RANGE;
     const newP = parseFloat(Math.max(C.PRICE.MIN_PRICE, p * (1 + swing)).toFixed(4));
     DB.setPrice(newP);
     eventBus.emit(EVENTS.PRICE_UPDATED, { price: newP });
-  }, C.PRICE.PRICE_FLUCTUATION_INTERVAL_MS);
+  }, C.PRICE.PRICE_FLUCTUATION_INTERVAL_MS));
 
-  // Deadline checker
-  setInterval(() => assetService.checkDeadlines(), 60000);
+  timerRefs.push(setInterval(() => assetService.checkDeadlines(), 60000));
 
-  // Session cleanup
-  setInterval(() => DB.run('DELETE FROM sessions WHERE expires_at < ?', [Date.now()]), C.AUTH.SESSION_CLEANUP_INTERVAL_MS);
+  timerRefs.push(setInterval(() => DB.run('DELETE FROM sessions WHERE expires_at < ?', [Date.now()]), C.AUTH.SESSION_CLEANUP_INTERVAL_MS));
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
 // START
 // ══════════════════════════════════════════════════════════════════════════════
+
+const timerRefs = [];
 
 (async () => {
   await DB.initDatabase();
@@ -511,10 +654,21 @@ function startTimers() {
   assetService = new AssetService(DB, blockchain, walletManager, escrowService);
   tradingEngine = new TradingEngine(DB, blockchain, walletManager);
 
+  feeService = new FeeService(DB, blockchain, walletManager);
+  priceService = new PriceService(DB);
+  complianceService = new ComplianceService(DB);
+  kycService = new KYCService(DB);
+  paymentService = new PaymentService(DB, blockchain, walletManager, kycService);
+  settlementService = new SettlementService(DB, blockchain, walletManager);
+
   startTimers();
 
+  const http = require('http');
+  const httpServer = http.createServer(app);
+  const wsServer = new WebSocketServer(httpServer);
+
   const PORT = process.env.PORT || 4200;
-  app.listen(PORT, () => {
+  httpServer.listen(PORT, () => {
     const stats = DB.getDashboardStats();
     console.log(`\n  ╔══════════════════════════════════════════════════╗`);
     console.log(`  ║  AVERON v${C.PLATFORM_VERSION} — Enterprise Asset Tokenization   ║`);
@@ -523,6 +677,29 @@ function startTimers() {
     console.log(`  ⛓  ${blockchain.chain.length} blocks | Difficulty ${blockchain.difficulty}`);
     console.log(`  💾 SQLite (WASM) | 🔑 ${systemWallet.address.substring(0, 16)}...`);
     console.log(`  📊 ${stats.userCount} users | ${stats.assets.total} assets | ${(stats.totalSupply || 0).toFixed(0)} AC supply`);
-    console.log(`  🔒 JWT Auth | Rate Limiting | Tamper-proof Audit\n`);
+    console.log(`  🔒 JWT Auth | Rate Limiting | Tamper-proof Audit`);
+    console.log(`  🔌 WebSocket | Admin: http://localhost:${PORT}/admin.html\n`);
   });
+
+  // ── Graceful Shutdown ────────────────────────────────────────────────────────
+
+  async function shutdown(signal) {
+    console.log(`\n  ⚡ ${signal} received — shutting down gracefully...`);
+    wsServer.broadcast('system', { type: 'SHUTDOWN', message: 'Server is shutting down' });
+    timerRefs.forEach(t => clearInterval(t));
+
+    httpServer.close(() => {
+      DB.persist();
+      console.log('  ✅ Connections closed. Goodbye.\n');
+      process.exit(0);
+    });
+
+    setTimeout(() => {
+      console.error('  ⚠ Force shutdown after 10s timeout');
+      process.exit(1);
+    }, 10000);
+  }
+
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
 })();

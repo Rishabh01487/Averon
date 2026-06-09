@@ -122,6 +122,70 @@ module.exports = {
     MIN_TRADE_AMOUNT: 0.01,          // Minimum trade: 0.01 AC
   },
 
+  // ── Payment ────────────────────────────────────────────────────────────────
+  PAYMENT: {
+    GATEWAYS: {
+      RAZORPAY: 'razorpay',
+      STRIPE: 'stripe',
+      WIRE: 'wire',
+      UPI: 'upi',
+    },
+    ORDER_STATUS: {
+      CREATED: 'created',
+      PENDING: 'pending',
+      CONFIRMED: 'confirmed',
+      COMPLETED: 'completed',
+      FAILED: 'failed',
+      REFUNDED: 'refunded',
+      EXPIRED: 'expired',
+    },
+    SETTLEMENT_STATUS: {
+      PENDING: 'pending',
+      PROCESSING: 'processing',
+      COMPLETED: 'completed',
+      FAILED: 'failed',
+    },
+    COIN_PURCHASE_MIN_INR: 100,
+    COIN_PURCHASE_MAX_INR: 50000000,  // 5 crore per transaction
+    ORDER_EXPIRY_MS: 30 * 60 * 1000,  // 30 minutes
+    WEBHOOK_TIMEOUT_MS: 5000,
+    RECONCILIATION_INTERVAL_MS: 3600000,  // 1 hour
+  },
+
+  // ── KYC & Compliance ──────────────────────────────────────────────────────
+  KYC: {
+    TIERS: {
+      UNVERIFIED: { level: 0, label: 'Unverified', dailyLimit: 0, monthlyLimit: 0, annualLimit: 0 },
+      BASIC: { level: 1, label: 'Basic KYC', dailyLimit: 100000, monthlyLimit: 1000000, annualLimit: 5000000 },
+      FULL: { level: 2, label: 'Full KYC', dailyLimit: 1000000, monthlyLimit: 10000000, annualLimit: 50000000 },
+      INSTITUTIONAL: { level: 3, label: 'Institutional', dailyLimit: 100000000, monthlyLimit: 1000000000, annualLimit: 10000000000 },
+    },
+    DOCUMENTS: {
+      AADHAAR: 'aadhaar',
+      PAN: 'pan',
+      PASSPORT: 'passport',
+      DRIVING_LICENSE: 'driving_license',
+      VOTER_ID: 'voter_id',
+      GST_CERT: 'gst_certificate',
+      INCORPORATION: 'incorporation_certificate',
+    },
+    AML_FLAGS: {
+      HIGH_VALUE: 'high_value',
+      HIGH_FREQUENCY: 'high_frequency',
+      DUPLICATE_PATTERN: 'duplicate_pattern',
+      ROUND_AMOUNT: 'round_amount',
+      RAPID_SEQUENTIAL: 'rapid_sequential',
+      NEW_ACCOUNT_HIGH_VALUE: 'new_account_high_value',
+      HIGH_RISK_JURISDICTION: 'high_risk_jurisdiction',
+      STRUCTURING: 'structuring',
+    },
+    TIER_UPGRADE_THRESHOLDS: {
+      1: { minTrades: 3, minVolume: 10000, minAgeDays: 7 },
+      2: { minTrades: 10, minVolume: 100000, minAgeDays: 30 },
+      3: { minTrades: 50, minVolume: 10000000, minAgeDays: 90 },
+    },
+  },
+
   // ── Investment Limits ──────────────────────────────────────────────────────
   LIMITS: {
     MIN_INVESTMENT_INR: 10,

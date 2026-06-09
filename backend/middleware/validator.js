@@ -73,6 +73,21 @@ const schemas = {
     amountInr: [{ rule: rules.required, msg: 'Amount is required' }, { rule: rules.number, msg: 'Amount must be a number' }, { rule: rules.min(C.LIMITS.MIN_INVESTMENT_INR), msg: `Minimum ₹${C.LIMITS.MIN_INVESTMENT_INR}` }],
   },
 
+  createOrder: {
+    gateway: [{ rule: rules.required, msg: 'Gateway is required' }, { rule: rules.oneOf(['razorpay', 'stripe', 'wire', 'upi']), msg: 'Invalid gateway' }],
+    amount: [{ rule: rules.required, msg: 'Amount is required' }, { rule: rules.number, msg: 'Amount must be a number' }, { rule: rules.min(C.PAYMENT.COIN_PURCHASE_MIN_INR), msg: `Minimum purchase: ₹${C.PAYMENT.COIN_PURCHASE_MIN_INR}` }, { rule: rules.max(C.PAYMENT.COIN_PURCHASE_MAX_INR), msg: `Maximum purchase: ₹${C.PAYMENT.COIN_PURCHASE_MAX_INR.toLocaleString()}` }],
+    currency: [{ rule: rules.oneOf(['INR', 'USD', 'EUR', 'GBP', 'SGD', 'AED']), msg: 'Invalid currency' }],
+  },
+
+  submitKyc: {
+    docType: [{ rule: rules.required, msg: 'Document type is required' }, { rule: rules.oneOf(Object.values(C.KYC.DOCUMENTS)), msg: 'Invalid document type' }],
+    docNumber: [{ rule: rules.required, msg: 'Document number is required' }, { rule: rules.minLength(4), msg: 'Document number too short' }, { rule: rules.maxLength(50), msg: 'Document number too long' }],
+  },
+
+  withdrawRequest: {
+    amount: [{ rule: rules.required, msg: 'Amount is required' }, { rule: rules.number, msg: 'Amount must be a number' }, { rule: rules.min(1), msg: 'Minimum withdrawal: 1 AC' }],
+  },
+
   buyTokens: {
     count: [{ rule: rules.required, msg: 'Token count is required' }, { rule: rules.number, msg: 'Count must be a number' }, { rule: rules.min(1), msg: 'Minimum 1 token' }, { rule: rules.max(C.LIMITS.MAX_TOKEN_COUNT), msg: `Maximum ${C.LIMITS.MAX_TOKEN_COUNT} tokens` }],
   },
