@@ -642,3 +642,111 @@ window.viewBlock = async (index) => {
 function initExplorer() {
   $('explorerSearchBtn')?.addEventListener('click', async () => {
     const q = $('explorerSearch').value.trim();
+    if (!q) return;
+
+    // Try as block index
+    if (/^\d+$/.test(q)) { viewBlock(parseInt(q)); return; }
+
+    // Try as tx hash
+    try {
+      const tx = await api(`/api/blockchain/tx/${q}`);
+      $('explorerResult').classList.remove('hidden');
+      $('explorerResult').innerHTML = `
+        <h3>Transaction</h3>
+        <div style="font-size:13px;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+          <div><strong>Type:</strong> ${tx.type}</div>
+          <div><strong>Amount:</strong> ${tx.amount} AC</div>
+          <div><strong>From:</strong> <span style="font-family:var(--mono);font-size:11px">${tx.from}</span></div>
+          <div><strong>To:</strong> <span style="font-family:var(--mono);font-size:11px">${tx.to}</span></div>
+          <div><strong>Status:</strong> ${tx.status}</div>
+          <div><strong>Block:</strong> #${tx.blockIndex}</div>
+          <div><strong>Confirmations:</strong> ${tx.confirmations}</div>
+          <div><strong>Hash:</strong> <span style="font-family:var(--mono);font-size:11px">${tx.hash}</span></div>
+        </div>`;
+    } catch {
+      // Try as address
+      try {
+        const addr = await api(`/api/blockchain/address/${q}`);
+        $('explorerResult').classList.remove('hidden');
+        $('explorerResult').innerHTML = `
+          <h3>Address</h3>
+          <p style="font-family:var(--mono);font-size:13px;margin:8px 0">${addr.address}</p>
+          <p style="font-size:18px;font-weight:700">Balance: ${addr.balance.toFixed(4)} AC</p>
+          <h4 style="margin-top:16px">${addr.transactions.length} Transactions</h4>
+          ${addr.transactions.slice(0, 20).map(tx => `<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;display:flex;justify-content:space-between"><span style="color:${tx.direction === 'in' ? 'var(--green)' : 'var(--red)'}">${tx.direction === 'in' ? '+' : '-'}${tx.amount.toFixed(4)} AC</span><span style="color:var(--text-muted)">${tx.type}</span></div>`).join('')}`;
+      } catch { toast('Not found', 'error'); }
+    }
+  });
+}
+
+// ── PORTFOLIO ────────────────────────────────────────────────────────────────
+
+async function loadPortfolio() {
+  try {
+    const data = await api('/api/portfolio');
+    $('portfolioValue').textContent = `₹${formatNum(data.coinValue)}`;
+    $('portfolioWallet').textContent = data.walletAddress || '—';
+    $('portfolioBalance').textContent = `${parseFloat(data.balance).toFixed(4)} AC`;
+
+    // Token holdings
+    $('myTokens').innerHTML = data.tokens?.length ? data.tokens.reduce((acc, t) => {
+      if (!acc.map[t.asset_id]) { acc.map[t.asset_id] = { title: t.asset_title, category: t.category, count: 0, value: 0, status: t.asset_status }; }
+      acc.map[t.asset_id].count++;
+      acc.map[t.asset_id].value += t.price;
+      return acc;
+    }, { map: {} }).map && Object.entries(data.tokens.reduce((acc, t) => {
+      if (!acc[t.asset_id]) acc[t.asset_id] = { title: t.asset_title, count: 0, value: 0, status: t.asset_status };
+      acc[t.asset_id].count++;
+      acc[t.asset_id].value += t.price;
+      return acc;
+    }, {})).map(([id, t]) => `
+      <div class="token-hold-card">
+        <div class="token-hold-title">${t.title}</div>
+        <div class="token-hold-meta">${t.count} tokens · ${t.value.toFixed(4)} AC · ${t.status}</div>
+      </div>`).join('') : '<div class="empty-state">No token holdings yet</div>';
+
+    // My assets
+    $('myAssets').innerHTML = data.myAssets?.length ? data.myAssets.map(a => `
+      <div class="asset-card" style="cursor:pointer" onclick="viewAsset(${a.id}); navigateTo('assets')">
+        <div class="asset-card-header">
+          <span class="asset-title">${a.title}</span>
+          <span class="asset-status status-${a.status}">${a.status.replace(/_/g,' ')}</span>
+        </div>
+        <div class="asset-meta"><div>₹${formatNum(a.raise_amount)}</div><div>${a.token_count || 0} tokens</div></div>
+      </div>`).join('') : '<div class="empty-state">No assets listed. <span class="link" onclick="navigateTo(\'tokenize\')">Tokenize an asset →</span></div>';
+
+    // Orders
+    $('myOrders').innerHTML = data.myOrders?.filter(o => o.status === 'open').map(o => `
+      <div class="order-item">
+        <span style="font-weight:600;color:${o.side === 'buy' ? 'var(--green)' : 'var(--red)'}">${o.side.toUpperCase()} ${o.remaining.toFixed(4)} AC @ ₹${o.price.toFixed(4)}</span>
+        <button class="btn-ghost btn-sm btn-danger" onclick="cancelOrder(${o.id})">Cancel</button>
+      </div>`).join('') || '<div class="empty-state">No open orders</div>';
+
+    // History
+    $('myHistory').innerHTML = data.activity?.slice(0, 20).map(a => `
+      <div class="tx-item">
+        <span class="tx-action">${a.action}</span>
+        <span class="tx-details">${a.details || ''}</span>
+        <span class="tx-time">${timeAgo(a.created_at)}</span>
+      </div>`).join('') || '<div class="empty-state">No history yet</div>';
+  } catch {}
+}
+
+window.cancelOrder = async (id) => {
+  try {
+    await api(`/api/market/order/${id}`, { method: 'DELETE', body: JSON.stringify({}) });
+    toast('Order cancelled', 'success');
+    loadPortfolio();
+  } catch {}
+};
+
+// Filter listeners
+document.addEventListener('change', (e) => {
+  if (e.target.id === 'assetFilterCategory' || e.target.id === 'assetFilterStatus') loadAssets();
+});
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', () => {
+  initAuth();
+  initNav();
