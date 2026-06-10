@@ -266,3 +266,53 @@ class AssetService {
 
   getAsset(assetId) {
     const asset = this.db.queryOne('SELECT * FROM assets WHERE id = ?', [assetId]);
+    if (!asset) return null;
+
+    const docs = this.db.query('SELECT * FROM asset_documents WHERE asset_id = ?', [asset.id]);
+    const tokens = this.db.query('SELECT * FROM asset_tokens WHERE asset_id = ? ORDER BY token_index', [asset.id]);
+    const sold = this.db.queryOne('SELECT COUNT(*) as c FROM asset_tokens WHERE asset_id = ? AND owner_id IS NOT NULL', [asset.id])?.c || 0;
+    const owner = this.db.queryOne('SELECT name, organization FROM users WHERE id = ?', [asset.owner_id]);
+    const history = this.db.query('SELECT * FROM asset_status_history WHERE asset_id = ? ORDER BY created_at DESC', [asset.id]);
+    const escrow = this.db.queryOne('SELECT * FROM escrow_accounts WHERE asset_id = ?', [asset.id]);
+
+    return {
+      ...asset,
+      documents: docs.map(d => ({ id: d.id, name: d.original_name, type: d.mimetype, size: d.size, url: '/uploads/' + asset.id + '/' + d.filename })),
+      tokens: tokens.map(t => ({ id: t.id, index: t.token_index, price: t.price, owned: !!t.owner_id, ownerId: t.owner_id })),
+      tokens_sold: sold,
+      tokens_available: asset.token_count - sold,
+      progress: asset.token_count ? Math.round((sold / asset.token_count) * 100) : 0,
+      owner_name: owner?.name || 'Unknown',
+      owner_org: owner?.organization || '',
+      statusHistory: history,
+      escrow: escrow ? { address: escrow.address, balance: escrow.balance, status: escrow.status } : null,
+    };
+  }
+
+  listAssets(filters = {}) {
+    let sql = 'SELECT * FROM assets WHERE 1=1';
+    const params = [];
+
+    if (filters.status) { sql += ' AND status = ?'; params.push(filters.status); }
+    if (filters.category) { sql += ' AND category = ?'; params.push(filters.category); }
+    if (filters.ownerId) { sql += ' AND owner_id = ?'; params.push(filters.ownerId); }
+    if (filters.excludeStatus) { sql += ' AND status != ?'; params.push(filters.excludeStatus); }
+
+    sql += ' ORDER BY created_at DESC';
+    if (filters.limit) { sql += ' LIMIT ?'; params.push(filters.limit); }
+
+    let assets = this.db.query(sql, params);
+
+    return assets.map(a => {
+      const sold = this.db.queryOne('SELECT COUNT(*) as c FROM asset_tokens WHERE asset_id = ? AND owner_id IS NOT NULL', [a.id])?.c || 0;
+      return {
+        ...a,
+        tokens_sold: sold,
+        tokens_available: a.token_count - sold,
+        progress: a.token_count ? Math.round((sold / a.token_count) * 100) : 0,
+      };
+    });
+  }
+}
+
+module.exports = { AssetService };
