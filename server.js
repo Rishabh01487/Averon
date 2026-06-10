@@ -78,3 +78,111 @@ app.get('/api/config', (req, res) => {
     categories: C.ASSET_CATEGORIES,
   });
 });
+
+app.get('/api/dashboard', (req, res) => {
+  const stats = DB.getDashboardStats();
+  const activity = DB.query('SELECT a.*, u.name as user_name FROM activity_log a LEFT JOIN users u ON a.user_id = u.id ORDER BY a.created_at DESC LIMIT 30');
+  res.json({ ...stats, recentActivity: activity });
+});
+
+// ── Auth ─────────────────────────────────────────────────────────────────────
+
+app.post('/api/auth/register', authLimiter, validate('register'), async (req, res) => {
+  const { email, password, name, organization } = req.body;
+
+  const existing = DB.queryOne('SELECT id FROM users WHERE email = ?', [email]);
+  if (existing) return res.status(409).json({ error: 'Email already registered', code: 'EMAIL_EXISTS' });
+
+  const userId = 'usr_' + crypto.randomBytes(8).toString('hex');
+  const passwordHash = await hashPassword(password);
+
+  // Create wallet
+  const wallet = walletManager.createWallet(userId);
+
+  // Determine role (first user = admin)
+  const userCount = DB.queryOne('SELECT COUNT(*) as c FROM users')?.c || 0;
+  const role = userCount === 0 ? C.ROLES.ADMIN : C.ROLES.USER;
+
+  const now = Date.now();
+  DB.run(
+    'INSERT INTO users (id, email, password_hash, name, organization, role, wallet_address, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?)',
+    [userId, email, passwordHash, name, organization || '', role, wallet.address, now, now]
+  );
+  DB.run('INSERT INTO wallets (user_id, public_key, private_key, address, created_at) VALUES (?,?,?,?,?)',
+    [userId, wallet.publicKey, wallet.privateKey, wallet.address, now]);
+
+  // Update holder count
+  const count = DB.queryOne('SELECT COUNT(*) as c FROM users')?.c || 0;
+  DB.updateEconomy('holder_count', count);
+
+  const user = DB.queryOne('SELECT * FROM users WHERE id = ?', [userId]);
+  const tokens = generateTokens(user);
+
+  logAudit('REGISTER', { email, role }, { userId, ip: req.ip });
+  eventBus.emit(EVENTS.USER_REGISTERED, { userId, name, wallet: wallet.address });
+
+  DB.run('INSERT INTO activity_log (user_id, action, details, created_at) VALUES (?,?,?,?)',
+    [userId, 'ACCOUNT_CREATED', `${name} — ${wallet.address}`, now]);
+
+  res.status(201).json({
+    user: { id: userId, name, email, role, walletAddress: wallet.address, balance: 0 },
+    ...tokens,
+  });
+});
+
+app.post('/api/auth/login', authLimiter, validate('login'), async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = DB.queryOne('SELECT * FROM users WHERE email = ?', [email]);
+  if (!user) return res.status(401).json({ error: 'Invalid credentials', code: 'AUTH_FAILED' });
+
+  // Check lockout
+  if (user.locked_until && user.locked_until > Date.now()) {
+    const remaining = Math.ceil((user.locked_until - Date.now()) / 60000);
+    return res.status(423).json({ error: `Account locked. Try again in ${remaining} minutes.`, code: 'ACCOUNT_LOCKED' });
+  }
+
+  if (user.is_frozen) return res.status(403).json({ error: 'Account is frozen', code: 'ACCOUNT_FROZEN' });
+
+  const valid = await verifyPassword(password, user.password_hash);
+  if (!valid) {
+    const attempts = user.login_attempts + 1;
+    if (attempts >= C.AUTH.MAX_LOGIN_ATTEMPTS) {
+      DB.run('UPDATE users SET login_attempts = ?, locked_until = ? WHERE id = ?',
+        [attempts, Date.now() + C.AUTH.LOCKOUT_DURATION_MS, user.id]);
+    } else {
+      DB.run('UPDATE users SET login_attempts = ? WHERE id = ?', [attempts, user.id]);
+    }
+    return res.status(401).json({ error: 'Invalid credentials', code: 'AUTH_FAILED' });
+  }
+
+  // Reset attempts on success
+  DB.run('UPDATE users SET login_attempts = 0, locked_until = 0, last_login = ? WHERE id = ?', [Date.now(), user.id]);
+
+  const tokens = generateTokens(user);
+  const wallet = DB.queryOne('SELECT address FROM wallets WHERE user_id = ?', [user.id]);
+  const balance = wallet ? blockchain.getBalance(wallet.address) : 0;
+
+  logAudit('LOGIN', { email }, { userId: user.id, ip: req.ip });
+
+  res.json({
+    user: { id: user.id, name: user.name, email: user.email, role: user.role, walletAddress: wallet?.address, balance },
+    ...tokens,
+  });
+});
+
+app.post('/api/auth/refresh', (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) return res.status(400).json({ error: 'Refresh token required' });
+
+  const payload = verifyRefreshToken(refreshToken);
+  if (!payload) return res.status(401).json({ error: 'Invalid refresh token' });
+
+  const user = DB.queryOne('SELECT * FROM users WHERE id = ?', [payload.userId]);
+  if (!user) return res.status(401).json({ error: 'User not found' });
+
+  const tokens = generateTokens(user);
+  res.json(tokens);
+});
+
+// ── Account ──────────────────────────────────────────────────────────────────
