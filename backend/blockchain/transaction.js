@@ -130,3 +130,8 @@ class Transaction {
     tx.status = json.status || 'confirmed';
     tx.blockIndex = json.blockIndex ?? -1;
     tx.confirmations = json.confirmations || 0;
+    return tx;
+  }
+}
+
+module.exports = { Transaction };
