@@ -186,3 +186,111 @@ app.post('/api/auth/refresh', (req, res) => {
 });
 
 // ── Account ──────────────────────────────────────────────────────────────────
+
+app.get('/api/account', authenticate, (req, res) => {
+  const user = DB.queryOne('SELECT * FROM users WHERE id = ?', [req.user.userId]);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  const wallet = DB.queryOne('SELECT address FROM wallets WHERE user_id = ?', [user.id]);
+  const balance = wallet ? blockchain.getBalance(wallet.address) : 0;
+  DB.run('UPDATE users SET averon_balance = ? WHERE id = ?', [balance, user.id]);
+
+  res.json({
+    id: user.id, name: user.name, email: user.email, role: user.role,
+    walletAddress: wallet?.address, balance, inrSpent: user.inr_spent,
+    createdAt: user.created_at,
+  });
+});
+
+app.get('/api/notifications', authenticate, (req, res) => {
+  const notifs = DB.query('SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 50', [req.user.userId]);
+  const unread = DB.queryOne('SELECT COUNT(*) as c FROM notifications WHERE user_id = ? AND is_read = 0', [req.user.userId])?.c || 0;
+  res.json({ notifications: notifs, unread });
+});
+
+app.post('/api/notifications/read', authenticate, (req, res) => {
+  DB.run('UPDATE notifications SET is_read = 1 WHERE user_id = ?', [req.user.userId]);
+  res.json({ success: true });
+});
+
+// ── Buy Averon Coin ──────────────────────────────────────────────────────────
+
+app.post('/api/buy-coins', authenticate, financialLimiter, validate('buyCoins'), (req, res) => {
+  const { amountInr } = req.body;
+  const userId = req.user.userId;
+
+  const wallet = DB.queryOne('SELECT * FROM wallets WHERE user_id = ?', [userId]);
+  if (!wallet) return res.status(404).json({ error: 'Wallet not found' });
+
+  const price = DB.getPrice();
+  const coinAmount = parseFloat((amountInr / price).toFixed(8));
+
+  // Blockchain MINT
+  const mintTx = new Transaction('SYSTEM', wallet.address, coinAmount, C.TX_TYPES.MINT, { inr: amountInr, price });
+  blockchain.addTransaction(mintTx);
+  const block = blockchain.minePendingTransactions(systemWallet.address);
+
+  const newBalance = blockchain.getBalance(wallet.address);
+  DB.run('UPDATE users SET averon_balance = ?, inr_spent = inr_spent + ? WHERE id = ?', [newBalance, amountInr, userId]);
+  DB.incrementEconomy('total_supply', coinAmount);
+  DB.incrementEconomy('circulating_supply', coinAmount);
+
+  // Recalculate price
+  const eco = DB.getEconomy();
+  const newPrice = parseFloat((C.PRICE.INITIAL_PRICE * (1 + (eco.total_supply || 0) / 10000) * (1 + (eco.total_assets_funded || 0) * 0.04)).toFixed(4));
+  DB.setPrice(newPrice);
+
+  DB.run('INSERT INTO activity_log (user_id, action, details, tx_hash, block_index, amount, created_at) VALUES (?,?,?,?,?,?,?)',
+    [userId, 'MINT', `Minted ${coinAmount.toFixed(4)} AC for ₹${amountInr}`, mintTx.hash, block?.index || 0, coinAmount, Date.now()]);
+
+  eventBus.emit(EVENTS.COINS_MINTED, { userId, amount: coinAmount, inr: amountInr });
+  eventBus.emit(EVENTS.BLOCK_MINED, { blockIndex: block?.index });
+  eventBus.emit(EVENTS.PRICE_UPDATED, { price: newPrice });
+
+  res.json({ success: true, coins: coinAmount, newBalance, newPrice, txHash: mintTx.hash, blockIndex: block?.index });
+});
+
+// ── Assets ───────────────────────────────────────────────────────────────────
+
+app.get('/api/assets', optionalAuth, (req, res) => {
+  const { status, category, limit } = req.query;
+  const filters = { excludeStatus: 'rejected' };
+  if (status && status !== 'all') filters.status = status;
+  if (category && category !== 'all') filters.category = category;
+  if (limit) filters.limit = parseInt(limit);
+  res.json(assetService.listAssets(filters));
+});
+
+app.get('/api/assets/:id', optionalAuth, (req, res) => {
+  const asset = assetService.getAsset(parseInt(req.params.id));
+  if (!asset) return res.status(404).json({ error: 'Asset not found' });
+  res.json(asset);
+});
+
+app.post('/api/assets/create', authenticate, validate('createAsset'), (req, res) => {
+  try {
+    const result = assetService.createAsset(req.user.userId, req.body);
+    eventBus.emit(EVENTS.ASSET_CREATED, result);
+    res.status(201).json(result);
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+app.post('/api/assets/:assetId/documents', authenticate, uploadLimiter, upload.array('documents', C.LIMITS.MAX_DOCUMENTS), (req, res) => {
+  const assetId = parseInt(req.params.assetId);
+  const asset = DB.queryOne('SELECT * FROM assets WHERE id = ? AND owner_id = ?', [assetId, req.user.userId]);
+  if (!asset) return res.status(404).json({ error: 'Asset not found or not owned' });
+
+  const assetDir = path.join(UPLOADS_DIR, String(assetId));
+  if (!fs.existsSync(assetDir)) fs.mkdirSync(assetDir, { recursive: true });
+
+  const docs = [];
+  for (const file of (req.files || [])) {
+    const newPath = path.join(assetDir, file.filename);
+    if (file.path !== newPath) try { fs.renameSync(file.path, newPath); } catch {}
+
+    // Hash the document for duplicate detection
+    let docHash = '';
+    try { docHash = crypto.createHash('sha256').update(fs.readFileSync(newPath)).digest('hex'); } catch {}
+
+    DB.run('INSERT INTO asset_documents (asset_id, filename, original_name, mimetype, size, filepath, doc_hash, uploaded_at) VALUES (?,?,?,?,?,?,?,?)',
+      [assetId, file.filename, file.originalname, file.mimetype, file.size, newPath, docHash, Date.now()]);
+    docs.push({ filename: file.filename, original_name: file.originalname, mimetype: file.mimetype, size: file.size });
