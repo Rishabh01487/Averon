@@ -1,16 +1,18 @@
 {
   "name": "averon",
-  "version": "2.0.0",
-  "description": "Averon — Family Investment Platform with Razorpay",
+  "version": "3.0.0",
+  "description": "Averon — Blockchain Asset Tokenization Platform with AI Analysis",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
   },
   "dependencies": {
-    "razorpay": "^2.9.4",
-    "express": "^4.18.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "multer": "^2.0.1",
+    "razorpay": "^2.9.4",
+    "sql.js": "^1.11.0"
   }
 }

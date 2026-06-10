@@ -1,12 +1,7 @@
-# Environment variables — never commit secrets
-.env
-
-# Node dependencies
 node_modules/
-
-# Runtime data files (local DB)
 data/
-
-# OS files
+uploads/
+.env
+*.db
 .DS_Store
-Thumbs.db
+package-lock.json
