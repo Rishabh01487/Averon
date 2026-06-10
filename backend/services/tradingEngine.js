@@ -154,3 +154,86 @@ class TradingEngine {
 
     // Update last trade price
     if (trades.length > 0) {
+      const lastTradePrice = trades[trades.length - 1].price;
+      this.db.setPrice(lastTradePrice);
+      this.checkCircuitBreaker(lastTradePrice);
+    }
+
+    return trades;
+  }
+
+  // ── Cancel Order ─────────────────────────────────────────────────────────
+
+  cancelOrder(orderId, userId) {
+    const order = this.db.queryOne('SELECT * FROM coin_orders WHERE id = ? AND user_id = ? AND status = "open"', [orderId, userId]);
+    if (!order) throw new Error('Order not found or not cancellable');
+
+    // Return locked coins for sell orders
+    if (order.side === 'sell' && order.remaining > 0) {
+      this.db.run('UPDATE users SET averon_balance = averon_balance + ? WHERE id = ?', [order.remaining, userId]);
+    }
+
+    this.db.run('UPDATE coin_orders SET status = "cancelled", updated_at = ? WHERE id = ?', [Date.now(), orderId]);
+
+    this.db.run('INSERT INTO activity_log (user_id, action, details, created_at) VALUES (?,?,?,?)',
+      [userId, 'ORDER_CANCELLED', `Cancelled ${order.side} order #${orderId}`, Date.now()]);
+
+    return { cancelled: true, returned: order.side === 'sell' ? order.remaining : 0 };
+  }
+
+  // ── Circuit Breaker ──────────────────────────────────────────────────────
+
+  checkCircuitBreaker(currentPrice) {
+    const enabled = this.db.getConfig('circuit_breaker_enabled') === 'true';
+    if (!enabled) return;
+
+    const threshold = parseFloat(this.db.getConfig('circuit_breaker_percent') || C.TRADING.CIRCUIT_BREAKER_PERCENT);
+    const now = Date.now();
+
+    if (now - this.lastPriceCheck > C.TRADING.CIRCUIT_BREAKER_WINDOW_MS) {
+      this.lastPriceCheck = now;
+      this.priceAtCheckpoint = currentPrice;
+      this.circuitBreakerTripped = false;
+      return;
+    }
+
+    const pctChange = Math.abs((currentPrice - this.priceAtCheckpoint) / this.priceAtCheckpoint * 100);
+    if (pctChange > threshold) {
+      this.circuitBreakerTripped = true;
+      console.warn(`  ⚠ CIRCUIT BREAKER: Price moved ${pctChange.toFixed(1)}% — trading halted`);
+
+      // Auto-reset after window
+      setTimeout(() => {
+        this.circuitBreakerTripped = false;
+        this.priceAtCheckpoint = this.db.getPrice();
+        this.lastPriceCheck = Date.now();
+        console.log('  ✓ Circuit breaker reset');
+      }, C.TRADING.CIRCUIT_BREAKER_WINDOW_MS);
+    }
+  }
+
+  // ── Order Book ───────────────────────────────────────────────────────────
+
+  getOrderBook() {
+    const buys = this.db.query('SELECT o.*, u.name FROM coin_orders o JOIN users u ON o.user_id = u.id WHERE o.status = "open" AND o.side = "buy" ORDER BY o.price DESC LIMIT 50');
+    const sells = this.db.query('SELECT o.*, u.name FROM coin_orders o JOIN users u ON o.user_id = u.id WHERE o.status = "open" AND o.side = "sell" ORDER BY o.price ASC LIMIT 50');
+    const spread = sells.length && buys.length ? parseFloat((sells[0].price - buys[0].price).toFixed(4)) : null;
+
+    return {
+      buys: buys.map(o => ({ id: o.id, amount: o.remaining, price: o.price, total: parseFloat((o.remaining * o.price).toFixed(4)) })),
+      sells: sells.map(o => ({ id: o.id, amount: o.remaining, price: o.price, total: parseFloat((o.remaining * o.price).toFixed(4)) })),
+      spread,
+      circuitBreaker: this.circuitBreakerTripped,
+    };
+  }
+
+  getRecentTrades(limit = 30) {
+    return this.db.query(
+      `SELECT t.*, b.name as buyer_name, s.name as seller_name 
+       FROM coin_trades t JOIN users b ON t.buyer_id = b.id JOIN users s ON t.seller_id = s.id 
+       ORDER BY t.created_at DESC LIMIT ?`, [limit]
+    );
+  }
+}
+
+module.exports = { TradingEngine };
