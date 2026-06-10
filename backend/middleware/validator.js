@@ -122,3 +122,12 @@ function validate(schemaName) {
 
     next();
   };
+}
+
+// Global sanitizer middleware
+function sanitizeBody(req, res, next) {
+  if (req.body) req.body = sanitizeObject(req.body);
+  next();
+}
+
+module.exports = { validate, sanitizeBody, sanitizeString, sanitizeObject, schemas, rules };
