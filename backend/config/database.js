@@ -421,3 +421,106 @@ function query(sql, params = []) {
     return [];
   }
 }
+
+function queryOne(sql, params = []) {
+  const results = query(sql, params);
+  return results.length > 0 ? results[0] : null;
+}
+
+function run(sql, params = []) {
+  if (!db) return { changes: 0, lastId: 0 };
+  try {
+    db.run(sql, params);
+    const changes = db.getRowsModified();
+    const lastRow = queryOne('SELECT last_insert_rowid() as id');
+    return { changes, lastId: lastRow?.id || 0 };
+  } catch (e) {
+    console.error('SQL Run Error:', e.message, '\n  SQL:', sql, '\n  Params:', params);
+    return { changes: 0, lastId: 0 };
+  }
+}
+
+function runTransaction(fn) {
+  db.run('BEGIN TRANSACTION');
+  try {
+    const result = fn();
+    db.run('COMMIT');
+    persist();
+    return result;
+  } catch (e) {
+    db.run('ROLLBACK');
+    throw e;
+  }
+}
+
+function getConfig(key) {
+  const row = queryOne('SELECT value FROM system_config WHERE key = ?', [key]);
+  return row?.value ?? null;
+}
+
+function setConfig(key, value, updatedBy = 'system') {
+  run('UPDATE system_config SET value = ?, updated_by = ?, updated_at = ? WHERE key = ?', [String(value), updatedBy, Date.now(), key]);
+}
+
+// ── ECONOMY HELPERS ──────────────────────────────────────────────────────────
+
+function getPrice() {
+  return queryOne('SELECT price FROM economy WHERE id = 1')?.price || C.PRICE.INITIAL_PRICE;
+}
+
+function setPrice(newPrice) {
+  newPrice = Math.max(C.PRICE.MIN_PRICE, Math.min(C.PRICE.MAX_PRICE, newPrice));
+  run('UPDATE economy SET price = ?, market_cap = price * circulating_supply, updated_at = ? WHERE id = 1', [newPrice, Date.now()]);
+  run('INSERT INTO price_history (price, high, low, open, close, recorded_at) VALUES (?,?,?,?,?,?)',
+    [newPrice, newPrice, newPrice, newPrice, newPrice, Date.now()]);
+}
+
+function updateEconomy(field, value) {
+  run(`UPDATE economy SET ${field} = ?, updated_at = ? WHERE id = 1`, [value, Date.now()]);
+}
+
+function incrementEconomy(field, amount) {
+  run(`UPDATE economy SET ${field} = ${field} + ?, updated_at = ? WHERE id = 1`, [amount, Date.now()]);
+}
+
+function getEconomy() {
+  return queryOne('SELECT * FROM economy WHERE id = 1');
+}
+
+function getDashboardStats() {
+  const eco = getEconomy() || {};
+  const assetStats = queryOne(`SELECT 
+    COUNT(*) as total,
+    SUM(CASE WHEN status = '${C.ASSET_STATUS.ACTIVE}' OR status = '${C.ASSET_STATUS.FUNDING}' THEN 1 ELSE 0 END) as active,
+    SUM(CASE WHEN status = '${C.ASSET_STATUS.FUNDED}' OR status = '${C.ASSET_STATUS.COMPLETED}' THEN 1 ELSE 0 END) as funded,
+    SUM(CASE WHEN status IN ('${C.ASSET_STATUS.DRAFT}','${C.ASSET_STATUS.DOCUMENTS_UPLOADED}','${C.ASSET_STATUS.AI_ANALYZING}','${C.ASSET_STATUS.VERIFIED}','${C.ASSET_STATUS.COMPLIANCE_REVIEW}') THEN 1 ELSE 0 END) as pending
+    FROM assets`) || {};
+  const userCount = queryOne('SELECT COUNT(*) as c FROM users')?.c || 0;
+  const priceHistory = query('SELECT price FROM price_history ORDER BY recorded_at DESC LIMIT 200').reverse();
+
+  return {
+    price: eco.price || C.PRICE.INITIAL_PRICE,
+    totalSupply: eco.total_supply || 0,
+    circulatingSupply: eco.circulating_supply || 0,
+    totalRaisedInr: eco.total_raised_inr || 0,
+    totalAssetsFunded: eco.total_assets_funded || 0,
+    totalFeesCollected: eco.total_fees_collected || 0,
+    totalTrades: eco.total_trades || 0,
+    totalVolume: eco.total_volume || 0,
+    holders: eco.holder_count || 0,
+    marketCap: eco.market_cap || 0,
+    tvl: eco.tvl || 0,
+    assets: { total: assetStats.total || 0, active: assetStats.active || 0, funded: assetStats.funded || 0, pending: assetStats.pending || 0 },
+    userCount,
+    priceHistory: priceHistory.map(h => h.price),
+  };
+}
+
+// ── EXPORTS ──────────────────────────────────────────────────────────────────
+
+module.exports = {
+  initDatabase, persist,
+  query, queryOne, run, runTransaction,
+  getConfig, setConfig,
+  getPrice, setPrice, updateEconomy, incrementEconomy, getEconomy, getDashboardStats,
+};
