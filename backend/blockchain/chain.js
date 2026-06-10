@@ -26,3 +26,111 @@ class Blockchain {
   }
 
   // ── Genesis Block ──────────────────────────────────────────────────────────
+
+  createGenesisBlock() {
+    const genesisTx = new Transaction('SYSTEM', 'SYSTEM', 0, C.TX_TYPES.MINT, {
+      message: 'Averon Genesis Block — Real-World Asset Tokenization Platform',
+      version: C.PLATFORM_VERSION,
+    });
+    genesisTx.status = 'confirmed';
+
+    const genesis = new Block(0, '0', [genesisTx], C.BLOCKCHAIN.GENESIS_TIMESTAMP);
+    genesis.miner = 'GENESIS';
+    genesis.difficulty = this.difficulty;
+    genesis.mine(this.difficulty);
+    genesis.transactions[0].blockIndex = 0;
+
+    this.chain.push(genesis);
+    this.save();
+    console.log('  ⛓  Genesis block created: ' + genesis.hash.substring(0, 16) + '...');
+  }
+
+  // ── Persistence ────────────────────────────────────────────────────────────
+
+  load() {
+    try {
+      if (fs.existsSync(this.chainPath)) {
+        const data = JSON.parse(fs.readFileSync(this.chainPath, 'utf8'));
+        this.chain = data.chain.map(b => Block.fromJSON(b));
+        this.pendingTransactions = (data.pending || []).map(tx => Transaction.fromJSON(tx));
+        this.difficulty = data.difficulty || C.BLOCKCHAIN.DIFFICULTY;
+      }
+    } catch (e) {
+      console.error('Chain load error:', e.message);
+      this.chain = [];
+    }
+  }
+
+  save() {
+    try {
+      const data = {
+        version: C.PLATFORM_VERSION,
+        difficulty: this.difficulty,
+        chain: this.chain.map(b => b.toJSON()),
+        pending: this.pendingTransactions.map(tx => tx.toJSON()),
+        savedAt: Date.now(),
+      };
+      fs.writeFileSync(this.chainPath, JSON.stringify(data));
+    } catch (e) {
+      console.error('Chain save error:', e.message);
+    }
+  }
+
+  // ── Transaction Pool ───────────────────────────────────────────────────────
+
+  addTransaction(transaction) {
+    // Validate transaction
+    if (transaction.from !== 'SYSTEM') {
+      if (!transaction.isValid()) {
+        throw new Error('Invalid transaction signature');
+      }
+    }
+
+    const ruleCheck = transaction.validateRules();
+    if (!ruleCheck.valid) {
+      throw new Error('Transaction rule violation: ' + ruleCheck.errors.join(', '));
+    }
+
+    // Check for duplicate
+    const exists = this.pendingTransactions.find(tx => tx.hash === transaction.hash);
+    if (exists) {
+      throw new Error('Duplicate transaction');
+    }
+
+    // Check if already in a block
+    for (const block of this.chain) {
+      if (block.transactions.find(tx => tx.hash === transaction.hash)) {
+        throw new Error('Transaction already confirmed');
+      }
+    }
+
+    this.pendingTransactions.push(transaction);
+    return transaction;
+  }
+
+  // ── Mining ─────────────────────────────────────────────────────────────────
+
+  minePendingTransactions(minerAddress) {
+    if (this.pendingTransactions.length === 0) return null;
+
+    // Select transactions for this block (up to max)
+    const txsToMine = this.pendingTransactions.slice(0, C.BLOCKCHAIN.MAX_TRANSACTIONS_PER_BLOCK);
+
+    // Add mining reward
+    const rewardTx = new Transaction('SYSTEM', minerAddress, this.miningReward, C.TX_TYPES.REWARD, {
+      blockIndex: this.chain.length,
+    });
+    rewardTx.status = 'confirmed';
+    txsToMine.push(rewardTx);
+
+    // Create new block
+    const previousBlock = this.getLatestBlock();
+    const newBlock = new Block(
+      this.chain.length,
+      previousBlock.hash,
+      txsToMine
+    );
+    newBlock.miner = minerAddress;
+    newBlock.difficulty = this.difficulty;
+
+    // Mine it
