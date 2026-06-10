@@ -134,3 +134,111 @@ class Blockchain {
     newBlock.difficulty = this.difficulty;
 
     // Mine it
+    const mineResult = newBlock.mine(this.difficulty);
+
+    // Mark transactions as confirmed
+    for (const tx of txsToMine) {
+      tx.status = 'confirmed';
+      tx.blockIndex = newBlock.index;
+    }
+
+    // Update confirmation counts for previous blocks
+    for (const block of this.chain) {
+      for (const tx of block.transactions) {
+        tx.confirmations = newBlock.index - tx.blockIndex;
+      }
+    }
+
+    // Add to chain
+    this.chain.push(newBlock);
+
+    // Remove mined transactions from pending pool
+    const minedHashes = new Set(txsToMine.map(tx => tx.hash));
+    this.pendingTransactions = this.pendingTransactions.filter(tx => !minedHashes.has(tx.hash));
+
+    // Adjust difficulty
+    this.difficulty = adjustDifficulty(this.chain);
+
+    // Persist
+    this.save();
+
+    return newBlock;
+  }
+
+  // ── Balance Calculation (UTXO-style) ───────────────────────────────────────
+
+  getBalance(address) {
+    let balance = 0;
+
+    for (const block of this.chain) {
+      for (const tx of block.transactions) {
+        if (tx.to === address) balance += tx.amount;
+        if (tx.from === address) balance -= (tx.amount + (tx.fee || 0));
+      }
+    }
+
+    // Also account for pending outgoing
+    for (const tx of this.pendingTransactions) {
+      if (tx.from === address) balance -= (tx.amount + (tx.fee || 0));
+    }
+
+    return parseFloat(Math.max(0, balance).toFixed(8));
+  }
+
+  /**
+   * Get all transactions for an address (full history).
+   */
+  getTransactionHistory(address, limit = 50) {
+    const txs = [];
+    for (const block of this.chain) {
+      for (const tx of block.transactions) {
+        if (tx.from === address || tx.to === address) {
+          txs.push({
+            ...tx.toJSON(),
+            direction: tx.to === address ? 'in' : 'out',
+            blockIndex: block.index,
+            blockHash: block.hash,
+            confirmations: this.chain.length - block.index,
+          });
+        }
+      }
+    }
+    return txs.reverse().slice(0, limit);
+  }
+
+  /**
+   * Find a transaction by hash across the entire chain.
+   */
+  findTransaction(hash) {
+    for (const block of this.chain) {
+      for (const tx of block.transactions) {
+        if (tx.hash === hash) {
+          return {
+            ...tx.toJSON(),
+            blockIndex: block.index,
+            blockHash: block.hash,
+            confirmations: this.chain.length - block.index,
+          };
+        }
+      }
+    }
+    // Check pending
+    const pending = this.pendingTransactions.find(tx => tx.hash === hash);
+    if (pending) return { ...pending.toJSON(), status: 'pending', confirmations: 0 };
+    return null;
+  }
+
+  // ── Queries ────────────────────────────────────────────────────────────────
+
+  getLatestBlock() {
+    return this.chain[this.chain.length - 1];
+  }
+
+  getBlock(index) {
+    if (index < 0 || index >= this.chain.length) return null;
+    return this.chain[index];
+  }
+
+  getBlockByHash(hash) {
+    return this.chain.find(b => b.hash === hash) || null;
+  }
