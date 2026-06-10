@@ -90,3 +90,109 @@ class Block {
       }
     }
     return { valid: errors.length === 0, errors };
+  }
+
+  /**
+   * Verify the Merkle root matches the transactions.
+   */
+  verifyMerkleRoot() {
+    const computed = this.computeMerkleRoot();
+    return computed === this.merkleRoot;
+  }
+
+  /**
+   * Get a Merkle proof for a specific transaction.
+   */
+  getMerkleProof(txHash) {
+    const tree = MerkleTree.fromTransactions(this.transactions);
+    const index = this.transactions.findIndex(tx => {
+      const h = typeof tx === 'string' ? tx : (tx.hash || '');
+      return h === txHash;
+    });
+    if (index === -1) return null;
+    return { proof: tree.getProof(index), root: this.merkleRoot };
+  }
+
+  /**
+   * Validate the block's timestamp is reasonable.
+   */
+  validateTimestamp(previousBlockTimestamp) {
+    // Must be after previous block
+    if (this.timestamp <= previousBlockTimestamp) return false;
+    // Must not be too far in the future
+    if (this.timestamp > Date.now() + C.BLOCKCHAIN.MAX_FUTURE_BLOCK_TIME_MS) return false;
+    return true;
+  }
+
+  /**
+   * Validate the block's hash meets difficulty requirement.
+   */
+  validateHash() {
+    const target = '0'.repeat(this.difficulty);
+    const recalculated = this.calculateHash();
+    return this.hash === recalculated && this.hash.startsWith(target);
+  }
+
+  /**
+   * Full block validation.
+   */
+  validate(previousBlock) {
+    const errors = [];
+
+    // Hash validation
+    if (!this.validateHash()) errors.push('Invalid hash or does not meet difficulty');
+
+    // Previous hash link
+    if (previousBlock && this.previousHash !== previousBlock.hash) errors.push('Previous hash mismatch');
+
+    // Merkle root
+    if (!this.verifyMerkleRoot()) errors.push('Merkle root mismatch');
+
+    // Timestamp
+    if (previousBlock && !this.validateTimestamp(previousBlock.timestamp)) errors.push('Invalid timestamp');
+
+    // Transaction validation
+    const txValidation = this.validateTransactions();
+    if (!txValidation.valid) errors.push(...txValidation.errors.map(e => `TX ${e.txIndex}: ${e.error || e.errors?.join(', ')}`));
+
+    // Block size
+    if (this.size > C.BLOCKCHAIN.MAX_BLOCK_SIZE_BYTES) errors.push('Block exceeds maximum size');
+
+    // Transaction count
+    if (this.transactions.length > C.BLOCKCHAIN.MAX_TRANSACTIONS_PER_BLOCK) errors.push('Too many transactions');
+
+    return { valid: errors.length === 0, errors };
+  }
+
+  toJSON() {
+    return {
+      version: this.version,
+      index: this.index,
+      previousHash: this.previousHash,
+      timestamp: this.timestamp,
+      merkleRoot: this.merkleRoot,
+      hash: this.hash,
+      nonce: this.nonce,
+      difficulty: this.difficulty,
+      miner: this.miner,
+      size: this.size,
+      transactionCount: this.transactions.length,
+      transactions: this.transactions.map(tx => tx.toJSON ? tx.toJSON() : tx),
+    };
+  }
+
+  static fromJSON(json) {
+    const txs = (json.transactions || []).map(tx => Transaction.fromJSON(tx));
+    const block = new Block(json.index, json.previousHash, txs, json.timestamp);
+    block.version = json.version || 1;
+    block.nonce = json.nonce;
+    block.difficulty = json.difficulty || C.BLOCKCHAIN.DIFFICULTY;
+    block.miner = json.miner || '';
+    block.merkleRoot = json.merkleRoot || block.computeMerkleRoot();
+    block.hash = json.hash || block.calculateHash();
+    block.size = json.size || 0;
+    return block;
+  }
+}
+
+module.exports = { Block };
