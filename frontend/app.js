@@ -110,3 +110,111 @@ function initAuth() {
   $('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     $('authError').classList.add('hidden');
+    try {
+      const data = await api('/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email: $('loginEmail').value, password: $('loginPassword').value }),
+      });
+      state.user = data.user;
+      state.accessToken = data.accessToken;
+      state.refreshToken = data.refreshToken;
+      saveSession();
+      enterApp();
+    } catch (e) {
+      $('authError').textContent = e.message;
+      $('authError').classList.remove('hidden');
+    }
+  });
+
+  $('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    $('authError').classList.add('hidden');
+    try {
+      const data = await api('/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: $('regName').value, organization: $('regOrg').value,
+          email: $('regEmail').value, password: $('regPassword').value,
+        }),
+      });
+      state.user = data.user;
+      state.accessToken = data.accessToken;
+      state.refreshToken = data.refreshToken;
+      saveSession();
+      toast(`Welcome, ${data.user.name}! Wallet: ${data.user.walletAddress}`, 'success');
+      enterApp();
+    } catch (e) {
+      $('authError').textContent = e.message;
+      $('authError').classList.remove('hidden');
+    }
+  });
+}
+
+// ── ENTER APP ────────────────────────────────────────────────────────────────
+
+async function enterApp() {
+  $('authOverlay').classList.add('hidden');
+  $('mainApp').classList.remove('hidden');
+  $('userName').textContent = state.user?.name || '';
+
+  // Load config
+  try {
+    state.config = await api('/api/config');
+    state.categories = state.config.categories || [];
+    $('livePrice').textContent = parseFloat(state.config.price).toFixed(2);
+    populateCategories();
+  } catch {}
+
+  // Load initial page
+  navigateTo('home');
+
+  // Refresh account
+  try {
+    const acc = await api('/api/account');
+    state.user = { ...state.user, ...acc };
+    saveSession();
+  } catch {}
+
+  // Check notifications
+  loadNotifications();
+
+  // Start price polling
+  setInterval(pollPrice, 10000);
+}
+
+function populateCategories() {
+  const sel = $('assetCategory');
+  const filter = $('assetFilterCategory');
+  for (const cat of state.categories) {
+    sel.innerHTML += `<option value="${cat}">${cat}</option>`;
+    filter.innerHTML += `<option value="${cat}">${cat}</option>`;
+  }
+}
+
+async function pollPrice() {
+  try {
+    const data = await api('/api/economy');
+    $('livePrice').textContent = parseFloat(data.price).toFixed(2);
+  } catch {}
+}
+
+async function loadNotifications() {
+  try {
+    const data = await api('/api/notifications');
+    const badge = $('notifCount');
+    if (data.unread > 0) { badge.textContent = data.unread; badge.classList.remove('hidden'); }
+    else badge.classList.add('hidden');
+  } catch {}
+}
+
+// ── NAVIGATION ───────────────────────────────────────────────────────────────
+
+function initNav() {
+  $$('.nav-link').forEach(link => {
+    link.addEventListener('click', () => navigateTo(link.dataset.page));
+  });
+  $('logoutBtn').addEventListener('click', logout);
+  $('notifBell').addEventListener('click', () => { navigateTo('portfolio'); api('/api/notifications/read', { method: 'POST' }); $('notifCount').classList.add('hidden'); });
+}
+
+function navigateTo(page) {
