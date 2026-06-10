@@ -286,3 +286,111 @@ app.post('/api/assets/:assetId/documents', authenticate, uploadLimiter, upload.a
   for (const file of (req.files || [])) {
     const newPath = path.join(assetDir, file.filename);
     if (file.path !== newPath) try { fs.renameSync(file.path, newPath); } catch {}
+
+    // Hash the document for duplicate detection
+    let docHash = '';
+    try { docHash = crypto.createHash('sha256').update(fs.readFileSync(newPath)).digest('hex'); } catch {}
+
+    DB.run('INSERT INTO asset_documents (asset_id, filename, original_name, mimetype, size, filepath, doc_hash, uploaded_at) VALUES (?,?,?,?,?,?,?,?)',
+      [assetId, file.filename, file.originalname, file.mimetype, file.size, newPath, docHash, Date.now()]);
+    docs.push({ filename: file.filename, original_name: file.originalname, mimetype: file.mimetype, size: file.size });
+  }
+
+  // Transition to documents_uploaded if in draft
+  if (asset.status === C.ASSET_STATUS.DRAFT) {
+    assetService.transition(assetId, C.ASSET_STATUS.DOCUMENTS_UPLOADED, req.user.userId, 'Documents uploaded');
+  }
+
+  res.json({ uploaded: docs.length, documents: docs });
+});
+
+app.post('/api/assets/:id/analyze', authenticate, (req, res) => {
+  const assetId = parseInt(req.params.id);
+  const asset = DB.queryOne('SELECT * FROM assets WHERE id = ? AND owner_id = ?', [assetId, req.user.userId]);
+  if (!asset) return res.status(404).json({ error: 'Asset not found or not owned' });
+
+  // Transition to analyzing
+  try { assetService.transition(assetId, C.ASSET_STATUS.AI_ANALYZING, req.user.userId, 'AI analysis triggered'); } catch {}
+
+  const docs = DB.query('SELECT * FROM asset_documents WHERE asset_id = ?', [assetId]);
+
+  (async () => {
+    try {
+      const result = await analyzeAsset(
+        { title: asset.title, description: asset.description, category: asset.category, raise_amount: asset.raise_amount },
+        docs.map(d => ({ ...d, path: d.filepath })),
+        DB
+      );
+
+      const newStatus = result.verified ? C.ASSET_STATUS.VERIFIED : C.ASSET_STATUS.REJECTED;
+      DB.run(`UPDATE assets SET ai_verified=?, ai_valuation=?, ai_risk_score=?, ai_risk_level=?, ai_confidence=?, ai_analysis_summary=?, ai_concerns=?, ai_raw_response=?, ai_analyzed_at=?, total_value=?, status=?, updated_at=? WHERE id=?`,
+        [result.verified ? 1 : 0, result.estimatedValue, result.riskScore, result.riskLevel, result.confidence,
+         result.analysis, result.concerns, result.raw || '', Date.now(), result.estimatedValue, newStatus, Date.now(), assetId]);
+
+      // Store valuation record
+      DB.run('INSERT INTO asset_valuations (asset_id, valuation, risk_score, confidence, source, details, created_at) VALUES (?,?,?,?,?,?,?)',
+        [assetId, result.estimatedValue, result.riskScore, result.confidence, result.source, JSON.stringify(result.stages || []), Date.now()]);
+
+      DB.run('INSERT INTO activity_log (user_id, action, details, created_at) VALUES (?,?,?,?)',
+        [asset.owner_id, 'AI_ANALYSIS', `AI ${result.verified ? 'verified' : 'rejected'} — Risk: ${result.riskLevel} (${result.riskScore}%)`, Date.now()]);
+
+      res.json({ ...result, assetId, status: newStatus });
+    } catch (e) {
+      DB.run('UPDATE assets SET status = ?, updated_at = ? WHERE id = ?', [C.ASSET_STATUS.DOCUMENTS_UPLOADED, Date.now(), assetId]);
+      res.status(500).json({ error: 'AI analysis failed: ' + e.message });
+    }
+  })();
+});
+
+app.post('/api/assets/:id/confirm', authenticate, (req, res) => {
+  try {
+    const assetId = parseInt(req.params.id);
+    const result = assetService.tokenizeAsset(assetId, req.user.userId, req.body.aiResult || {});
+    res.json({ success: true, ...result, asset: assetService.getAsset(assetId) });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+app.post('/api/assets/:id/tokens/buy', authenticate, financialLimiter, validate('buyTokens'), (req, res) => {
+  try {
+    const result = assetService.buyTokens(parseInt(req.params.id), req.user.userId, parseInt(req.body.count) || 1);
+    eventBus.emit(EVENTS.TOKEN_PURCHASED, result);
+    if (result.funded) eventBus.emit(EVENTS.ASSET_FUNDED, { assetId: parseInt(req.params.id) });
+    res.json(result);
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// ── Marketplace ──────────────────────────────────────────────────────────────
+
+app.get('/api/market/orderbook', (req, res) => {
+  const book = tradingEngine.getOrderBook();
+  const trades = tradingEngine.getRecentTrades(30);
+  res.json({ ...book, recentTrades: trades });
+});
+
+app.post('/api/market/order', authenticate, financialLimiter, validate('placeOrder'), (req, res) => {
+  const { side, type, amount, price } = req.body;
+  try {
+    const result = tradingEngine.placeOrder(req.user.userId, side, type || 'limit', parseFloat(amount), parseFloat(price));
+    eventBus.emit(EVENTS.ORDER_PLACED, result);
+    res.json(result);
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+app.delete('/api/market/order/:id', authenticate, (req, res) => {
+  try {
+    const result = tradingEngine.cancelOrder(parseInt(req.params.id), req.user.userId);
+    res.json(result);
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// ── Portfolio ────────────────────────────────────────────────────────────────
+
+app.get('/api/portfolio', authenticate, (req, res) => {
+  const userId = req.user.userId;
+  const wallet = DB.queryOne('SELECT address FROM wallets WHERE user_id = ?', [userId]);
+  const balance = wallet ? blockchain.getBalance(wallet.address) : 0;
+  const price = DB.getPrice();
+
+  const tokens = DB.query(`SELECT t.*, a.title as asset_title, a.category, a.status as asset_status 
+    FROM asset_tokens t JOIN assets a ON t.asset_id = a.id WHERE t.owner_id = ?`, [userId]);
+  const myAssets = DB.query('SELECT * FROM assets WHERE owner_id = ? ORDER BY created_at DESC', [userId]);
