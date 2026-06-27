@@ -109,7 +109,7 @@ class ComplianceService {
       tokenCount: tokens.length,
       investorCount: investors.length,
       concentrationRisk: investors.map(i => {
-        const total = tokens.filter(t => t.owner_id === i.i).reduce((s, t) => s + t.price, 0);
+        const total = tokens.filter(t => t.owner_id === i.owner_id).reduce((s, t) => s + t.price, 0);
         return { userId: i.owner_id, exposure: total };
       }),
       reportedAt: Date.now(),

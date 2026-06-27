@@ -32,14 +32,20 @@ class TradingEngine {
     // Validate
     if (amount < C.TRADING.MIN_ORDER_AMOUNT) throw new Error(`Minimum: ${C.TRADING.MIN_ORDER_AMOUNT} AC`);
 
-    // For sell orders, verify balance
-    if (side === 'sell') {
-      const wallet = this.db.queryOne('SELECT address FROM wallets WHERE user_id = ?', [userId]);
-      const balance = wallet ? this.blockchain.getBalance(wallet.address) : 0;
-      if (balance < amount) throw new Error(`Insufficient balance: ${balance.toFixed(4)} AC`);
+    // Get wallet and balance
+    const wallet = this.db.queryOne('SELECT address FROM wallets WHERE user_id = ?', [userId]);
+    const balance = wallet ? this.blockchain.getBalance(wallet.address) : 0;
 
-      // Lock the coins (deduct from available balance)
-      this.db.run('UPDATE users SET averon_balance = averon_balance - ? WHERE id = ?', [amount, userId]);
+    if (side === 'sell') {
+      // For sell orders, verify coin balance and lock
+      if (balance < amount) throw new Error(`Insufficient balance: ${balance.toFixed(4)} AC`);
+    } else if (side === 'buy') {
+      // For buy orders, verify the user has enough coins to pay (amount * price)
+      // For limit orders, lock the total cost; for market orders price is set below
+      if (type === 'limit' && price) {
+        const totalCost = parseFloat((amount * price).toFixed(8));
+        if (balance < totalCost) throw new Error(`Insufficient balance: need ${totalCost.toFixed(4)} AC, have ${balance.toFixed(4)} AC`);
+      }
     }
 
     // For market orders, use best available price
@@ -99,11 +105,6 @@ class TradingEngine {
         const buyerWallet = this.db.queryOne('SELECT address FROM wallets WHERE user_id = ?', [buy.user_id]);
         const sellerWallet = this.db.queryOne('SELECT address FROM wallets WHERE user_id = ?', [sell.user_id]);
 
-        // Transfer coins: Escrow (sell order hold) → Buyer
-        const buyer = this.db.queryOne('SELECT * FROM users WHERE id = ?', [buy.user_id]);
-        this.db.run('UPDATE users SET averon_balance = averon_balance + ? WHERE id = ?',
-          [parseFloat((tradeAmount - buyerFee).toFixed(8)), buy.user_id]);
-
         // Record blockchain trade
         const tradeTx = new Transaction(
           sellerWallet?.address || sell.user_id,
@@ -152,8 +153,24 @@ class TradingEngine {
       }
     }
 
-    // Update last trade price
+    // Mine all trade transactions and sync balances
     if (trades.length > 0) {
+      this.blockchain.minePendingTransactions(this.walletManager.getSystemWallet().address);
+
+      // Sync DB balances from blockchain for all affected users
+      const affectedUsers = new Set();
+      for (const t of trades) {
+        affectedUsers.add(t.buyerId);
+        affectedUsers.add(t.sellerId);
+      }
+      for (const uid of affectedUsers) {
+        const w = this.db.queryOne('SELECT address FROM wallets WHERE user_id = ?', [uid]);
+        if (w) {
+          const bal = this.blockchain.getBalance(w.address);
+          this.db.run('UPDATE users SET averon_balance = ? WHERE id = ?', [bal, uid]);
+        }
+      }
+
       const lastTradePrice = trades[trades.length - 1].price;
       this.db.setPrice(lastTradePrice);
       this.checkCircuitBreaker(lastTradePrice);

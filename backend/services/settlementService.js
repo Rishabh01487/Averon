@@ -55,6 +55,9 @@ class SettlementService {
     const wallet = this.db.queryOne('SELECT * FROM wallets WHERE user_id = ?', [req.user_id]);
     if (!wallet) throw new Error('User wallet not found');
 
+    const userWallet = this.walletManager.getWallet(req.user_id);
+    if (!userWallet) throw new Error('User wallet keys not found');
+
     const withdrawTx = new Transaction(
       wallet.address,
       this.walletManager.getSystemWallet().address,
@@ -62,6 +65,7 @@ class SettlementService {
       C.TX_TYPES.TRANSFER,
       { withdrawalId: req.id, type: 'WITHDRAWAL' }
     );
+    userWallet.sign(withdrawTx);
     this.blockchain.addTransaction(withdrawTx);
 
     if (req.fee > 0) {
@@ -72,6 +76,7 @@ class SettlementService {
         C.TX_TYPES.FEE,
         { withdrawalId: req.id, feeType: 'withdrawal' }
       );
+      userWallet.sign(feeTx);
       this.blockchain.addTransaction(feeTx);
     }
 

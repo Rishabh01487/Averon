@@ -1,4 +1,5 @@
 const { eventBus, EVENTS } = require('./eventBus');
+const { verifyAccessToken } = require('../middleware/auth');
 
 class WebSocketServer {
   constructor(httpServer) {
@@ -60,7 +61,22 @@ class WebSocketServer {
         }
         break;
       case 'auth':
-        client.userId = msg.userId;
+        // Verify JWT token before trusting the userId
+        if (msg.token) {
+          try {
+            const decoded = verifyToken(msg.token);
+            if (decoded && decoded.userId) {
+              client.userId = decoded.userId;
+              this._send(clientId, { type: 'authenticated', userId: decoded.userId });
+            } else {
+              this._send(clientId, { type: 'auth_error', message: 'Invalid token' });
+            }
+          } catch (e) {
+            this._send(clientId, { type: 'auth_error', message: 'Token verification failed' });
+          }
+        } else {
+          this._send(clientId, { type: 'auth_error', message: 'Token required for authentication' });
+        }
         break;
       case 'ping':
         this._send(clientId, { type: 'pong', timestamp: Date.now() });
@@ -120,10 +136,14 @@ class WebSocketServer {
   }
 
   getStats() {
+    const channelStats = {};
+    for (const [name, members] of this.channels.entries()) {
+      channelStats[name] = members.size;
+    }
     return {
       connectedClients: this.clients.size,
       activeChannels: this.channels.size,
-      channels: Object.fromEntries(this.channels.entries()),
+      channels: channelStats,
     };
   }
 }

@@ -81,7 +81,7 @@ class KYCService {
     this.db.run('INSERT INTO kyc_tier_history (user_id, old_tier, new_tier, changed_by, reason, created_at) VALUES (?,?,?,?,?,?)',
       [userId, currentTier, newTier, changedBy, reason, Date.now()]);
 
-    this.db.run('UPDATE kyc_records SET current_tier = ? WHERE user_id = ?', [newTier, userId]);
+    this.db.run('UPDATE kyc_records SET current_tier = ? WHERE user_id = ? AND id = (SELECT MAX(id) FROM kyc_records WHERE user_id = ?)', [newTier, userId, userId]);
     this.db.run('UPDATE users SET kyc_status = ? WHERE id = ?', [this.getTierConfig(newTier).label, userId]);
 
     this.db.run('INSERT INTO activity_log (user_id, action, details, created_at) VALUES (?,?,?,?)',
@@ -121,9 +121,20 @@ class KYCService {
   }
 
   checkPurchaseLimit(userId, amount) {
-    const tier = this.getUserTier(userId);
-    const config = this.getTierConfig(tier);
+    let tier = this.getUserTier(userId);
+    let config = this.getTierConfig(tier);
     const today = this._today();
+
+    // Only auto-grant in development mode — production requires real KYC
+    if (config.dailyLimit <= 0 && tier === 0) {
+      if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+        this._autoGrantBasicTier(userId);
+        tier = 1;
+        config = this.getTierConfig(tier);
+      } else {
+        return { approved: false, reason: 'KYC verification required before making purchases. Please submit your identity documents.' };
+      }
+    }
 
     if (config.dailyLimit <= 0) {
       return { approved: false, reason: `Tier ${tier} (${config.label}) cannot make purchases. Complete KYC to upgrade.` };
@@ -232,6 +243,18 @@ class KYCService {
        FROM kyc_records kr JOIN users u ON kr.user_id = u.id
        WHERE kr.doc_status = 'pending' ORDER BY kr.submitted_at ASC`
     );
+  }
+
+  _autoGrantBasicTier(userId) {
+    const now = Date.now();
+    // Insert a system-verified KYC record
+    this.db.run(
+      'INSERT INTO kyc_records (user_id, doc_type, doc_number, doc_filepath, doc_status, current_tier, submitted_at, verified_at, verified_by) VALUES (?,?,?,?,?,?,?,?,?)',
+      [userId, 'auto_basic', 'AUTO_BASIC_TIER', '', 'verified', 1, now, now, 'system']
+    );
+    this.db.run('UPDATE users SET kyc_status = ? WHERE id = ?', ['Basic KYC', userId]);
+    this.db.run('INSERT INTO activity_log (user_id, action, details, created_at) VALUES (?,?,?,?)',
+      [userId, 'KYC_AUTO_BASIC', 'Auto-granted Basic KYC tier for testing', now]);
   }
 
   autoUpgradeAll() {
