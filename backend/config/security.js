@@ -8,10 +8,12 @@ function setupSecurity(app) {
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:", "blob:"],
-        connectSrc: ["'self'", "ws:", "wss:"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "https://checkout.razorpay.com", "https://cdn.razorpay.com", "https://cdn.tailwindcss.com"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
+        imgSrc: ["'self'", "data:", "blob:", "https:"],
+        connectSrc: ["'self'", "ws:", "wss:", "https://lumberjack.razorpay.com", "https://api.razorpay.com", "https://cdn.razorpay.com"],
+        frameSrc: ["'self'", "https://api.razorpay.com", "https://checkout.razorpay.com"],
       },
     },
     hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },

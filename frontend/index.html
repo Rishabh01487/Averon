@@ -127,23 +127,63 @@
 
       <!-- ── BUY COIN ── -->
       <section id="page-buy" class="page">
-        <div class="centered-card">
-          <h1>Buy Averon Coin</h1>
-          <p class="subtitle">Purchase AC tokens directly from the platform. Coins are minted to your blockchain wallet.</p>
-          <div class="buy-info">
-            <div class="info-row"><span>Current Price</span><span id="buyPrice" class="val">₹1.00</span></div>
-            <div class="info-row"><span>Your Balance</span><span id="buyBalance" class="val">0 AC</span></div>
+        <div class="buy-layout">
+          <div class="buy-main">
+            <div class="centered-card">
+              <h1>Buy Averon Coin</h1>
+              <p class="subtitle">Purchase AC tokens via Razorpay. Coins are minted to your blockchain wallet instantly.</p>
+              <div class="buy-info">
+                <div class="info-row"><span>Current Price</span><span id="buyPrice" class="val">₹1.00</span></div>
+                <div class="info-row"><span>Your Balance</span><span id="buyBalance" class="val">0 AC</span></div>
+              </div>
+
+              <!-- Gateway Selection -->
+              <div class="field">
+                <label>Payment Method</label>
+                <div class="gateway-selector" id="gatewaySelector">
+                  <button class="gateway-pill active" data-gateway="razorpay">
+                    <span class="gateway-icon">💳</span>
+                    <span class="gateway-name">Razorpay</span>
+                    <span class="gateway-desc">Cards, UPI, NetBanking</span>
+                  </button>
+                  <button class="gateway-pill" data-gateway="upi">
+                    <span class="gateway-icon">📱</span>
+                    <span class="gateway-name">Direct UPI</span>
+                    <span class="gateway-desc">Manual transfer</span>
+                  </button>
+                  <button class="gateway-pill" data-gateway="wire">
+                    <span class="gateway-icon">🏦</span>
+                    <span class="gateway-name">Wire Transfer</span>
+                    <span class="gateway-desc">Bank transfer</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Amount (INR)</label>
+                <input type="number" id="buyAmountInr" placeholder="Min ₹1" min="1" step="1">
+              </div>
+              <div class="conversion-display">
+                <span>You'll receive:</span>
+                <span id="buyEstimate" class="estimate">0 AC</span>
+              </div>
+              <button id="buyCoinsBtn" class="btn-primary btn-full">Pay with Razorpay →</button>
+              <div id="buyResult" class="result-box hidden"></div>
+
+              <!-- Manual gateway instructions (UPI / Wire) -->
+              <div id="manualInstructions" class="manual-instructions hidden"></div>
+            </div>
           </div>
-          <div class="field">
-            <label>Amount (INR)</label>
-            <input type="number" id="buyAmountInr" placeholder="Enter amount in ₹" min="10" step="10">
+
+          <!-- Payment Order History -->
+          <div class="buy-sidebar">
+            <div class="order-history-card">
+              <h3>Payment History</h3>
+              <div id="paymentOrders" class="payment-orders-list">
+                <div class="empty-state">No purchases yet</div>
+              </div>
+            </div>
           </div>
-          <div class="conversion-display">
-            <span>You'll receive:</span>
-            <span id="buyEstimate" class="estimate">0 AC</span>
-          </div>
-          <button id="buyCoinsBtn" class="btn-primary btn-full">Buy Averon Coin →</button>
-          <div id="buyResult" class="result-box hidden"></div>
         </div>
       </section>
 
@@ -293,6 +333,7 @@
   <!-- ═══ TOAST ═══ -->
   <div id="toastContainer" class="toast-container"></div>
 
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

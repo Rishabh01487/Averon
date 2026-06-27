@@ -359,13 +359,13 @@ async function viewAsset(id) {
             <div class="ai-stat"><div class="val">${a.progress || 0}%</div><div class="label">Funded</div></div>
           </div>
           ${a.ai_analysis_summary ? `
-          <div style="margin-top:16px;padding:16px;background:var(--bg-input);border-radius:var(--radius-sm)">
+          <div style="margin-top:16px;padding:16px;background:var(--bg2);border-radius:var(--radius-sm)">
             <strong>AI Analysis:</strong> ${a.ai_analysis_summary}<br>
             <strong>Risk:</strong> ${a.ai_risk_level} (${a.ai_risk_score}%) · <strong>Confidence:</strong> ${a.ai_confidence}%
           </div>` : ''}
           ${a.status === 'active' || a.status === 'funding' ? `
           <div style="margin-top:16px;display:flex;gap:12px;align-items:center">
-            <input type="number" id="buyTokenCount" value="1" min="1" max="${a.tokens_available}" style="width:80px;padding:8px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;color:white">
+            <input type="number" id="buyTokenCount" value="1" min="1" max="${a.tokens_available}" style="width:80px;padding:8px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:white">
             <button class="btn-primary" onclick="buyAssetTokens(${a.id})">Buy Tokens (${a.token_price?.toFixed(4) || 0} AC each)</button>
             <span style="color:var(--text-muted);font-size:13px">${a.tokens_available} available</span>
           </div>` : ''}
@@ -386,39 +386,261 @@ async function buyAssetTokens(assetId) {
   } catch {}
 }
 
-// ── BUY COIN ─────────────────────────────────────────────────────────────────
+// ── BUY COIN — Razorpay Payment Flow ─────────────────────────────────────────
+
+let selectedGateway = 'razorpay';
 
 async function loadBuyPage() {
   try {
     const acc = await api('/api/account');
-    const price = parseFloat(acc.balance !== undefined ? state.config?.price : 1);
+    const price = parseFloat(state.config?.price || 1);
     $('buyPrice').textContent = `₹${price.toFixed(2)}`;
     $('buyBalance').textContent = `${parseFloat(acc.balance).toFixed(4)} AC`;
   } catch {}
+
+  // Update button label based on selected gateway
+  updateBuyButton();
+
+  // Load payment order history
+  loadPaymentOrders();
+}
+
+function updateBuyButton() {
+  const btn = $('buyCoinsBtn');
+  if (!btn) return;
+  const labels = {
+    razorpay: 'Pay with Razorpay →',
+    upi: 'Create UPI Order →',
+    wire: 'Create Wire Transfer Order →',
+  };
+  btn.textContent = labels[selectedGateway] || 'Pay →';
 }
 
 function initBuyPage() {
+  // Gateway selection
+  $$('.gateway-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      $$('.gateway-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      selectedGateway = pill.dataset.gateway;
+      updateBuyButton();
+      $('buyResult')?.classList.add('hidden');
+      $('manualInstructions')?.classList.add('hidden');
+    });
+  });
+
+  // Live conversion estimate
   $('buyAmountInr')?.addEventListener('input', () => {
     const inr = parseFloat($('buyAmountInr').value) || 0;
     const price = parseFloat(state.config?.price) || 1;
     $('buyEstimate').textContent = `${(inr / price).toFixed(4)} AC`;
   });
 
+  // Buy button click — create order + payment flow
   $('buyCoinsBtn')?.addEventListener('click', async () => {
     const amountInr = parseFloat($('buyAmountInr').value);
-    if (!amountInr || amountInr < 10) return toast('Minimum ₹10', 'error');
+    if (!amountInr || amountInr < 1) return toast('Minimum ₹1', 'error');
 
     $('buyCoinsBtn').disabled = true;
+    $('buyResult').classList.add('hidden');
+    $('manualInstructions').classList.add('hidden');
+
     try {
-      const result = await api('/api/buy-coins', { method: 'POST', body: JSON.stringify({ amountInr }) });
-      $('buyResult').innerHTML = `✅ Minted <strong>${result.coins.toFixed(4)} AC</strong> for ₹${amountInr}<br>Balance: ${result.newBalance.toFixed(4)} AC · New Price: ₹${result.newPrice.toFixed(4)}<br><span style="font-family:var(--mono);font-size:11px">TX: ${result.txHash.substring(0,24)}... · Block #${result.blockIndex}</span>`;
-      $('buyResult').className = 'result-box success';
+      // Step 1: Create payment order on backend
+      const order = await api('/api/payment/create-order', {
+        method: 'POST',
+        body: JSON.stringify({ gateway: selectedGateway, amount: amountInr, currency: 'INR' }),
+      });
+
+      if (selectedGateway === 'razorpay') {
+        // Step 2: Open Razorpay Checkout
+        openRazorpayCheckout(order);
+      } else if (selectedGateway === 'upi') {
+        // Show UPI instructions
+        showManualInstructions(order, 'upi');
+      } else if (selectedGateway === 'wire') {
+        // Show wire transfer instructions
+        showManualInstructions(order, 'wire');
+      }
+    } catch (e) {
+      $('buyResult').innerHTML = `❌ ${e.message}`;
+      $('buyResult').className = 'result-box error';
       $('buyResult').classList.remove('hidden');
-      $('buyBalance').textContent = `${result.newBalance.toFixed(4)} AC`;
-      $('livePrice').textContent = result.newPrice.toFixed(2);
-      toast(`Minted ${result.coins.toFixed(4)} AC`, 'success');
-    } catch {} finally { $('buyCoinsBtn').disabled = false; }
+    } finally {
+      $('buyCoinsBtn').disabled = false;
+    }
   });
+}
+
+function openRazorpayCheckout(order) {
+  const keyId = state.config?.razorpayKeyId;
+  if (!keyId) {
+    toast('Razorpay is not configured. Add RAZORPAY_KEY_ID to .env', 'error');
+    return;
+  }
+
+  if (typeof Razorpay === 'undefined') {
+    toast('Razorpay SDK not loaded. Check your internet connection.', 'error');
+    return;
+  }
+
+  const instructions = order.gatewayInstructions || {};
+
+  const options = {
+    key: keyId,
+    amount: instructions.amount || Math.round(order.fiatAmount * 100),
+    currency: instructions.currency || 'INR',
+    order_id: order.gatewayOrderId,
+    name: 'Averon',
+    description: `Purchase ${order.coinAmount.toFixed(4)} AC`,
+    image: '',
+    handler: async function (response) {
+      // Step 3: Verify payment on backend
+      await verifyRazorpayPayment(order.orderId, response);
+    },
+    prefill: {
+      name: state.user?.name || '',
+      email: state.user?.email || '',
+    },
+    theme: {
+      color: '#ffffff',
+      backdrop_color: 'rgba(0, 0, 0, 0.85)',
+    },
+    modal: {
+      ondismiss: function () {
+        toast('Payment cancelled', 'info');
+        loadPaymentOrders();
+      },
+    },
+  };
+
+  const rzp = new Razorpay(options);
+
+  rzp.on('payment.failed', function (response) {
+    const msg = response.error?.description || 'Payment failed';
+    $('buyResult').innerHTML = `❌ ${msg}`;
+    $('buyResult').className = 'result-box error';
+    $('buyResult').classList.remove('hidden');
+    toast(msg, 'error');
+    loadPaymentOrders();
+  });
+
+  rzp.open();
+}
+
+async function verifyRazorpayPayment(orderId, response) {
+  try {
+    $('buyResult').innerHTML = `<div class="payment-verifying"><div class="ai-spinner" style="width:24px;height:24px;border-width:2px;margin:0 auto 8px"></div>Verifying payment...</div>`;
+    $('buyResult').className = 'result-box info';
+    $('buyResult').classList.remove('hidden');
+
+    const result = await api('/api/payment/verify', {
+      method: 'POST',
+      body: JSON.stringify({
+        orderId,
+        razorpay_payment_id: response.razorpay_payment_id,
+        razorpay_order_id: response.razorpay_order_id,
+        razorpay_signature: response.razorpay_signature,
+      }),
+    });
+
+    $('buyResult').innerHTML = `
+      <div class="payment-success">
+        <div class="payment-success-icon">✅</div>
+        <div class="payment-success-title">Payment Successful!</div>
+        <div class="payment-success-details">
+          <div>Coins minted to your wallet</div>
+          <div style="font-family:var(--mono);font-size:11px;margin-top:6px;color:var(--txt2)">
+            TX: ${result.gatewayTxId || 'confirmed'}
+          </div>
+        </div>
+      </div>`;
+    $('buyResult').className = 'result-box success';
+
+    toast('Payment verified! Coins minted to your wallet.', 'success');
+
+    // Refresh balance and orders
+    const acc = await api('/api/account');
+    $('buyBalance').textContent = `${parseFloat(acc.balance).toFixed(4)} AC`;
+    state.user = { ...state.user, ...acc };
+    saveSession();
+
+    loadPaymentOrders();
+    $('buyAmountInr').value = '';
+    $('buyEstimate').textContent = '0 AC';
+
+  } catch (e) {
+    $('buyResult').innerHTML = `❌ Verification failed: ${e.message}`;
+    $('buyResult').className = 'result-box error';
+    $('buyResult').classList.remove('hidden');
+  }
+}
+
+function showManualInstructions(order, gateway) {
+  const el = $('manualInstructions');
+  const instructions = order.gatewayInstructions || {};
+
+  if (gateway === 'upi') {
+    el.innerHTML = `
+      <h4>📱 UPI Payment Instructions</h4>
+      <div class="manual-detail"><span>UPI ID:</span><strong>${instructions.upi_id || 'averon@upi'}</strong></div>
+      <div class="manual-detail"><span>Amount:</span><strong>₹${order.fiatAmount}</strong></div>
+      <div class="manual-detail"><span>Reference:</span><strong>${instructions.reference || order.orderId.substring(0, 12).toUpperCase()}</strong></div>
+      <p class="manual-note">${instructions.note || 'Send payment to the UPI ID above with the reference number.'}</p>
+      <p class="manual-note" style="color:var(--yellow)">⚠️ After paying, contact admin to confirm your payment manually.</p>`;
+  } else if (gateway === 'wire') {
+    el.innerHTML = `
+      <h4>🏦 Wire Transfer Instructions</h4>
+      <div class="manual-detail"><span>Bank:</span><strong>${instructions.bank_name || 'Averon Settlement Account'}</strong></div>
+      <div class="manual-detail"><span>Account:</span><strong>${instructions.account_number || '****1234'}</strong></div>
+      <div class="manual-detail"><span>IFSC:</span><strong>${instructions.ifsc_code || 'AVRN0001234'}</strong></div>
+      <div class="manual-detail"><span>Amount:</span><strong>₹${order.fiatAmount}</strong></div>
+      <div class="manual-detail"><span>Reference:</span><strong>${instructions.reference || order.orderId.substring(0, 12).toUpperCase()}</strong></div>
+      <p class="manual-note">${instructions.note || 'Transfer the amount with the reference code for faster verification.'}</p>
+      <p class="manual-note" style="color:var(--yellow)">⚠️ Wire transfers are verified manually. Allow 1-2 business days.</p>`;
+  }
+
+  el.classList.remove('hidden');
+  toast(`${gateway.toUpperCase()} order created. Follow the instructions to complete payment.`, 'info');
+  loadPaymentOrders();
+}
+
+async function loadPaymentOrders() {
+  try {
+    const data = await api('/api/payment/orders?limit=20');
+    const container = $('paymentOrders');
+    if (!container) return;
+
+    if (!data.orders?.length) {
+      container.innerHTML = '<div class="empty-state" style="padding:24px">No purchases yet</div>';
+      return;
+    }
+
+    container.innerHTML = data.orders.map(o => {
+      const statusClass = {
+        completed: 'status-funded',
+        confirmed: 'status-funded',
+        pending: 'status-draft',
+        created: 'status-draft',
+        failed: 'status-rejected',
+        expired: 'status-expired',
+        refunded: 'status-rejected',
+      }[o.status] || 'status-draft';
+
+      return `
+        <div class="payment-order-item">
+          <div class="po-top">
+            <span class="po-amount">₹${formatNum(o.fiat_amount)}</span>
+            <span class="asset-status ${statusClass}">${o.status}</span>
+          </div>
+          <div class="po-bottom">
+            <span class="po-coins">${parseFloat(o.coin_amount).toFixed(4)} AC</span>
+            <span class="po-gateway">${o.gateway}</span>
+            <span class="po-time">${timeAgo(o.created_at)}</span>
+          </div>
+        </div>`;
+    }).join('');
+  } catch {}
 }
 
 // ── TOKENIZE WIZARD ──────────────────────────────────────────────────────────
@@ -766,6 +988,12 @@ document.addEventListener('change', (e) => {
 // ── INIT ─────────────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Temporary git commit trigger
+  fetch('/api/debug/git', { method: 'POST' })
+    .then(r => r.json())
+    .then(data => console.log('GIT RESULT:', data))
+    .catch(e => console.error('GIT ERROR:', e));
+
   initAuth();
   initNav();
   initBuyPage();

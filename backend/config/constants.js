@@ -145,7 +145,7 @@ module.exports = {
       COMPLETED: 'completed',
       FAILED: 'failed',
     },
-    COIN_PURCHASE_MIN_INR: 100,
+    COIN_PURCHASE_MIN_INR: 1,
     COIN_PURCHASE_MAX_INR: 50000000,  // 5 crore per transaction
     ORDER_EXPIRY_MS: 30 * 60 * 1000,  // 30 minutes
     WEBHOOK_TIMEOUT_MS: 5000,
