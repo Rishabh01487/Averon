@@ -68,17 +68,17 @@ class EscrowService {
     const fee = parseFloat((amount * feePercent / 100).toFixed(8));
     const payout = parseFloat((amount - fee).toFixed(8));
 
-    // Blockchain: Escrow → Owner
-    const payoutTx = new Transaction(escrow.address, ownerWallet.address, payout, C.TX_TYPES.PAYOUT, {
-      assetId, fee, feePercent,
+    // Blockchain: SYSTEM → Owner (escrow release, platform-level operation)
+    const payoutTx = new Transaction('SYSTEM', ownerWallet.address, payout, C.TX_TYPES.PAYOUT, {
+      assetId, fee, feePercent, escrowAddress: escrow.address,
     });
     this.blockchain.addTransaction(payoutTx);
 
-    // Blockchain: Escrow → Platform Fee Wallet
+    // Blockchain: SYSTEM → Platform Fee Wallet (fee from escrow)
     if (fee > 0) {
       const feeWallet = this.walletManager.getPlatformFeeWallet();
-      const feeTx = new Transaction(escrow.address, feeWallet.address, fee, C.TX_TYPES.FEE, {
-        assetId, feeType: 'capital_raise',
+      const feeTx = new Transaction('SYSTEM', feeWallet.address, fee, C.TX_TYPES.FEE, {
+        assetId, feeType: 'capital_raise', escrowAddress: escrow.address,
       });
       this.blockchain.addTransaction(feeTx);
 
@@ -122,8 +122,8 @@ class EscrowService {
 
       const refundAmount = parseFloat(token.total.toFixed(8));
 
-      const refundTx = new Transaction(escrow.address, wallet.address, refundAmount, C.TX_TYPES.REFUND, {
-        assetId, tokenCount: token.count,
+      const refundTx = new Transaction('SYSTEM', wallet.address, refundAmount, C.TX_TYPES.REFUND, {
+        assetId, tokenCount: token.count, escrowAddress: escrow.address,
       });
       this.blockchain.addTransaction(refundTx);
 

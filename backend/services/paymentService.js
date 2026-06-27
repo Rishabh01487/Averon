@@ -198,6 +198,13 @@ class PaymentService {
       throw new Error('Payment window expired');
     }
 
+    // Atomic status check to prevent double-minting race condition
+    const lockResult = this.db.run(
+      `UPDATE payment_orders SET status = 'verifying', updated_at = ? WHERE id = ? AND status IN (?, ?)`,
+      [Date.now(), orderId, C.PAYMENT.ORDER_STATUS.CREATED, C.PAYMENT.ORDER_STATUS.PENDING]
+    );
+    if (lockResult.changes === 0) throw new Error('Order is already being processed');
+
     let verified = false;
     let gatewayTxId = '';
     let gatewayData = {};
@@ -229,21 +236,28 @@ class PaymentService {
         break;
 
       case 'wire':
-        if (gatewayParams.confirmed) {
+        // Wire payments require admin-confirmed flag from webhook or admin action
+        if (gatewayParams._adminConfirmed === true) {
           verified = true;
           gatewayTxId = gatewayParams.tx_id || 'WIRE_' + orderId.substring(0, 12);
         }
         break;
 
       case 'upi':
-        if (gatewayParams.confirmed) {
+        // UPI payments require admin-confirmed flag from webhook or admin action
+        if (gatewayParams._adminConfirmed === true) {
           verified = true;
           gatewayTxId = gatewayParams.tx_ref || 'UPI_' + orderId.substring(0, 12);
         }
         break;
     }
 
-    if (!verified) throw new Error('Payment verification failed');
+    if (!verified) {
+      // Revert the lock if verification failed
+      this.db.run('UPDATE payment_orders SET status = ?, updated_at = ? WHERE id = ?',
+        [C.PAYMENT.ORDER_STATUS.PENDING, Date.now(), orderId]);
+      throw new Error('Payment verification failed');
+    }
 
     this.db.run(
       `UPDATE payment_orders SET status = ?, gateway_tx_id = ?, gateway_response = ?, verified_at = ?, completed_at = ?, updated_at = ?
@@ -335,12 +349,29 @@ class PaymentService {
       const orderId = payload.notes?.orderId || payload.receipt;
       if (orderId) {
         try {
-          await this.verifyPayment(orderId, {
-            razorpay_payment_id: payload.id,
-            razorpay_order_id: payload.order_id,
-            razorpay_signature: 'webhook_verified',
-          });
-        } catch {}
+          // For webhook-verified payments, skip client-side signature check
+          // The webhook signature itself (verified in processWebhook) is the auth
+          const order = this.db.queryOne('SELECT * FROM payment_orders WHERE id = ?', [orderId]);
+          if (order && order.status !== C.PAYMENT.ORDER_STATUS.COMPLETED) {
+            // Atomic lock
+            const lockResult = this.db.run(
+              `UPDATE payment_orders SET status = 'verifying', updated_at = ? WHERE id = ? AND status IN (?, ?)`,
+              [Date.now(), orderId, C.PAYMENT.ORDER_STATUS.CREATED, C.PAYMENT.ORDER_STATUS.PENDING]
+            );
+            if (lockResult.changes > 0) {
+              // Update with gateway info
+              this.db.run('UPDATE payment_orders SET gateway_tx_id = ?, verified_at = ?, updated_at = ? WHERE id = ?',
+                [payload.id, Date.now(), Date.now(), orderId]);
+              // Re-fetch after lock
+              const lockedOrder = this.db.queryOne('SELECT * FROM payment_orders WHERE id = ?', [orderId]);
+              if (lockedOrder) {
+                this._mintCoins(lockedOrder);
+              }
+            }
+          }
+        } catch (e) {
+          console.error('Razorpay webhook processing error:', e.message);
+        }
       }
     }
   }

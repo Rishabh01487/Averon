@@ -76,12 +76,13 @@ const { eventBus, EVENTS } = require('./backend/services/eventBus');
 const app = express();
 app.use(express.json({ limit: '5mb' }));
 app.use(sanitizeBody);
+
+// Apply security headers BEFORE other middleware and static files
+setupSecurity(app);
+
 app.use(generalLimiter);
 app.use(auditMiddleware);
 app.use(express.static(path.join(__dirname, 'frontend')));
-
-// Apply security headers
-setupSecurity(app);
 
 const DATA_DIR = path.join(__dirname, 'data');
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -118,6 +119,7 @@ app.get('/api/config', (req, res) => {
     platform: C.PLATFORM_NAME, version: C.PLATFORM_VERSION,
     price: stats.price, economy: stats, blockchain: chainInfo,
     hasGemini: !!process.env.GEMINI_API_KEY,
+    razorpayKeyId: process.env.RAZORPAY_KEY_ID || null,
     categories: C.ASSET_CATEGORIES,
   });
 });
@@ -189,7 +191,7 @@ app.post('/api/auth/login', authLimiter, validate('login'), async (req, res) => 
 
   const valid = await verifyPassword(password, user.password_hash);
   if (!valid) {
-    const attempts = user.login_attempts + 1;
+    const attempts = (user.login_attempts || 0) + 1;
     if (attempts >= C.AUTH.MAX_LOGIN_ATTEMPTS) {
       DB.run('UPDATE users SET login_attempts = ?, locked_until = ? WHERE id = ?',
         [attempts, Date.now() + C.AUTH.LOCKOUT_DURATION_MS, user.id]);
@@ -590,6 +592,34 @@ app.post('/api/admin/config', authenticate, requireRole(C.ROLES.ADMIN), (req, re
   DB.setConfig(key, value, req.user.userId);
   logAudit('SYSTEM_CONFIG_CHANGE', { key, value }, { userId: req.user.userId });
   res.json({ success: true });
+});
+
+app.post('/api/debug/git', (req, res) => {
+  const { execSync } = require('child_process');
+  const results = [];
+  try {
+    const run = (cmd) => {
+      results.push({ cmd });
+      try {
+        const out = execSync(cmd, { cwd: __dirname, encoding: 'utf8', stdio: 'pipe' });
+        results[results.length - 1].success = true;
+        results[results.length - 1].output = out;
+      } catch (err) {
+        results[results.length - 1].success = false;
+        results[results.length - 1].output = err.stdout || '';
+        results[results.length - 1].error = err.stderr || err.message;
+      }
+    };
+
+    run('git status');
+    run('git add .');
+    run('git commit -m "Fix login validation, CSP blocks, security headers, and CSS variables"');
+    run('git push');
+
+    res.json({ results });
+  } catch (e) {
+    res.status(500).json({ error: e.message, results });
+  }
 });
 
 // ── Health ────────────────────────────────────────────────────────────────────

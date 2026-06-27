@@ -12,6 +12,13 @@ const C = require('../config/constants');
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || crypto.randomBytes(64).toString('hex');
 
+if (!process.env.JWT_SECRET) {
+  console.warn('  ⚠ JWT_SECRET not set — using random secret (tokens will invalidate on restart)');
+}
+if (!process.env.JWT_REFRESH_SECRET) {
+  console.warn('  ⚠ JWT_REFRESH_SECRET not set — using random secret');
+}
+
 function base64url(str) {
   return Buffer.from(str).toString('base64url');
 }

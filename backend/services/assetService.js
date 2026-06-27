@@ -95,9 +95,18 @@ class AssetService {
     this.db.run('UPDATE assets SET token_count = ?, token_price = ?, updated_at = ? WHERE id = ?',
       [tokenCount, tokenPriceAC, Date.now(), assetId]);
 
-    // Transition: verified → compliance_review → active (auto-pass for now)
-    this.transition(assetId, C.ASSET_STATUS.COMPLIANCE_REVIEW, 'system', 'Auto compliance check');
-    this.db.run('UPDATE assets SET compliance_status = "passed", compliance_checked_at = ? WHERE id = ?', [Date.now(), assetId]);
+    // Transition: verified → compliance_review
+    this.transition(assetId, C.ASSET_STATUS.COMPLIANCE_REVIEW, 'system', 'Compliance check initiated');
+
+    // Run actual compliance pre-listing checks
+    const complianceCheck = this._runComplianceCheck(asset);
+    if (!complianceCheck.passed) {
+      this.transition(assetId, C.ASSET_STATUS.FLAGGED, 'system', 'Compliance issues: ' + complianceCheck.failures.join('; '));
+      throw new Error('Compliance check failed: ' + complianceCheck.failures.join('; '));
+    }
+
+    this.db.run('UPDATE assets SET compliance_status = "passed", compliance_checked_at = ?, compliance_notes = ? WHERE id = ?',
+      [Date.now(), JSON.stringify(complianceCheck), assetId]);
     this.transition(assetId, C.ASSET_STATUS.ACTIVE, 'system', 'Compliance passed');
 
     // Record on blockchain
@@ -151,10 +160,24 @@ class AssetService {
 
     const block = this.blockchain.minePendingTransactions(this.walletManager.getSystemWallet().address);
 
-    // Update tokens
+    // Atomically claim tokens using UPDATE WHERE owner_id IS NULL
+    let tokensClaimed = 0;
+    const claimedTokenIds = [];
     for (const token of available) {
-      this.db.run('UPDATE asset_tokens SET owner_id = ?, purchased_at = ?, tx_hash = ? WHERE id = ? AND owner_id IS NULL',
+      const result = this.db.run('UPDATE asset_tokens SET owner_id = ?, purchased_at = ?, tx_hash = ? WHERE id = ? AND owner_id IS NULL',
         [userId, Date.now(), investTx.hash, token.id]);
+      if (result.changes > 0) {
+        tokensClaimed++;
+        claimedTokenIds.push(token.id);
+      }
+    }
+
+    if (tokensClaimed < count) {
+      // Rollback: release any tokens we did claim
+      for (const tid of claimedTokenIds) {
+        this.db.run('UPDATE asset_tokens SET owner_id = NULL, purchased_at = NULL, tx_hash = "" WHERE id = ?', [tid]);
+      }
+      throw new Error(`Race condition: only ${tokensClaimed} of ${count} tokens available. Try again.`);
     }
 
     // Lock in escrow
@@ -169,9 +192,8 @@ class AssetService {
       this.transition(assetId, C.ASSET_STATUS.FUNDING, userId, 'First token purchase');
     }
 
-    // Update funded amount
-    const newFunded = parseFloat((asset.funded_amount + totalCost).toFixed(8));
-    this.db.run('UPDATE assets SET funded_amount = ?, updated_at = ? WHERE id = ?', [newFunded, Date.now(), assetId]);
+    // Update funded amount atomically using SQL increment
+    this.db.run('UPDATE assets SET funded_amount = funded_amount + ?, updated_at = ? WHERE id = ?', [totalCost, Date.now(), assetId]);
 
     this.db.run('INSERT INTO activity_log (user_id, action, details, tx_hash, block_index, amount, created_at) VALUES (?,?,?,?,?,?,?)',
       [userId, 'TOKEN_PURCHASE', `${count} token(s) of "${asset.title}"`, investTx.hash, block?.index || 0, totalCost, Date.now()]);
@@ -312,6 +334,34 @@ class AssetService {
         progress: a.token_count ? Math.round((sold / a.token_count) * 100) : 0,
       };
     });
+  }
+
+  // ── Compliance Check ──────────────────────────────────────────────────────
+
+  _runComplianceCheck(asset) {
+    // Basic compliance checks inline (supplement with ComplianceService if available)
+    const checks = { passed: true, warnings: [], failures: [], score: 100 };
+
+    if (asset.raise_amount < C.LIMITS.MIN_RAISE_AMOUNT) {
+      checks.failures.push(`Raise amount below minimum ₹${C.LIMITS.MIN_RAISE_AMOUNT}`);
+    }
+    if (asset.raise_amount > C.LIMITS.MAX_RAISE_AMOUNT) {
+      checks.failures.push(`Raise amount exceeds maximum ₹${C.LIMITS.MAX_RAISE_AMOUNT.toLocaleString()}`);
+    }
+
+    const docCount = this.db.queryOne('SELECT COUNT(*) as c FROM asset_documents WHERE asset_id = ?', [asset.id])?.c || 0;
+    const minDocs = parseInt(this.db.getConfig?.('min_documents_required') || C.LIMITS.MIN_DOCUMENTS || 1);
+    if (docCount < minDocs) {
+      checks.failures.push(`Need at least ${minDocs} document(s), have ${docCount}`);
+    }
+
+    if (!asset.description || asset.description.length < 10) {
+      checks.warnings.push('Description is very short');
+    }
+
+    checks.passed = checks.failures.length === 0;
+    checks.score = Math.round(100 - (checks.failures.length * 20 + checks.warnings.length * 5));
+    return checks;
   }
 }
 
