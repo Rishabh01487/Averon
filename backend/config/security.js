@@ -8,7 +8,7 @@ function setupSecurity(app) {
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "https://checkout.razorpay.com", "https://cdn.razorpay.com", "https://cdn.tailwindcss.com"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "https://checkout.razorpay.com", "https://cdn.razorpay.com", "https://cdn.tailwindcss.com", "https://cdn.jsdelivr.net"],
         styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
         fontSrc: ["'self'", "https://fonts.gstatic.com"],
         imgSrc: ["'self'", "data:", "blob:", "https:"],
@@ -33,3 +33,4 @@ function setupSecurity(app) {
 }
 
 module.exports = { setupSecurity };
+console.log('=== SECURITY.JS LOADED ===', Date.now());
