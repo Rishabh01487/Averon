@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Averon — Enterprise blockchain platform for tokenizing real-world assets with AI-powered valuation and decentralized trading.">
+  <title>Averon — Asset Tokenization Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="particleCanvas"></canvas>
+  <!-- ═══ AUTH OVERLAY ═══ -->
+  <div id="authOverlay" class="auth-overlay">
+    <div class="auth-container">
+      <div class="auth-header">
+        <div class="logo-large">Averon</div>
+        <p class="auth-subtitle">Enterprise Asset Tokenization Platform</p>
+        <p class="auth-tagline">SHA-256 Blockchain · ECDSA Wallets · AI Valuation</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Sign In</button>
+        <button class="auth-tab" data-tab="register">Register</button>
+      </div>
+
+      <form id="loginForm" class="auth-form">
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" required>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-primary btn-full">Sign In →</button>
+      </form>
+
+      <form id="registerForm" class="auth-form hidden">
+        <div class="field">
+          <label>Full Name</label>
+          <input type="text" id="regName" placeholder="Your name" required>
+        </div>
+        <div class="field">
+          <label>Organization (optional)</label>
+          <input type="text" id="regOrg" placeholder="Company or individual">
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="regEmail" placeholder="you@example.com" required>
+        </div>
+        <div class="field">
+          <label>Password (min 8 characters)</label>
+          <input type="password" id="regPassword" placeholder="••••••••" required minlength="8">
+        </div>
+        <div class="auth-note">A blockchain wallet (ECDSA secp256k1) will be generated. All transactions are signed and immutable.</div>
+        <button type="submit" class="btn-primary btn-full">Create Wallet & Account →</button>
+      </form>
+
+      <div id="authError" class="auth-error hidden"></div>
+    </div>
+  </div>
+
+  <!-- ═══ MAIN APP ═══ -->
+  <div id="mainApp" class="hidden">
+    <!-- ── Navbar ── -->
+    <nav class="navbar">
+      <div class="nav-left">
+        <span class="logo">Averon</span>
+        <span class="version-badge">v4</span>
+      </div>
+      <div class="nav-links">
+        <button class="nav-link active" data-page="home">Dashboard</button>
+        <button class="nav-link" data-page="assets">Assets</button>
+        <button class="nav-link" data-page="buy">Buy AC</button>
+        <button class="nav-link" data-page="tokenize">Tokenize</button>
+        <button class="nav-link" data-page="market">Market</button>
+        <button class="nav-link" data-page="explorer">Explorer</button>
+        <button class="nav-link" data-page="portfolio">Portfolio</button>
+      </div>
+      <div class="nav-right">
+        <div class="price-ticker" id="priceTicker">AC: ₹<span id="livePrice">1.00</span></div>
+        <div class="notif-bell" id="notifBell" title="Notifications">🔔<span id="notifCount" class="notif-badge hidden">0</span></div>
+        <div class="user-menu" id="userMenu">
+          <span id="userName"></span>
+          <button id="logoutBtn" class="btn-ghost btn-sm">Logout</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ═══ PAGES ═══ -->
+    <main class="main-content">
+
+      <!-- ── DASHBOARD ── -->
+      <section id="page-home" class="page active">
+        <div class="dashboard-grid">
+          <div class="stat-card hero-stat">
+            <div class="stat-icon">💰</div>
+            <div class="stat-value" id="statPrice">₹1.00</div>
+            <div class="stat-label">Averon Coin Price</div>
+            <canvas id="priceChart" width="300" height="80"></canvas>
+          </div>
+          <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-value" id="statSupply">0</div><div class="stat-label">Total Supply</div></div>
+          <div class="stat-card"><div class="stat-icon">🏢</div><div class="stat-value" id="statAssets">0</div><div class="stat-label">Total Assets</div></div>
+          <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value" id="statFunded">0</div><div class="stat-label">Assets Funded</div></div>
+          <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-value" id="statUsers">0</div><div class="stat-label">Registered Users</div></div>
+          <div class="stat-card"><div class="stat-icon">📈</div><div class="stat-value" id="statTrades">0</div><div class="stat-label">Total Trades</div></div>
+          <div class="stat-card"><div class="stat-icon">⛓</div><div class="stat-value" id="statBlocks">0</div><div class="stat-label">Blocks Mined</div></div>
+          <div class="stat-card"><div class="stat-icon">🔒</div><div class="stat-value" id="statTVL">₹0</div><div class="stat-label">Total Value Locked</div></div>
+        </div>
+        <div class="section-header"><h2>Recent Activity</h2></div>
+        <div id="activityFeed" class="activity-feed"></div>
+      </section>
+
+      <!-- ── ASSETS ── -->
+      <section id="page-assets" class="page">
+        <div class="page-header">
+          <h1>Tokenized Assets</h1>
+          <div class="filter-row">
+            <select id="assetFilterCategory" class="select-sm"><option value="all">All Categories</option></select>
+            <select id="assetFilterStatus" class="select-sm"><option value="all">All Status</option><option value="active">Active</option><option value="funding">Funding</option><option value="funded">Funded</option></select>
+          </div>
+        </div>
+        <div id="assetGrid" class="asset-grid"></div>
+      </section>
+
+      <!-- ── BUY COIN ── -->
+      <section id="page-buy" class="page">
+        <div class="buy-layout">
+          <div class="buy-main">
+            <div class="centered-card">
+              <h1>Buy Averon Coin</h1>
+              <p class="subtitle">Purchase AC tokens via Razorpay. Coins are minted to your blockchain wallet instantly.</p>
+              <div class="buy-info">
+                <div class="info-row"><span>Current Price</span><span id="buyPrice" class="val">₹1.00</span></div>
+                <div class="info-row"><span>Your Balance</span><span id="buyBalance" class="val">0 AC</span></div>
+              </div>
+
+              <!-- Gateway Selection -->
+              <div class="field">
+                <label>Payment Method</label>
+                <div class="gateway-selector" id="gatewaySelector">
+                  <button class="gateway-pill active" data-gateway="razorpay">
+                    <span class="gateway-icon">💳</span>
+                    <span class="gateway-name">Razorpay</span>
+                    <span class="gateway-desc">Cards, UPI, NetBanking</span>
+                  </button>
+                  <button class="gateway-pill" data-gateway="upi">
+                    <span class="gateway-icon">📱</span>
+                    <span class="gateway-name">Direct UPI</span>
+                    <span class="gateway-desc">Manual transfer</span>
+                  </button>
+                  <button class="gateway-pill" data-gateway="wire">
+                    <span class="gateway-icon">🏦</span>
+                    <span class="gateway-name">Wire Transfer</span>
+                    <span class="gateway-desc">Bank transfer</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Amount (INR)</label>
+                <input type="number" id="buyAmountInr" placeholder="Min ₹1" min="1" step="1">
+              </div>
+              <div class="conversion-display">
+                <span>You'll receive:</span>
+                <span id="buyEstimate" class="estimate">0 AC</span>
+              </div>
+              <button id="buyCoinsBtn" class="btn-primary btn-full">Pay with Razorpay →</button>
+              <div id="buyResult" class="result-box hidden"></div>
+
+              <!-- Manual gateway instructions (UPI / Wire) -->
+              <div id="manualInstructions" class="manual-instructions hidden"></div>
+            </div>
+          </div>
+
+          <!-- Payment Order History -->
+          <div class="buy-sidebar">
+            <div class="order-history-card">
+              <h3>Payment History</h3>
+              <div id="paymentOrders" class="payment-orders-list">
+                <div class="empty-state">No purchases yet</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── TOKENIZE ── -->
+      <section id="page-tokenize" class="page">
+        <div class="wizard-container">
+          <div class="wizard-steps">
+            <div class="wizard-step active" data-step="1"><span class="step-num">1</span>Create Asset</div>
+            <div class="wizard-step" data-step="2"><span class="step-num">2</span>Upload Docs</div>
+            <div class="wizard-step" data-step="3"><span class="step-num">3</span>AI Analysis</div>
+            <div class="wizard-step" data-step="4"><span class="step-num">4</span>Launch</div>
+          </div>
+
+          <!-- Step 1 -->
+          <div id="wizStep1" class="wiz-panel active">
+            <h2>Describe Your Asset</h2>
+            <p class="subtitle">Tell us about the real-world asset you want to tokenize for capital raising.</p>
+            <div class="field"><label>Asset Title</label><input type="text" id="assetTitle" placeholder="e.g., Premium Agricultural Land — 2.5 acres Nagpur"></div>
+            <div class="field"><label>Category</label><select id="assetCategory"><option value="">Select category...</option></select></div>
+            <div class="field"><label>Description (min 20 chars)</label><textarea id="assetDescription" rows="4" placeholder="Describe the asset, its value, history, and why you're raising capital..."></textarea></div>
+            <div class="field-row">
+              <div class="field"><label>Raise Amount (₹)</label><input type="number" id="assetRaise" placeholder="50000" min="100"></div>
+              <div class="field"><label>Listing Duration (days)</label><input type="number" id="assetDays" placeholder="30" min="1" max="365" value="30"></div>
+            </div>
+            <button id="createAssetBtn" class="btn-primary">Create Asset & Continue →</button>
+          </div>
+
+          <!-- Step 2 -->
+          <div id="wizStep2" class="wiz-panel">
+            <h2>Upload Documents</h2>
+            <p class="subtitle">Upload ownership proof, certificates, invoices, or images of the asset.</p>
+            <div id="dropZone" class="drop-zone">
+              <div class="drop-icon">📁</div>
+              <p>Drag & drop files here or click to browse</p>
+              <small>Images, PDFs — Max 10MB each, up to 10 files</small>
+              <input type="file" id="fileInput" multiple accept="image/*,.pdf" style="display:none">
+            </div>
+            <div id="fileList" class="file-list"></div>
+            <button id="uploadDocsBtn" class="btn-primary" disabled>Upload Documents →</button>
+          </div>
+
+          <!-- Step 3 -->
+          <div id="wizStep3" class="wiz-panel">
+            <h2>AI Analysis</h2>
+            <p class="subtitle">Our AI pipeline analyzes your documents for legitimacy, valuation, and risk.</p>
+            <button id="startAnalysisBtn" class="btn-primary btn-full">Start AI Analysis →</button>
+            <div id="aiProgress" class="ai-progress hidden">
+              <div class="ai-spinner"></div>
+              <p id="aiStatusText">Analyzing documents...</p>
+            </div>
+            <div id="aiResult" class="ai-result hidden"></div>
+          </div>
+
+          <!-- Step 4 -->
+          <div id="wizStep4" class="wiz-panel">
+            <h2>Confirm & Launch</h2>
+            <p class="subtitle">Review the AI recommendation and launch your tokenized asset.</p>
+            <div id="launchSummary" class="launch-summary"></div>
+            <button id="confirmLaunchBtn" class="btn-primary btn-full">Confirm & Launch on Blockchain →</button>
+            <div id="launchResult" class="launch-result hidden"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── MARKETPLACE ── -->
+      <section id="page-market" class="page">
+        <div class="market-layout">
+          <div class="market-panel">
+            <h2>Order Book</h2>
+            <div class="order-book">
+              <div class="ob-header"><span>Price (₹)</span><span>Amount (AC)</span><span>Total</span></div>
+              <div id="sellOrders" class="ob-side ob-sells"></div>
+              <div class="ob-spread" id="obSpread">Spread: —</div>
+              <div id="buyOrders" class="ob-side ob-buys"></div>
+            </div>
+          </div>
+          <div class="market-panel">
+            <h2>Place Order</h2>
+            <div class="order-tabs">
+              <button class="order-tab active" data-side="buy">Buy AC</button>
+              <button class="order-tab" data-side="sell">Sell AC</button>
+            </div>
+            <div class="field"><label>Amount (AC)</label><input type="number" id="orderAmount" placeholder="0.00" step="0.01" min="0.01"></div>
+            <div class="field"><label>Price per AC (₹)</label><input type="number" id="orderPrice" placeholder="0.00" step="0.01" min="0.001"></div>
+            <div class="order-total">Total: ₹<span id="orderTotal">0.00</span></div>
+            <button id="placeOrderBtn" class="btn-primary btn-full">Place Order</button>
+          </div>
+          <div class="market-panel">
+            <h2>Recent Trades</h2>
+            <div id="recentTrades" class="trade-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── EXPLORER ── -->
+      <section id="page-explorer" class="page">
+        <div class="page-header">
+          <h1>Blockchain Explorer</h1>
+          <div class="chain-stats" id="chainStats"></div>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="explorerSearch" placeholder="Search by block index, transaction hash, or wallet address...">
+          <button id="explorerSearchBtn" class="btn-primary btn-sm">Search</button>
+        </div>
+        <div id="explorerResult" class="explorer-result hidden"></div>
+        <div id="blockList" class="block-list"></div>
+      </section>
+
+      <!-- ── PORTFOLIO ── -->
+      <section id="page-portfolio" class="page">
+        <div class="portfolio-header">
+          <div class="portfolio-balance">
+            <div class="balance-label">Your Portfolio Value</div>
+            <div class="balance-value" id="portfolioValue">₹0.00</div>
+          </div>
+          <div class="portfolio-wallet">
+            <div class="wallet-label">Wallet</div>
+            <div class="wallet-address" id="portfolioWallet">—</div>
+          </div>
+          <div class="portfolio-balance">
+            <div class="balance-label">Averon Balance</div>
+            <div class="balance-value" id="portfolioBalance">0 AC</div>
+          </div>
+        </div>
+        <div class="portfolio-sections">
+          <div class="portfolio-section">
+            <h3>My Token Holdings</h3>
+            <div id="myTokens" class="token-holdings"></div>
+          </div>
+          <div class="portfolio-section">
+            <h3>My Listed Assets</h3>
+            <div id="myAssets" class="my-assets"></div>
+          </div>
+          <div class="portfolio-section">
+            <h3>Open Orders</h3>
+            <div id="myOrders" class="my-orders"></div>
+          </div>
+          <div class="portfolio-section">
+            <h3>Transaction History</h3>
+            <div id="myHistory" class="tx-history"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ═══ TOAST ═══ -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
