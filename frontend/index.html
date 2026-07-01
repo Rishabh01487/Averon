@@ -1,339 +1,642 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Averon — Enterprise blockchain platform for tokenizing real-world assets with AI-powered valuation and decentralized trading.">
-  <title>Averon — Asset Tokenization Platform</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Averon — System Architecture</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;background:#0f172a}
+#container{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
+#ui{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.label{position:absolute;transform:translate(-50%,-50%);padding:10px 24px;border-radius:100px;background:rgba(255,255,255,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.4);box-shadow:0 8px 40px rgba(34,211,238,0.04);color:#1a2332;font-size:13px;font-weight:500;letter-spacing:0.2px;white-space:nowrap;opacity:0;pointer-events:none;transition:none}
+.label.badge{background:rgba(34,211,238,0.08);border-color:rgba(34,211,238,0.12);color:#0891b2;font-size:11px;font-weight:600;padding:6px 18px;letter-spacing:0.8px;text-transform:uppercase}
+.label.pink{background:rgba(232,160,191,0.12);border-color:rgba(232,160,191,0.15);color:#b0708a;font-size:11px;font-weight:600;padding:6px 18px;letter-spacing:0.5px;text-transform:uppercase}
+.label.gold{background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.12);color:#b8860b;font-size:11px;font-weight:600;padding:6px 18px;letter-spacing:0.5px;text-transform:uppercase}
+.label.emerald{background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.12);color:#047857;font-size:11px;font-weight:600;padding:6px 18px;letter-spacing:0.5px;text-transform:uppercase}
+.label.purple{background:rgba(139,92,246,0.08);border-color:rgba(139,92,246,0.12);color:#6d28d9;font-size:11px;font-weight:600;padding:6px 18px;letter-spacing:0.5px;text-transform:uppercase}
+.label.lifecycle{position:absolute;display:flex;flex-direction:column;align-items:center;gap:5px;opacity:0;pointer-events:none}
+.label.lifecycle .num{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#22d3ee,#8b5cf6);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(34,211,238,0.25)}
+.label.lifecycle .text{font-size:9px;font-weight:600;letter-spacing:0.4px;text-transform:uppercase;color:#1a2332;opacity:0.8}
+.label.lifecycle .arrow{font-size:12px;color:#22d3ee;opacity:0.35}
+.label.stage-title{font-size:16px;font-weight:600;background:rgba(255,255,255,0.88);border-color:rgba(34,211,238,0.08);padding:10px 28px;box-shadow:0 8px 32px rgba(34,211,238,0.04);letter-spacing:0.5px}
+.label.value{font-size:14px;font-weight:600;color:#0891b2;background:rgba(34,211,238,0.06);border-color:rgba(34,211,238,0.08);padding:6px 16px}
+.label.small{font-size:10px;font-weight:400;padding:5px 14px;background:rgba(255,255,255,0.55)}
+.label.big-value{font-size:20px;font-weight:700;color:#22d3ee;background:rgba(255,255,255,0.92);border:1px solid rgba(34,211,238,0.1);padding:12px 28px;box-shadow:0 12px 48px rgba(34,211,238,0.06)}
+.label.tagline{font-size:14px;font-weight:400;background:rgba(255,255,255,0.5);border-color:rgba(255,255,255,0.2);color:#5a6a82;padding:8px 20px;letter-spacing:0.3px}
+.label.tag{background:rgba(34,211,238,0.08);border-color:rgba(34,211,238,0.12);color:#0891b2;font-size:11px;font-weight:600;padding:6px 18px;letter-spacing:0.8px;text-transform:uppercase}
+#enter-btn{position:fixed;bottom:48px;left:50%;transform:translateX(-50%);padding:18px 60px;border-radius:100px;background:rgba(255,255,255,0.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(34,211,238,0.1);box-shadow:0 8px 48px rgba(34,211,238,0.04),0 2px 8px rgba(0,0,0,0.02);color:#0891b2;font-size:15px;font-weight:600;letter-spacing:2.5px;cursor:pointer;pointer-events:auto;opacity:0;transition:opacity 1.5s ease,transform 0.5s ease,box-shadow 0.5s ease;z-index:2;outline:none;font-family:'Inter',sans-serif;text-transform:uppercase}
+#enter-btn:hover{transform:translateX(-50%) scale(1.04);box-shadow:0 16px 64px rgba(34,211,238,0.1),0 2px 8px rgba(0,0,0,0.02)}
+#enter-btn:active{transform:translateX(-50%) scale(0.96)}
+canvas{display:block}
+#glitch{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2;mix-blend-mode:screen;opacity:0.4}
+#glitch canvas{width:100%;height:100%}
+@media(max-width:768px){.label{font-size:11px;padding:6px 16px}.label.badge,.label.pink,.label.gold,.label.emerald,.label.purple,.label.tag{font-size:10px;padding:5px 14px}.label.big-value{font-size:16px;padding:8px 20px}.label.stage-title{font-size:14px;padding:8px 22px}#enter-btn{padding:14px 40px;font-size:13px;bottom:28px}}
+</style>
 </head>
 <body>
-  <canvas id="particleCanvas"></canvas>
-  <!-- ═══ AUTH OVERLAY ═══ -->
-  <div id="authOverlay" class="auth-overlay">
-    <div class="auth-container">
-      <div class="auth-header">
-        <div class="logo-large">Averon</div>
-        <p class="auth-subtitle">Enterprise Asset Tokenization Platform</p>
-        <p class="auth-tagline">SHA-256 Blockchain · ECDSA Wallets · AI Valuation</p>
-      </div>
-
-      <div class="auth-tabs">
-        <button class="auth-tab active" data-tab="login">Sign In</button>
-        <button class="auth-tab" data-tab="register">Register</button>
-      </div>
-
-      <form id="loginForm" class="auth-form">
-        <div class="field">
-          <label>Email</label>
-          <input type="email" id="loginEmail" placeholder="you@example.com" required>
-        </div>
-        <div class="field">
-          <label>Password</label>
-          <input type="password" id="loginPassword" placeholder="••••••••" required>
-        </div>
-        <button type="submit" class="btn-primary btn-full">Sign In →</button>
-      </form>
-
-      <form id="registerForm" class="auth-form hidden">
-        <div class="field">
-          <label>Full Name</label>
-          <input type="text" id="regName" placeholder="Your name" required>
-        </div>
-        <div class="field">
-          <label>Organization (optional)</label>
-          <input type="text" id="regOrg" placeholder="Company or individual">
-        </div>
-        <div class="field">
-          <label>Email</label>
-          <input type="email" id="regEmail" placeholder="you@example.com" required>
-        </div>
-        <div class="field">
-          <label>Password (min 8 characters)</label>
-          <input type="password" id="regPassword" placeholder="••••••••" required minlength="8">
-        </div>
-        <div class="auth-note">A blockchain wallet (ECDSA secp256k1) will be generated. All transactions are signed and immutable.</div>
-        <button type="submit" class="btn-primary btn-full">Create Wallet & Account →</button>
-      </form>
-
-      <div id="authError" class="auth-error hidden"></div>
-    </div>
-  </div>
-
-  <!-- ═══ MAIN APP ═══ -->
-  <div id="mainApp" class="hidden">
-    <!-- ── Navbar ── -->
-    <nav class="navbar">
-      <div class="nav-left">
-        <span class="logo">Averon</span>
-        <span class="version-badge">v4</span>
-      </div>
-      <div class="nav-links">
-        <button class="nav-link active" data-page="home">Dashboard</button>
-        <button class="nav-link" data-page="assets">Assets</button>
-        <button class="nav-link" data-page="buy">Buy AC</button>
-        <button class="nav-link" data-page="tokenize">Tokenize</button>
-        <button class="nav-link" data-page="market">Market</button>
-        <button class="nav-link" data-page="explorer">Explorer</button>
-        <button class="nav-link" data-page="portfolio">Portfolio</button>
-      </div>
-      <div class="nav-right">
-        <div class="price-ticker" id="priceTicker">AC: ₹<span id="livePrice">1.00</span></div>
-        <div class="notif-bell" id="notifBell" title="Notifications">🔔<span id="notifCount" class="notif-badge hidden">0</span></div>
-        <div class="user-menu" id="userMenu">
-          <span id="userName"></span>
-          <button id="logoutBtn" class="btn-ghost btn-sm">Logout</button>
-        </div>
-      </div>
-    </nav>
-
-    <!-- ═══ PAGES ═══ -->
-    <main class="main-content">
-
-      <!-- ── DASHBOARD ── -->
-      <section id="page-home" class="page active">
-        <div class="dashboard-grid">
-          <div class="stat-card hero-stat">
-            <div class="stat-icon">💰</div>
-            <div class="stat-value" id="statPrice">₹1.00</div>
-            <div class="stat-label">Averon Coin Price</div>
-            <canvas id="priceChart" width="300" height="80"></canvas>
-          </div>
-          <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-value" id="statSupply">0</div><div class="stat-label">Total Supply</div></div>
-          <div class="stat-card"><div class="stat-icon">🏢</div><div class="stat-value" id="statAssets">0</div><div class="stat-label">Total Assets</div></div>
-          <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value" id="statFunded">0</div><div class="stat-label">Assets Funded</div></div>
-          <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-value" id="statUsers">0</div><div class="stat-label">Registered Users</div></div>
-          <div class="stat-card"><div class="stat-icon">📈</div><div class="stat-value" id="statTrades">0</div><div class="stat-label">Total Trades</div></div>
-          <div class="stat-card"><div class="stat-icon">⛓</div><div class="stat-value" id="statBlocks">0</div><div class="stat-label">Blocks Mined</div></div>
-          <div class="stat-card"><div class="stat-icon">🔒</div><div class="stat-value" id="statTVL">₹0</div><div class="stat-label">Total Value Locked</div></div>
-        </div>
-        <div class="section-header"><h2>Recent Activity</h2></div>
-        <div id="activityFeed" class="activity-feed"></div>
-      </section>
-
-      <!-- ── ASSETS ── -->
-      <section id="page-assets" class="page">
-        <div class="page-header">
-          <h1>Tokenized Assets</h1>
-          <div class="filter-row">
-            <select id="assetFilterCategory" class="select-sm"><option value="all">All Categories</option></select>
-            <select id="assetFilterStatus" class="select-sm"><option value="all">All Status</option><option value="active">Active</option><option value="funding">Funding</option><option value="funded">Funded</option></select>
-          </div>
-        </div>
-        <div id="assetGrid" class="asset-grid"></div>
-      </section>
-
-      <!-- ── BUY COIN ── -->
-      <section id="page-buy" class="page">
-        <div class="buy-layout">
-          <div class="buy-main">
-            <div class="centered-card">
-              <h1>Buy Averon Coin</h1>
-              <p class="subtitle">Purchase AC tokens via Razorpay. Coins are minted to your blockchain wallet instantly.</p>
-              <div class="buy-info">
-                <div class="info-row"><span>Current Price</span><span id="buyPrice" class="val">₹1.00</span></div>
-                <div class="info-row"><span>Your Balance</span><span id="buyBalance" class="val">0 AC</span></div>
-              </div>
-
-              <!-- Gateway Selection -->
-              <div class="field">
-                <label>Payment Method</label>
-                <div class="gateway-selector" id="gatewaySelector">
-                  <button class="gateway-pill active" data-gateway="razorpay">
-                    <span class="gateway-icon">💳</span>
-                    <span class="gateway-name">Razorpay</span>
-                    <span class="gateway-desc">Cards, UPI, NetBanking</span>
-                  </button>
-                  <button class="gateway-pill" data-gateway="upi">
-                    <span class="gateway-icon">📱</span>
-                    <span class="gateway-name">Direct UPI</span>
-                    <span class="gateway-desc">Manual transfer</span>
-                  </button>
-                  <button class="gateway-pill" data-gateway="wire">
-                    <span class="gateway-icon">🏦</span>
-                    <span class="gateway-name">Wire Transfer</span>
-                    <span class="gateway-desc">Bank transfer</span>
-                  </button>
-                </div>
-              </div>
-
-              <div class="field">
-                <label>Amount (INR)</label>
-                <input type="number" id="buyAmountInr" placeholder="Min ₹1" min="1" step="1">
-              </div>
-              <div class="conversion-display">
-                <span>You'll receive:</span>
-                <span id="buyEstimate" class="estimate">0 AC</span>
-              </div>
-              <button id="buyCoinsBtn" class="btn-primary btn-full">Pay with Razorpay →</button>
-              <div id="buyResult" class="result-box hidden"></div>
-
-              <!-- Manual gateway instructions (UPI / Wire) -->
-              <div id="manualInstructions" class="manual-instructions hidden"></div>
-            </div>
-          </div>
-
-          <!-- Payment Order History -->
-          <div class="buy-sidebar">
-            <div class="order-history-card">
-              <h3>Payment History</h3>
-              <div id="paymentOrders" class="payment-orders-list">
-                <div class="empty-state">No purchases yet</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── TOKENIZE ── -->
-      <section id="page-tokenize" class="page">
-        <div class="wizard-container">
-          <div class="wizard-steps">
-            <div class="wizard-step active" data-step="1"><span class="step-num">1</span>Create Asset</div>
-            <div class="wizard-step" data-step="2"><span class="step-num">2</span>Upload Docs</div>
-            <div class="wizard-step" data-step="3"><span class="step-num">3</span>AI Analysis</div>
-            <div class="wizard-step" data-step="4"><span class="step-num">4</span>Launch</div>
-          </div>
-
-          <!-- Step 1 -->
-          <div id="wizStep1" class="wiz-panel active">
-            <h2>Describe Your Asset</h2>
-            <p class="subtitle">Tell us about the real-world asset you want to tokenize for capital raising.</p>
-            <div class="field"><label>Asset Title</label><input type="text" id="assetTitle" placeholder="e.g., Premium Agricultural Land — 2.5 acres Nagpur"></div>
-            <div class="field"><label>Category</label><select id="assetCategory"><option value="">Select category...</option></select></div>
-            <div class="field"><label>Description (min 20 chars)</label><textarea id="assetDescription" rows="4" placeholder="Describe the asset, its value, history, and why you're raising capital..."></textarea></div>
-            <div class="field-row">
-              <div class="field"><label>Raise Amount (₹)</label><input type="number" id="assetRaise" placeholder="50000" min="100"></div>
-              <div class="field"><label>Listing Duration (days)</label><input type="number" id="assetDays" placeholder="30" min="1" max="365" value="30"></div>
-            </div>
-            <button id="createAssetBtn" class="btn-primary">Create Asset & Continue →</button>
-          </div>
-
-          <!-- Step 2 -->
-          <div id="wizStep2" class="wiz-panel">
-            <h2>Upload Documents</h2>
-            <p class="subtitle">Upload ownership proof, certificates, invoices, or images of the asset.</p>
-            <div id="dropZone" class="drop-zone">
-              <div class="drop-icon">📁</div>
-              <p>Drag & drop files here or click to browse</p>
-              <small>Images, PDFs — Max 10MB each, up to 10 files</small>
-              <input type="file" id="fileInput" multiple accept="image/*,.pdf" style="display:none">
-            </div>
-            <div id="fileList" class="file-list"></div>
-            <button id="uploadDocsBtn" class="btn-primary" disabled>Upload Documents →</button>
-          </div>
-
-          <!-- Step 3 -->
-          <div id="wizStep3" class="wiz-panel">
-            <h2>AI Analysis</h2>
-            <p class="subtitle">Our AI pipeline analyzes your documents for legitimacy, valuation, and risk.</p>
-            <button id="startAnalysisBtn" class="btn-primary btn-full">Start AI Analysis →</button>
-            <div id="aiProgress" class="ai-progress hidden">
-              <div class="ai-spinner"></div>
-              <p id="aiStatusText">Analyzing documents...</p>
-            </div>
-            <div id="aiResult" class="ai-result hidden"></div>
-          </div>
-
-          <!-- Step 4 -->
-          <div id="wizStep4" class="wiz-panel">
-            <h2>Confirm & Launch</h2>
-            <p class="subtitle">Review the AI recommendation and launch your tokenized asset.</p>
-            <div id="launchSummary" class="launch-summary"></div>
-            <button id="confirmLaunchBtn" class="btn-primary btn-full">Confirm & Launch on Blockchain →</button>
-            <div id="launchResult" class="launch-result hidden"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── MARKETPLACE ── -->
-      <section id="page-market" class="page">
-        <div class="market-layout">
-          <div class="market-panel">
-            <h2>Order Book</h2>
-            <div class="order-book">
-              <div class="ob-header"><span>Price (₹)</span><span>Amount (AC)</span><span>Total</span></div>
-              <div id="sellOrders" class="ob-side ob-sells"></div>
-              <div class="ob-spread" id="obSpread">Spread: —</div>
-              <div id="buyOrders" class="ob-side ob-buys"></div>
-            </div>
-          </div>
-          <div class="market-panel">
-            <h2>Place Order</h2>
-            <div class="order-tabs">
-              <button class="order-tab active" data-side="buy">Buy AC</button>
-              <button class="order-tab" data-side="sell">Sell AC</button>
-            </div>
-            <div class="field"><label>Amount (AC)</label><input type="number" id="orderAmount" placeholder="0.00" step="0.01" min="0.01"></div>
-            <div class="field"><label>Price per AC (₹)</label><input type="number" id="orderPrice" placeholder="0.00" step="0.01" min="0.001"></div>
-            <div class="order-total">Total: ₹<span id="orderTotal">0.00</span></div>
-            <button id="placeOrderBtn" class="btn-primary btn-full">Place Order</button>
-          </div>
-          <div class="market-panel">
-            <h2>Recent Trades</h2>
-            <div id="recentTrades" class="trade-list"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── EXPLORER ── -->
-      <section id="page-explorer" class="page">
-        <div class="page-header">
-          <h1>Blockchain Explorer</h1>
-          <div class="chain-stats" id="chainStats"></div>
-        </div>
-        <div class="search-bar">
-          <input type="text" id="explorerSearch" placeholder="Search by block index, transaction hash, or wallet address...">
-          <button id="explorerSearchBtn" class="btn-primary btn-sm">Search</button>
-        </div>
-        <div id="explorerResult" class="explorer-result hidden"></div>
-        <div id="blockList" class="block-list"></div>
-      </section>
-
-      <!-- ── PORTFOLIO ── -->
-      <section id="page-portfolio" class="page">
-        <div class="portfolio-header">
-          <div class="portfolio-balance">
-            <div class="balance-label">Your Portfolio Value</div>
-            <div class="balance-value" id="portfolioValue">₹0.00</div>
-          </div>
-          <div class="portfolio-wallet">
-            <div class="wallet-label">Wallet</div>
-            <div class="wallet-address" id="portfolioWallet">—</div>
-          </div>
-          <div class="portfolio-balance">
-            <div class="balance-label">Averon Balance</div>
-            <div class="balance-value" id="portfolioBalance">0 AC</div>
-          </div>
-        </div>
-        <div class="portfolio-sections">
-          <div class="portfolio-section">
-            <h3>My Token Holdings</h3>
-            <div id="myTokens" class="token-holdings"></div>
-          </div>
-          <div class="portfolio-section">
-            <h3>My Listed Assets</h3>
-            <div id="myAssets" class="my-assets"></div>
-          </div>
-          <div class="portfolio-section">
-            <h3>Open Orders</h3>
-            <div id="myOrders" class="my-orders"></div>
-          </div>
-          <div class="portfolio-section">
-            <h3>Transaction History</h3>
-            <div id="myHistory" class="tx-history"></div>
-          </div>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <!-- ═══ TOAST ═══ -->
-  <div id="toastContainer" class="toast-container"></div>
-
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <script src="app.js"></script>
+<div id="container"></div>
+<div id="ui"></div>
+<div id="glitch"></div>
+<button id="enter-btn">ENTER AVERON</button>
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+<script>
+var THREE = window.THREE;
+var PI=Math.PI,TAU=PI*2,DURATION=30;
+function lerp(a,b,t){return a+(b-a)*t}
+function clamp(v,mn,mx){return Math.max(mn,Math.min(mx,v))}
+function easeInOut(t){return t<0.5?2*t*t:-1+(4-2*t)*t}
+function easeOut(t){return 1-(1-t)*(1-t)}
+function easeIn(t){return t*t}
+function smoothstep(t){return t*t*(3-2*t)}
+function normalize(t,s,e){if(t<=s)return 0;if(t>=e)return 1;return(t-s)/(e-s)}
+function damp(t){return 1-Math.pow(1-t,3)}
+var C={blue:0x22d3ee,blueD:0x0891b2,blueL:0x67e8f9,pink:0xf472b6,pinkD:0xdb2777,pinkL:0xf9a8d4,gold:0xfbbf24,emerald:0x34d399,cyan:0x22d3ee,violet:0x8b5cf6,white:0xffffff,pearl:0xf0ece8,silver:0xd4dce8,bgT:"#0a0e1a",bgM:"#0f172a",bgB:"#1e293b"};
+var container=document.getElementById("container");
+var w=window.innerWidth,h=window.innerHeight;
+var scene=new THREE.Scene();
+var camera=new THREE.PerspectiveCamera(28,w/h,0.1,250);
+var renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setSize(w,h);renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.5;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+container.appendChild(renderer.domElement);
+var bgC2=document.createElement("canvas");bgC2.width=512;bgC2.height=512;
+var bgCtx2=bgC2.getContext("2d");
+var bgTex=new THREE.CanvasTexture(bgC2);
+scene.background=bgTex;
+function updBg(t){
+  bgCtx2.clearRect(0,0,512,512);
+  var g=bgCtx2.createLinearGradient(0,0,0,512);
+  var ph=Math.sin(t*0.03)*0.06;
+  g.addColorStop(0,"hsl(220,55%,"+(25+ph*15)+"%)");
+  g.addColorStop(0.4,"hsl(240,45%,"+(20+ph*12)+"%)");
+  g.addColorStop(0.7,"hsl(260,35%,"+(16+ph*10)+"%)");
+  g.addColorStop(1,"hsl(220,25%,"+(12+ph*8)+"%)");
+  bgCtx2.fillStyle=g;bgCtx2.fillRect(0,0,512,512);
+  bgCtx2.strokeStyle="rgba(34,211,238,0.02)";bgCtx2.lineWidth=1;
+  for(var x=0;x<512;x+=48){bgCtx2.beginPath();bgCtx2.moveTo(x,0);bgCtx2.lineTo(x,512);bgCtx2.stroke();}
+  for(var y=0;y<512;y+=48){bgCtx2.beginPath();bgCtx2.moveTo(0,y);bgCtx2.lineTo(512,y);bgCtx2.stroke();}
+  bgTex.needsUpdate=true;
+}
+updBg(0);
+scene.fog=new THREE.Fog(0x0a0e1a,30,80);
+scene.add(new THREE.AmbientLight(0xffffff,0.8));
+scene.add(new THREE.HemisphereLight(0x22d3ee,0x8b5cf6,0.6));
+var mL=new THREE.DirectionalLight(0xffffff,1.8);
+mL.position.set(20,30,15);mL.castShadow=true;
+mL.shadow.mapSize.width=2048;mL.shadow.mapSize.height=2048;
+scene.add(mL);
+var fL=new THREE.DirectionalLight(0x22d3ee,0.6);fL.position.set(-15,10,-10);scene.add(fL);
+var bL2=new THREE.DirectionalLight(0x8b5cf6,0.35);bL2.position.set(10,5,20);scene.add(bL2);
+var dl1=new THREE.DirectionalLight(0xa78bfa,0.3);dl1.position.set(-10,5,-10);scene.add(dl1);
+var aL=new THREE.PointLight(C.cyan,0.5,30);aL.position.set(0,8,0);scene.add(aL);
+var bLp=new THREE.PointLight(C.blue,0.3,25);bLp.position.set(-4,3,0);scene.add(bLp);
+var rmL=new THREE.PointLight(0x22d3ee,0.25,40);rmL.position.set(0,15,0);scene.add(rmL);
+var gndM=new THREE.MeshPhysicalMaterial({color:0x1e293b,metalness:0.2,roughness:0.3,transparent:true,opacity:0.9,side:THREE.DoubleSide,clearcoat:0.2});
+var gnd=new THREE.Mesh(new THREE.PlaneGeometry(200,200),gndM);gnd.rotation.x=-PI/2;gnd.position.y=-0.1;gnd.receiveShadow=true;scene.add(gnd);
+var gridM2=new THREE.LineBasicMaterial({color:C.blue,transparent:true,opacity:0.08});
+var gridPts2=[];for(var i=-50;i<=50;i+=2.5){gridPts2.push(new THREE.Vector3(i,0,-50));gridPts2.push(new THREE.Vector3(i,0,50));gridPts2.push(new THREE.Vector3(-50,0,i));gridPts2.push(new THREE.Vector3(50,0,i));}
+scene.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(gridPts2),gridM2));
+var envWallM=new THREE.MeshPhysicalMaterial({color:0xffffff,transparent:true,opacity:0.04,side:THREE.DoubleSide,roughness:0.0,metalness:0.0,clearcoat:0.4});
+for(var i=0;i<12;i++){var a=(i/12)*TAU;var wl=new THREE.Mesh(new THREE.PlaneGeometry(35,28),envWallM);wl.position.set(Math.cos(a)*45,6,Math.sin(a)*45);wl.rotation.y=-a;scene.add(wl);}
+var glowOrbM=new THREE.MeshBasicMaterial({color:C.cyan,transparent:true,opacity:0.015,side:THREE.DoubleSide,blending:THREE.AdditiveBlending});
+var glowOrb1=new THREE.Mesh(new THREE.SphereGeometry(14,16,16),glowOrbM);glowOrb1.position.set(-22,10,-28);scene.add(glowOrb1);
+var glowOrb2=new THREE.Mesh(new THREE.SphereGeometry(12,16,16),glowOrbM.clone());glowOrb2.material.color.setHex(C.violet);glowOrb2.position.set(28,7,-32);scene.add(glowOrb2);
+var glowOrb3=new THREE.Mesh(new THREE.SphereGeometry(10,16,16),glowOrbM.clone());glowOrb3.material.color.setHex(C.blue);glowOrb3.position.set(5,16,-22);scene.add(glowOrb3);
+var aPC=2000;var aP=new Float32Array(aPC*3);
+for(var i=0;i<aPC;i++){aP[i*3]=(Math.random()-0.5)*140;aP[i*3+1]=Math.random()*35;aP[i*3+2]=(Math.random()-0.5)*140;}
+var aG=new THREE.BufferGeometry();aG.setAttribute("position",new THREE.BufferAttribute(aP,3));
+var aMp=new THREE.PointsMaterial({color:0xffffff,size:0.05,transparent:true,opacity:0.2,blending:THREE.AdditiveBlending,depthWrite:false,sizeAttenuation:true});
+var atm=new THREE.Points(aG,aMp);scene.add(atm);
+var starC=600;var starPos=new Float32Array(starC*3);
+for(var i=0;i<starC;i++){var th=Math.random()*TAU,ph=Math.acos(2*Math.random()-1),r=80+Math.random()*20;starPos[i*3]=Math.sin(ph)*Math.cos(th)*r;starPos[i*3+1]=Math.sin(ph)*Math.sin(th)*r;starPos[i*3+2]=Math.cos(ph)*r;}
+var starG=new THREE.BufferGeometry();starG.setAttribute("position",new THREE.BufferAttribute(starPos,3));
+var starM=new THREE.PointsMaterial({color:0xffffff,size:0.06,transparent:true,opacity:0.25,blending:THREE.AdditiveBlending,depthWrite:false,sizeAttenuation:true});
+var stars=new THREE.Points(starG,starM);scene.add(stars);
+var gc=document.getElementById("glitch");
+var gCanvas=document.createElement("canvas");gCanvas.width=256;gCanvas.height=144;
+gc.appendChild(gCanvas);
+var gCtx=gCanvas.getContext("2d");
+function updGlitch(t){
+  gCtx.clearRect(0,0,256,144);
+  var gInt=Math.sin(t*0.7+Math.sin(t*1.3)*0.5)*0.5+0.5;
+  if(gInt>0.92){
+    var offset=(Math.random()-0.5)*12;
+    gCtx.fillStyle="rgba(34,211,238,0.03)";gCtx.fillRect(0,0,256,144);
+    gCtx.fillStyle="rgba(139,92,246,0.02)";gCtx.fillRect(offset,0,256,144);
+    for(var i=0;i<6;i++){var y=Math.random()*144;var h=1+Math.random()*4;gCtx.fillStyle="rgba(34,211,238,0.03)";gCtx.fillRect(0,y,256,h);}
+    for(var i=0;i<12;i++){var x=Math.random()*256;var y=Math.random()*144;gCtx.fillStyle="rgba(255,255,255,0.015)";gCtx.fillRect(x,y,1+Math.random()*2,1+Math.random()*2);}
+  }
+  if(Math.random()>0.97){gCtx.fillStyle="rgba(34,211,238,0.01)";gCtx.fillRect(Math.random()*200,Math.random()*140,2+Math.random()*8,1);}
+  gCanvas.style.opacity=0.3+Math.sin(t*0.2)*0.1;
+}
+var flowRibbons=new THREE.Group();scene.add(flowRibbons);
+var ribbonColors=[0x22d3ee,0x8b5cf6,0x34d399,0xf472b6,0xfbbf24];
+var ribbons=[];
+for(var r=0;r<6;r++){
+  var pts=[];var startAngle=(r/6)*TAU;
+  for(var i=0;i<12;i++){
+    var t2=i/11;var a=startAngle+t2*PI*1.5+Math.random()*0.5;
+    var rad=8+Math.sin(t2*PI*3)*5+Math.random()*2;
+    pts.push(new THREE.Vector3(Math.cos(a)*rad,Math.sin(t2*PI)*5+Math.random()*2,Math.sin(a)*rad));
+  }
+  var curve=new THREE.CatmullRomCurve3(pts);
+  var tubeGeo=new THREE.TubeGeometry(curve,40,0.03,6,false);
+  var tubeMat=new THREE.MeshPhysicalMaterial({color:ribbonColors[r%ribbonColors.length],transparent:true,opacity:0.08,blending:THREE.AdditiveBlending,emissive:ribbonColors[r%ribbonColors.length],emissiveIntensity:0.3,side:THREE.DoubleSide,depthWrite:false});
+  var tube=new THREE.Mesh(tubeGeo,tubeMat);flowRibbons.add(tube);
+  ribbons.push({mesh:tube,curve:curve,pts:pts,phase:Math.random()*TAU});
+}
+var welcomeM=new THREE.MeshPhysicalMaterial({color:0x22d3ee,metalness:0.3,roughness:0.1,transparent:true,opacity:0.5,emissive:0x22d3ee,emissiveIntensity:0.3,clearcoat:0.8});
+var welcomeS=new THREE.Mesh(new THREE.SphereGeometry(0.3,20,20),welcomeM);welcomeS.position.set(0,4,0);scene.add(welcomeS);
+var welcomeG=new THREE.Mesh(new THREE.SphereGeometry(0.6,16,16),new THREE.MeshBasicMaterial({color:0x22d3ee,transparent:true,opacity:0.1,blending:THREE.AdditiveBlending}));
+welcomeG.position.set(0,4,0);scene.add(welcomeG);
+var aiG=new THREE.Group();scene.add(aiG);
+var aiStageColors=[C.blue,C.cyan,C.violet,C.emerald,C.gold];
+var aiNodes=[];
+for(var s=0;s<5;s++){
+  var yPos=s*1.4;
+  var core=new THREE.Mesh(new THREE.SphereGeometry(0.35,16,16),new THREE.MeshPhysicalMaterial({color:aiStageColors[s],metalness:0.4,roughness:0.1,transparent:true,opacity:0,emissive:aiStageColors[s],emissiveIntensity:0.5,clearcoat:0.8}));core.position.set(0,yPos,0);aiG.add(core);
+  var ring=new THREE.Mesh(new THREE.TorusGeometry(0.5,0.02,8,24),new THREE.MeshBasicMaterial({color:aiStageColors[s],transparent:true,opacity:0,blending:THREE.AdditiveBlending}));ring.position.set(0,yPos,0);aiG.add(ring);
+  var glow=new THREE.Mesh(new THREE.SphereGeometry(0.6,12,12),new THREE.MeshBasicMaterial({color:aiStageColors[s],transparent:true,opacity:0,blending:THREE.AdditiveBlending}));glow.position.set(0,yPos,0);aiG.add(glow);
+  aiNodes.push({core:core,ring:ring,glow:glow,yPos:yPos,color:aiStageColors[s]});
+}
+for(var i=0;i<4;i++){
+  var n1=aiNodes[i],n2=aiNodes[i+1];
+  var pts=[new THREE.Vector3(0,n1.yPos,0),new THREE.Vector3(0.8,n1.yPos+0.7,0),new THREE.Vector3(0,n2.yPos,0)];
+  var curve=new THREE.QuadraticBezierCurve3(pts[0],pts[1],pts[2]).getPoints(16);
+  var line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(curve),new THREE.LineBasicMaterial({color:C.blueL,transparent:true,opacity:0,blending:THREE.AdditiveBlending}));aiG.add(line);
+}
+var aipC=150;var aipPos=new Float32Array(aipC*3);var aipPh=new Float32Array(aipC);var aipT=new Float32Array(aipC);
+for(var i=0;i<aipC;i++){aipPh[i]=Math.random()*TAU;aipT[i]=Math.random()*5;aipPos[i*3]=0;aipPos[i*3+1]=0;aipPos[i*3+2]=0;}
+var aipGeo=new THREE.BufferGeometry();aipGeo.setAttribute("position",new THREE.BufferAttribute(aipPos,3));
+var aipMat=new THREE.PointsMaterial({color:C.cyan,size:0.04,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});
+var aipSys=new THREE.Points(aipGeo,aipMat);aiG.add(aipSys);
+aiG.position.set(-5,2.5,0);
+var fsmG=new THREE.Group();scene.add(fsmG);
+var fsmStates=["Draft","Docs Uploaded","AI Analyzing","Verified","Compliance","Active","Funding","Funded","Payout Pending","Completed","Archived"];
+var fsmColors=[C.silver,C.blue,C.violet,C.emerald,C.gold,C.cyan,C.pink,C.emerald,C.blueL,C.gold,C.silver];
+var fsmEls=[];
+fsmStates.forEach(function(name,i){
+  var yPos=i*0.7;
+  var box=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.25,0.6),new THREE.MeshPhysicalMaterial({color:fsmColors[i],metalness:0.3,roughness:0.2,transparent:true,opacity:0,emissive:fsmColors[i],emissiveIntensity:0.1}));box.position.set(0,yPos,0);fsmG.add(box);
+  var ring=new THREE.Mesh(new THREE.TorusGeometry(0.4,0.015,8,16),new THREE.MeshBasicMaterial({color:fsmColors[i],transparent:true,opacity:0,blending:THREE.AdditiveBlending}));ring.position.set(0,yPos,0);ring.rotation.x=PI/2;fsmG.add(ring);
+  fsmEls.push({box:box,ring:ring,yPos:yPos,name:name});
+  if(i<fsmStates.length-1){var beam=new THREE.Mesh(new THREE.CylinderGeometry(0.015,0.015,0.7,4),new THREE.MeshBasicMaterial({color:C.blue,transparent:true,opacity:0}));beam.position.set(0,yPos+0.35,0);fsmG.add(beam);}
+});
+var fsmPC=200;var fsmPP=new Float32Array(fsmPC*3);var fsmPPh=new Float32Array(fsmPC);
+for(var i=0;i<fsmPC;i++){fsmPPh[i]=Math.random()*TAU;fsmPP[i*3]=0;fsmPP[i*3+1]=0;fsmPP[i*3+2]=0;}
+var fsmPG=new THREE.BufferGeometry();fsmPG.setAttribute("position",new THREE.BufferAttribute(fsmPP,3));
+var fsmPM=new THREE.PointsMaterial({color:C.cyan,size:0.03,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});
+var fsmP=new THREE.Points(fsmPG,fsmPM);fsmG.add(fsmP);
+fsmG.position.set(4,0.5,-1);
+var dotTraceG=new THREE.Group();scene.add(dotTraceG);
+var dtColors=[C.cyan,C.violet,C.emerald,C.gold];
+for(var ti=0;ti<4;ti++){var pc=80;var pos=new Float32Array(pc*3);for(var j=0;j<pc;j++){var pr=j/(pc-1);var a=ti*PI/2+pr*TAU*1.5;var r=6+Math.sin(pr*PI*4)*3;pos[j*3]=Math.cos(a)*r;pos[j*3+1]=Math.sin(pr*PI*2)*4+Math.sin(a)*1.5;pos[j*3+2]=Math.sin(a)*r;}var g2=new THREE.BufferGeometry();g2.setAttribute("position",new THREE.BufferAttribute(pos,3));var m2=new THREE.PointsMaterial({color:dtColors[ti],size:0.04,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});dotTraceG.add(new THREE.Points(g2,m2));}
+var bcG=new THREE.Group();scene.add(bcG);
+var BC=7;var bcB=[];
+if(!CanvasRenderingContext2D.prototype.roundRect)CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){this.moveTo(x+r,y);this.lineTo(x+w-r,y);this.quadraticCurveTo(x+w,y,x+w,y+r);this.lineTo(x+w,y+h-r);this.quadraticCurveTo(x+w,y+h,x+w-r,y+h);this.lineTo(x+r,y+h);this.quadraticCurveTo(x,y+h,x,y+h-r);this.lineTo(x,y+r);this.quadraticCurveTo(x,y,x+r,y);this.closePath();return this;};
+function mkBlockTex(h,clr){
+  var c=document.createElement("canvas");c.width=256;c.height=64;var cx=c.getContext("2d");
+  cx.fillStyle="rgba(34,211,238,0.04)";cx.roundRect(0,0,256,64,8);cx.fill();
+  cx.strokeStyle="rgba(34,211,238,0.06)";cx.lineWidth=1;
+  for(var i=0;i<8;i++){cx.beginPath();cx.moveTo(i*32,0);cx.lineTo(i*32,64);cx.stroke();}
+  cx.fillStyle="#"+clr.toString(16).padStart(6,"0");cx.font="bold 14px monospace";cx.textAlign="left";cx.textBaseline="middle";
+  cx.fillText(h,16,22);cx.font="10px monospace";cx.fillStyle="rgba(255,255,255,0.35)";
+  cx.fillText("SHA-256 \u25cf "+Math.floor(Math.random()*999999)+" nonce",16,46);
+  return new THREE.CanvasTexture(c);
+}
+for(var i=0;i<BC;i++){
+  var a=(i/(BC-1))*PI*0.8-PI*0.4;
+  var x=Math.sin(a)*5.5,y=1.5+Math.cos(a*0.8)*2.2,z=-1.5-Math.cos(a)*1.5;
+  var grp=new THREE.Group();
+  var clr=i%2===0?C.blue:C.violet;
+  var shell=new THREE.Mesh(new THREE.BoxGeometry(1.6,1.0,1.0),new THREE.MeshPhysicalMaterial({color:clr,transparent:true,opacity:0,roughness:0.1,metalness:0.0,clearcoat:0.7,clearcoatRoughness:0.05,side:THREE.BackSide,envMapIntensity:0.4}));shell.position.z=-0.04;grp.add(shell);
+  var body=new THREE.Mesh(new THREE.BoxGeometry(1.3,0.7,0.7),new THREE.MeshPhysicalMaterial({color:clr,transparent:true,opacity:0,roughness:0.2,metalness:0.05,clearcoat:0.5,emissive:clr,emissiveIntensity:0.05}));grp.add(body);
+  var edge=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1.32,0.72,0.72)),new THREE.LineBasicMaterial({color:clr===C.blue?C.pinkL:C.blueL,transparent:true,opacity:0,blending:THREE.AdditiveBlending}));grp.add(edge);
+  var dtMat=new THREE.MeshBasicMaterial({map:mkBlockTex("0x"+(i*123456).toString(16)+"...",clr),transparent:true,opacity:0,side:THREE.DoubleSide});
+  var dtPlane=new THREE.Mesh(new THREE.PlaneGeometry(1.0,0.5),dtMat);dtPlane.position.set(0,0,0.36);grp.add(dtPlane);
+  var ring=new THREE.Mesh(new THREE.RingGeometry(0.7,0.8,24),new THREE.MeshBasicMaterial({color:C.blueL,transparent:true,opacity:0,side:THREE.DoubleSide,blending:THREE.AdditiveBlending}));ring.rotation.x=-PI/2;ring.position.y=-0.36;grp.add(ring);
+  var dgs=[];
+  for(var j=0;j<12;j++){
+    var dMat=new THREE.MeshBasicMaterial({color:Math.random()>0.5?C.cyan:C.violet,transparent:true,opacity:0});
+    var dMesh=new THREE.Mesh(new THREE.SphereGeometry(0.04,6,6),dMat);
+    var da=Math.random()*TAU,dr=0.6+Math.random()*0.4,dyO=(Math.random()-0.5)*0.7;
+    dMesh.position.set(Math.cos(da)*dr,dyO,Math.sin(da)*dr);
+    dMesh.userData={angle:da,rad:dr,dy:dyO,speed:0.3+Math.random()*0.5,phase:Math.random()*TAU};grp.add(dMesh);dgs.push(dMesh);
+  }
+  grp.position.set(x,y,z);grp.rotation.y=-a*0.2;bcG.add(grp);bcB.push({group:grp,body:body,shell:shell,edge:edge,ring:ring,dt:dtPlane,dtMat:dtMat,dgs:dgs,clr:clr,a:a});
+  if(i<BC-1){
+    var na=((i+1)/(BC-1))*PI*0.8-PI*0.4;
+    var nx=Math.sin(na)*5.5,ny=1.5+Math.cos(na*0.8)*2.2,nz=-1.5-Math.cos(na)*1.5;
+    var dx=nx-x,dy=ny-y,dz=nz-z;var len=Math.sqrt(dx*dx+dy*dy+dz*dz);
+    var beam=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,len,6,1,true),new THREE.MeshBasicMaterial({color:C.blueL,transparent:true,opacity:0,blending:THREE.AdditiveBlending,side:THREE.DoubleSide}));beam.position.set((x+nx)/2,(y+ny)/2,(z+nz)/2);beam.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),new THREE.Vector3(dx,dy,dz).normalize());bcG.add(beam);bcB[i].beam=beam;
+  }
+}
+var bcPC=300;var bcPP=new Float32Array(bcPC*3);var bcPPh=new Float32Array(bcPC);
+for(var i=0;i<bcPC;i++){bcPPh[i]=Math.random()*TAU;bcPP[i*3]=0;bcPP[i*3+1]=0;bcPP[i*3+2]=0;}
+var bcPG=new THREE.BufferGeometry();bcPG.setAttribute("position",new THREE.BufferAttribute(bcPP,3));
+var bcPM=new THREE.PointsMaterial({color:C.blueL,size:0.06,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});
+var bcP=new THREE.Points(bcPG,bcPM);bcG.add(bcP);
+var bcDigC=60;var bcDigPos=new Float32Array(bcDigC*3);var bcDigPh=new Float32Array(bcDigC);
+for(var i=0;i<bcDigC;i++){bcDigPh[i]=Math.random()*TAU;bcDigPos[i*3]=(Math.random()-0.5)*8;bcDigPos[i*3+1]=1+Math.random()*4;bcDigPos[i*3+2]=-2+(Math.random()-0.5)*3;}
+var bcDigG=new THREE.BufferGeometry();bcDigG.setAttribute("position",new THREE.BufferAttribute(bcDigPos,3));
+var bcDigM=new THREE.PointsMaterial({color:C.cyan,size:0.04,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});
+var bcDigP=new THREE.Points(bcDigG,bcDigM);bcG.add(bcDigP);
+var merkleG=new THREE.Group();scene.add(merkleG);
+function mkMerkleTree(){
+  var g=new THREE.Group();var nodes=[];
+  for(var i=0;i<8;i++){var leaf=new THREE.Mesh(new THREE.CircleGeometry(0.08,6),new THREE.MeshBasicMaterial({color:C.emerald,transparent:true,opacity:0,side:THREE.DoubleSide}));leaf.position.set((i-3.5)*0.35,0,0);g.add(leaf);nodes.push(leaf);}
+  for(var i=0;i<4;i++){var parent=new THREE.Mesh(new THREE.CircleGeometry(0.1,6),new THREE.MeshBasicMaterial({color:C.blue,transparent:true,opacity:0,side:THREE.DoubleSide}));parent.position.set((i-1.5)*0.7,0.5,0);g.add(parent);nodes.push(parent);for(var j=0;j<2;j++){var pts=[new THREE.Vector3(nodes[i*2+j].position.x,0,0),new THREE.Vector3(parent.position.x,0.5,0)];var line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:C.blueL,transparent:true,opacity:0}));g.add(line);}}
+  for(var i=0;i<2;i++){var parent=new THREE.Mesh(new THREE.CircleGeometry(0.12,6),new THREE.MeshBasicMaterial({color:C.violet,transparent:true,opacity:0,side:THREE.DoubleSide}));parent.position.set((i-0.5)*1.4,1.0,0);g.add(parent);nodes.push(parent);for(var j=0;j<2;j++){var ci=8+i*2+j;var pts=[new THREE.Vector3(nodes[ci].position.x,0.5,0),new THREE.Vector3(parent.position.x,1.0,0)];var line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:C.violet,transparent:true,opacity:0}));g.add(line);}}
+  var root=new THREE.Mesh(new THREE.CircleGeometry(0.16,8),new THREE.MeshBasicMaterial({color:C.gold,transparent:true,opacity:0,side:THREE.DoubleSide}));root.position.set(0,1.5,0);g.add(root);nodes.push(root);
+  for(var j=0;j<2;j++){var ci=12+j;var pts=[new THREE.Vector3(nodes[ci].position.x,1.0,0),new THREE.Vector3(0,1.5,0)];var line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:C.gold,transparent:true,opacity:0}));g.add(line);}
+  return {g:g,nodes:nodes};
+}
+var merkle=mkMerkleTree();merkleG.add(merkle.g);merkleG.position.set(-1.5,3.5,-6);
+var tokG=new THREE.Group();scene.add(tokG);
+var tokRM=new THREE.MeshPhysicalMaterial({color:C.blue,metalness:0.5,roughness:0.15,transparent:true,opacity:0,emissive:C.blue,emissiveIntensity:0.3,side:THREE.DoubleSide});
+var tokR=new THREE.Mesh(new THREE.TorusGeometry(3.5,0.08,16,48),tokRM);tokR.rotation.x=PI/2.8;tokR.position.y=2.5;tokG.add(tokR);
+var tokIRM=new THREE.MeshPhysicalMaterial({color:C.violet,metalness:0.3,roughness:0.25,transparent:true,opacity:0,emissive:C.violet,emissiveIntensity:0.2,side:THREE.DoubleSide});
+var tokIR=new THREE.Mesh(new THREE.TorusGeometry(2.4,0.05,12,36),tokIRM);tokIR.rotation.x=PI/2.8;tokIR.position.y=2.5;tokG.add(tokIR);
+var tokDM=new THREE.MeshBasicMaterial({color:C.cyan,transparent:true,opacity:0,wireframe:true});
+var tokDome=new THREE.Mesh(new THREE.SphereGeometry(3.8,12,8,0,TAU,0,PI/3),tokDM);tokDome.position.y=2.5;tokDome.scale.y=0.6;tokG.add(tokDome);
+var tokPMat=new THREE.MeshPhysicalMaterial({color:C.cyan,transparent:true,opacity:0,emissive:C.cyan,emissiveIntensity:0.1});
+for(var i=0;i<12;i++){var a=(i/12)*TAU;var pMm=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.08,1.0,6),tokPMat);pMm.position.set(Math.cos(a)*3.5,2.5,Math.sin(a)*3.5);tokG.add(pMm);}
+var fracRing=new THREE.Mesh(new THREE.RingGeometry(1.5,2.5,32),new THREE.MeshBasicMaterial({color:C.emerald,transparent:true,opacity:0,side:THREE.DoubleSide,blending:THREE.AdditiveBlending}));fracRing.position.set(0,2.5,0);fracRing.rotation.x=PI/3;tokG.add(fracRing);
+var fracRing2=new THREE.Mesh(new THREE.RingGeometry(1.0,1.8,24),new THREE.MeshBasicMaterial({color:C.gold,transparent:true,opacity:0,side:THREE.DoubleSide,blending:THREE.AdditiveBlending}));fracRing2.position.set(0,2.5,0);fracRing2.rotation.x=-PI/4;tokG.add(fracRing2);
+var escrowG=new THREE.Group();scene.add(escrowG);
+var escM=new THREE.MeshPhysicalMaterial({color:C.gold,metalness:0.5,roughness:0.15,transparent:true,opacity:0,emissive:C.gold,emissiveIntensity:0.2});
+var escBox=new THREE.Mesh(new THREE.BoxGeometry(0.8,1.0,0.8),escM);escBox.position.set(0,0.5,0);escrowG.add(escBox);
+var escL=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(0.82,1.02,0.82)),new THREE.LineBasicMaterial({color:C.gold,transparent:true,opacity:0}));escrowG.add(escL);
+escrowG.position.set(0,1.5,-6);
+var tkCount=4000;var tkPos=new Float32Array(tkCount*3);var tkCol=new Float32Array(tkCount*3);var tkPh=new Float32Array(tkCount);var tkSP=new Float32Array(tkCount*3);var tkEP=new Float32Array(tkCount*3);
+for(var i=0;i<tkCount;i++){
+  var th=Math.random()*TAU,ph=Math.acos(2*Math.random()-1),r=0.3+Math.random()*1.5;
+  tkPos[i*3]=Math.sin(ph)*Math.cos(th)*r;tkPos[i*3+1]=2.5+Math.sin(ph)*Math.sin(th)*r;tkPos[i*3+2]=Math.cos(ph)*r;
+  tkSP[i*3]=tkPos[i*3];tkSP[i*3+1]=tkPos[i*3+1];tkSP[i*3+2]=tkPos[i*3+2];tkPh[i]=Math.random()*TAU;
+  var c=Math.random();if(c<0.33){tkCol[i*3]=0.13;tkCol[i*3+1]=0.83;tkCol[i*3+2]=0.91;}else if(c<0.6){tkCol[i*3]=0.91;tkCol[i*3+1]=0.45;tkCol[i*3+2]=0.71;}else if(c<0.8){tkCol[i*3]=0.73;tkCol[i*3+1]=0.49;tkCol[i*3+2]=0.96;}else{tkCol[i*3]=0.2;tkCol[i*3+1]=0.83;tkCol[i*3+2]=0.6;}
+  var a2=Math.random()*TAU,d2=6+Math.random()*3;tkEP[i*3]=Math.cos(a2)*d2;tkEP[i*3+1]=0.15+Math.random()*0.6;tkEP[i*3+2]=Math.sin(a2)*d2;
+}
+var tkg=new THREE.BufferGeometry();tkg.setAttribute("position",new THREE.BufferAttribute(tkPos,3));tkg.setAttribute("color",new THREE.BufferAttribute(tkCol,3));
+var tkm=new THREE.PointsMaterial({size:0.05,transparent:true,opacity:0,vertexColors:true,blending:THREE.AdditiveBlending,depthWrite:false,sizeAttenuation:true});
+var tkp=new THREE.Points(tkg,tkm);tokG.add(tkp);
+var trG=new THREE.Group();scene.add(trG);
+var trIC=80;var trInvs=[];
+function mkTrader(){
+  var g=new THREE.Group();
+  var bM2=new THREE.MeshPhysicalMaterial({color:0x1e293b,metalness:0.2,roughness:0.15,transparent:true,opacity:0,clearcoat:0.3});
+  var body=new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.2,0.4,6),bM2);body.position.set(0,0.2,0);g.add(body);
+  var sh=new THREE.Mesh(new THREE.SphereGeometry(0.16,6,4,0,TAU,0,PI/2.5),bM2);sh.position.y=0.35;sh.scale.x=1.2;g.add(sh);
+  var hM2=new THREE.MeshPhysicalMaterial({color:Math.random()>0.5?C.blue:C.violet,metalness:0.2,roughness:0.15,transparent:true,opacity:0});
+  var head=new THREE.Mesh(new THREE.SphereGeometry(0.08,6,6),hM2);head.position.set(0,0.48,0);g.add(head);
+  var dot=new THREE.Mesh(new THREE.SphereGeometry(0.02,4,4),new THREE.MeshBasicMaterial({color:[C.blue,C.violet,C.gold,C.emerald][Math.floor(Math.random()*4)],transparent:true,opacity:0}));dot.position.set(0.15,0.26,0);g.add(dot);return g;
+}
+for(var i=0;i<trIC;i++){var inv=mkTrader();var a=(i/trIC)*TAU+Math.random()*0.1;var r=5+Math.random()*3;inv.position.set(Math.cos(a)*r,0.1,Math.sin(a)*r);inv.rotation.y=-a+Math.random()*0.1;var s=0.3+Math.random()*0.4;inv.scale.set(s,s,s);trG.add(inv);trInvs.push({mesh:inv,angle:a,radius:r,baseY:0.1,phase:Math.random()*TAU});}
+var obG=new THREE.Group();scene.add(obG);
+var obBgM=new THREE.MeshBasicMaterial({color:C.blue,transparent:true,opacity:0,side:THREE.DoubleSide});
+var obBg=new THREE.Mesh(new THREE.PlaneGeometry(3.0,4.0),obBgM);obBg.position.set(0,2,0);obG.add(obBg);
+var obGridM=new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0});
+for(var i=0;i<=10;i++){var y=i*0.36;var pts=[new THREE.Vector3(-1.4,y,0.01),new THREE.Vector3(1.4,y,0.01)];obG.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts),obGridM));}
+for(var i=0;i<8;i++){var side=i<4?"buy":"sell";var yPos=3.6-i*0.36;var w=1.0+Math.random()*0.8;var bar=new THREE.Mesh(new THREE.BoxGeometry(w,0.12,0.05),new THREE.MeshBasicMaterial({color:side==="buy"?C.emerald:C.violet,transparent:true,opacity:0}));bar.position.set(side==="buy"?-1.4+w/2:1.4-w/2,yPos,0);obG.add(bar);}
+var obPts=[];for(var i=0;i<200;i++){var obP=new THREE.Mesh(new THREE.SphereGeometry(0.025,4,4),new THREE.MeshBasicMaterial({color:[C.emerald,C.violet][Math.floor(Math.random()*2)],transparent:true,opacity:0}));obP.position.set((Math.random()-0.5)*2.6,Math.random()*4,0);obG.add(obP);obPts.push(obP);}
+obG.position.set(0,1.5,5.5);
+var trPths=[];var trClrs=[C.blue,C.pink,C.emerald,C.gold];
+for(var i=0;i<40;i++){
+  var i1=Math.floor(Math.random()*trIC),i2=Math.floor(Math.random()*trIC);if(i1===i2)continue;
+  var v1=trInvs[i1],v2=trInvs[i2];
+  var s=new THREE.Vector3(v1.mesh.position.x,0.4,v1.mesh.position.z),e=new THREE.Vector3(v2.mesh.position.x,0.4,v2.mesh.position.z);
+  var mid=new THREE.Vector3((s.x+e.x)/2,0.5+Math.random()*2.0,(s.z+e.z)/2);
+  var pts=new THREE.QuadraticBezierCurve3(s,mid,e).getPoints(20);
+  var g1=new THREE.BufferGeometry().setFromPoints(pts);var m1=new THREE.LineBasicMaterial({color:trClrs[i%4],transparent:true,opacity:0});
+  var ln=new THREE.Line(g1,m1);trG.add(ln);trPths.push({line:ln,phase:Math.random()*TAU,speed:0.12+Math.random()*0.3});
+}
+var trPC=200;var trPP=new Float32Array(trPC*3);
+var trPG=new THREE.BufferGeometry();trPG.setAttribute("position",new THREE.BufferAttribute(trPP,3));
+var trPM=new THREE.PointsMaterial({color:C.cyan,size:0.03,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});
+var trP=new THREE.Points(trPG,trPM);trG.add(trP);
+var finG=new THREE.Group();scene.add(finG);
+var kycColors=[C.silver,C.blue,C.violet,C.gold];
+var kycTiers=[];
+for(var i=0;i<4;i++){
+  var g=new THREE.Group();
+  var shield=new THREE.Mesh(new THREE.ShapeGeometry((function(){var s=new THREE.Shape();s.moveTo(0,0.8);s.lineTo(-0.5,-0.2);s.lineTo(-0.5,-0.6);s.lineTo(0.5,-0.6);s.lineTo(0.5,-0.2);s.closePath();return s;})()),new THREE.MeshBasicMaterial({color:kycColors[i],transparent:true,opacity:0,side:THREE.DoubleSide}));g.add(shield);
+  var check=new THREE.Mesh(new THREE.PlaneGeometry(0.2,0.12),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0,side:THREE.DoubleSide}));check.position.set(0,0.1,0.01);g.add(check);
+  var ring2=new THREE.Mesh(new THREE.RingGeometry(0.4,0.5,16),new THREE.MeshBasicMaterial({color:kycColors[i],transparent:true,opacity:0,side:THREE.DoubleSide}));ring2.position.set(0,0,0);g.add(ring2);
+  g.position.set((i-1.5)*2.5,2,0);finG.add(g);kycTiers.push({g:g,shield:shield,check:check,ring2:ring2,tier:i,color:kycColors[i]});
+}
+var payG=new THREE.Group();scene.add(payG);
+var gateways=["Razorpay","Stripe","UPI","Wire"];
+var gwMeshes=[];
+gateways.forEach(function(name,i){
+  var g=new THREE.Group();
+  var panel=new THREE.Mesh(new THREE.PlaneGeometry(0.8,0.5),new THREE.MeshPhysicalMaterial({color:C.white,transparent:true,opacity:0,roughness:0.1,metalness:0.0,clearcoat:0.3,side:THREE.DoubleSide}));panel.position.set(0,0,0);g.add(panel);
+  var glow=new THREE.Mesh(new THREE.PlaneGeometry(0.9,0.6),new THREE.MeshBasicMaterial({color:[C.blue,C.violet,C.emerald,C.gold][i],transparent:true,opacity:0,blending:THREE.AdditiveBlending}));g.add(glow);
+  g.position.set((i-1.5)*2.5,0.5,0);payG.add(g);gwMeshes.push({g:g,panel:panel,glow:glow});
+});
+var amlShield=new THREE.Mesh(new THREE.RingGeometry(1.2,1.5,24),new THREE.MeshBasicMaterial({color:C.emerald,transparent:true,opacity:0,side:THREE.DoubleSide}));amlShield.position.set(0,3.5,0);finG.add(amlShield);
+var amlFlags=new THREE.Group();scene.add(amlFlags);
+for(var i=0;i<8;i++){
+  var flag=new THREE.Mesh(new THREE.BoxGeometry(0.15,0.35,0.02),new THREE.MeshBasicMaterial({color:[C.violet,C.gold,C.pink,C.blue,C.emerald,C.cyan,C.silver,C.gold][i],transparent:true,opacity:0}));
+  var a=(i/8)*TAU;flag.position.set(Math.cos(a)*1.8,3.5+Math.sin(a*2)*0.3,Math.sin(a)*1.8);flag.rotation.z=Math.sin(a)*0.2;amlFlags.add(flag);
+}
+var finPC=300;var finPP=new Float32Array(finPC*3);var finPPh=new Float32Array(finPC);
+for(var i=0;i<finPC;i++){finPPh[i]=Math.random()*TAU;finPP[i*3]=(Math.random()-0.5)*8;finPP[i*3+1]=Math.random()*4;finPP[i*3+2]=(Math.random()-0.5)*6;}
+var finPG=new THREE.BufferGeometry();finPG.setAttribute("position",new THREE.BufferAttribute(finPP,3));
+var finPM=new THREE.PointsMaterial({color:C.cyan,size:0.03,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});
+var finP=new THREE.Points(finPG,finPM);finG.add(finP);
+finG.position.set(2,2.5,-8);payG.position.set(2,0.5,-8);amlFlags.position.set(2,3.5,-8);
+var ecoG=new THREE.Group();scene.add(ecoG);
+var ecoTypes=[{name:"Real Estate",color:C.blue,size:1.0},{name:"Gold Reserves",color:C.gold,size:0.9},{name:"Agriculture",color:C.emerald,size:0.8},{name:"Solar Farms",color:C.cyan,size:0.7},{name:"Wind Energy",color:C.blueL,size:0.7},{name:"Hotels",color:C.pink,size:0.8},{name:"Warehouses",color:C.blue,size:0.8},{name:"Factories",color:C.blueD,size:0.9},{name:"Fine Art",color:C.gold,size:0.6},{name:"Businesses",color:C.emerald,size:0.8},{name:"Vehicles",color:C.pink,size:0.7},{name:"Inventory",color:C.cyan,size:0.7}];
+var eAs=[];var eR2=28;
+ecoTypes.forEach(function(a,i){
+  var s=a.size*0.35;var geo;var shapeIdx=i%5;
+  if(shapeIdx===0)geo=new THREE.BoxGeometry(s,s,s);else if(shapeIdx===1)geo=new THREE.SphereGeometry(s*0.8,12,12);else if(shapeIdx===2)geo=new THREE.ConeGeometry(s*0.7,s,8);else if(shapeIdx===3)geo=new THREE.TorusGeometry(s*0.6,s*0.2,8,12);else geo=new THREE.TorusKnotGeometry(s*0.5,s*0.15,12,8);
+  var g=new THREE.Mesh(geo,new THREE.MeshPhysicalMaterial({color:a.color,metalness:0.3,roughness:0.2,transparent:true,opacity:0,emissive:a.color,emissiveIntensity:0.15,clearcoat:0.3}));
+  var glowRing=new THREE.Mesh(new THREE.RingGeometry(s*0.5,s*0.7,24),new THREE.MeshBasicMaterial({color:a.color,transparent:true,opacity:0,side:THREE.DoubleSide,blending:THREE.AdditiveBlending}));glowRing.rotation.x=-PI/2;glowRing.position.y=-0.1;
+  var grp=new THREE.Group();grp.add(g);grp.add(glowRing);
+  var ang=(i/ecoTypes.length)*TAU-Math.PI/2;
+  grp.position.set(Math.cos(ang)*eR2,1.5+Math.sin(ang*2)*0.5,Math.sin(ang)*eR2);
+  ecoG.add(grp);eAs.push({group:grp,mesh:g,glowRing:glowRing,angle:ang,phase:Math.random()*TAU,name:a.name,color:a.color,size:a.size});
+});
+var cM2=new THREE.LineDashedMaterial({color:C.cyan,dashSize:0.3,gapSize:0.2,transparent:true,opacity:0});
+eAs.forEach(function(a){var pts=[new THREE.Vector3(a.group.position.x,1.5,a.group.position.z),new THREE.Vector3(0,0,0)];var g2=new THREE.BufferGeometry().setFromPoints(pts);var l=new THREE.Line(g2,cM2.clone());l.computeLineDistances();ecoG.add(l);});
+var glbG=new THREE.Group();scene.add(glbG);
+var glbWM=new THREE.MeshBasicMaterial({color:C.blueL,transparent:true,opacity:0,wireframe:true});
+var glbW=new THREE.Mesh(new THREE.SphereGeometry(22,28,20),glbWM);glbW.position.y=0;glbG.add(glbW);
+var glbWM2=new THREE.MeshBasicMaterial({color:C.cyan,transparent:true,opacity:0,wireframe:true});
+var glbW2=new THREE.Mesh(new THREE.SphereGeometry(20,18,14),glbWM2);glbW2.position.y=0;glbW2.rotation.x=0.3;glbG.add(glbW2);
+var glbLM=new THREE.LineBasicMaterial({color:C.violet,transparent:true,opacity:0});
+for(var i=0;i<24;i++){var a=(i/24)*TAU;var pts=[new THREE.Vector3(Math.cos(a)*22,0,Math.sin(a)*22),new THREE.Vector3(0,9,0),new THREE.Vector3(Math.cos(a+PI/24)*22,0,Math.sin(a+PI/24)*22)];var g2=new THREE.BufferGeometry().setFromPoints(pts);glbG.add(new THREE.Line(g2,glbLM));}
+var glbLM2=new THREE.LineBasicMaterial({color:C.emerald,transparent:true,opacity:0});
+for(var i=0;i<12;i++){var a=(i/12)*TAU+PI/12;var pts=[new THREE.Vector3(Math.cos(a)*16,6,Math.sin(a)*16),new THREE.Vector3(Math.cos(a+PI/12)*18,3,Math.sin(a+PI/12)*18),new THREE.Vector3(Math.cos(a+PI/6)*16,-4,Math.sin(a+PI/6)*16)];var g2=new THREE.BufferGeometry().setFromPoints(pts);glbG.add(new THREE.Line(g2,glbLM2));}
+var glbDM=new THREE.PointsMaterial({color:C.cyan,size:0.12,transparent:true,opacity:0,blending:THREE.AdditiveBlending});
+var glbDC=800;var glbDP=new Float32Array(glbDC*3);
+for(var i=0;i<glbDC;i++){var th=Math.random()*TAU,ph=Math.acos(2*Math.random()-1),r=18+Math.random()*5;glbDP[i*3]=Math.sin(ph)*Math.cos(th)*r;glbDP[i*3+1]=Math.sin(ph)*Math.sin(th)*r;glbDP[i*3+2]=Math.cos(ph)*r;}
+var glbDG=new THREE.BufferGeometry();glbDG.setAttribute("position",new THREE.BufferAttribute(glbDP,3));
+var glbD=new THREE.Points(glbDG,glbDM);glbG.add(glbD);
+var glbOrbitM=new THREE.MeshBasicMaterial({color:C.gold,transparent:true,opacity:0});
+var glbOrbit=new THREE.Mesh(new THREE.RingGeometry(21,21.3,64),glbOrbitM);glbOrbit.position.y=0;glbOrbit.rotation.x=PI/2.5;glbG.add(glbOrbit);
+var glbOrbit2=new THREE.Mesh(new THREE.RingGeometry(17,17.2,48),glbOrbitM);glbOrbit2.material.color.setHex(C.cyan);glbOrbit2.position.y=0;glbOrbit2.rotation.x=-PI/3;glbG.add(glbOrbit2);
+var hubG=new THREE.Group();scene.add(hubG);
+var hubM=new THREE.MeshPhysicalMaterial({color:C.blue,metalness:0.7,roughness:0.1,transparent:true,opacity:0,emissive:C.blue,emissiveIntensity:0.4,clearcoat:0.8});
+var hub=new THREE.Mesh(new THREE.SphereGeometry(0.8,24,24),hubM);hub.position.set(0,0,0);hubG.add(hub);
+var hubGM=new THREE.MeshBasicMaterial({color:C.cyan,transparent:true,opacity:0,side:THREE.DoubleSide,blending:THREE.AdditiveBlending});
+var hubG2=new THREE.Mesh(new THREE.SphereGeometry(1.2,18,18),hubGM);hubG2.position.set(0,0,0);hubG.add(hubG2);
+var hubRM=new THREE.MeshBasicMaterial({color:C.violet,transparent:true,opacity:0,side:THREE.DoubleSide});
+for(var i=0;i<5;i++){var hr=new THREE.Mesh(new THREE.RingGeometry(1.4+i*0.5,1.5+i*0.5,48),hubRM);hr.position.set(0,0,0);hr.rotation.x=PI/2;hubG.add(hr);}
+var hubRM2=new THREE.MeshBasicMaterial({color:C.gold,transparent:true,opacity:0,side:THREE.DoubleSide});
+for(var i=0;i<3;i++){var hr=new THREE.Mesh(new THREE.RingGeometry(2.8+i*0.6,2.9+i*0.6,32),hubRM2);hr.position.set(0,0,0);hr.rotation.x=PI/3+i*0.2;hubG.add(hr);}
+var fAPC=12;var fAPP=new Float32Array(fAPC*3);var fAPPh=new Float32Array(fAPC);
+for(var i=0;i<fAPC;i++){fAPPh[i]=Math.random()*TAU;fAPP[i*3]=0;fAPP[i*3+1]=0;fAPP[i*3+2]=0;}
+var fAPG=new THREE.BufferGeometry();fAPG.setAttribute("position",new THREE.BufferAttribute(fAPP,3));
+var fAPM=new THREE.PointsMaterial({color:C.blueL,size:0.15,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});
+var fAP=new THREE.Points(fAPG,fAPM);hubG.add(fAP);
+var bgGlassM=new THREE.MeshPhysicalMaterial({color:0xffffff,transparent:true,opacity:0,roughness:0.2,metalness:0.0,clearcoat:0.4,clearcoatRoughness:0.15,side:THREE.DoubleSide,depthWrite:false});
+var bgGlass=new THREE.Mesh(new THREE.PlaneGeometry(60,40),bgGlassM);bgGlass.position.set(0,6,-15);scene.add(bgGlass);
+var bgGlassL=new THREE.Mesh(new THREE.PlaneGeometry(40,35),bgGlassM.clone());bgGlassL.position.set(-18,5,-18);bgGlassL.rotation.y=0.5;scene.add(bgGlassL);
+var bgGlassR=new THREE.Mesh(new THREE.PlaneGeometry(40,35),bgGlassM.clone());bgGlassR.position.set(18,5,-18);bgGlassR.rotation.y=-0.5;scene.add(bgGlassR);
+function mkRoundRectGeo(w,h,r){var s=new THREE.Shape();s.moveTo(-w/2+r,-h/2);s.lineTo(w/2-r,-h/2);s.quadraticCurveTo(w/2,-h/2,w/2,-h/2+r);s.lineTo(w/2,h/2-r);s.quadraticCurveTo(w/2,h/2,w/2-r,h/2);s.lineTo(-w/2+r,h/2);s.quadraticCurveTo(-w/2,h/2,-w/2,h/2-r);s.lineTo(-w/2,-h/2+r);s.quadraticCurveTo(-w/2,-h/2,-w/2+r,-h/2);return new THREE.ShapeGeometry(s);}
+function addGlBorder(mesh,w,h,r,clr){var bGeo=new THREE.EdgesGeometry(mkRoundRectGeo(w,h,r));var bLine=new THREE.LineSegments(bGeo,new THREE.LineBasicMaterial({color:clr,transparent:true,opacity:0,blending:THREE.AdditiveBlending}));bLine.position.copy(mesh.position);bLine.rotation.copy(mesh.rotation);scene.add(bLine);return bLine;}
+var bdr1=addGlBorder(bgGlass,59,39,2,C.cyan);
+var bdr2=addGlBorder(bgGlassL,39,34,2,C.blueL);
+var bdr3=addGlBorder(bgGlassR,39,34,2,C.violet);
+function mkArchCanvas(){
+  var c=document.createElement("canvas");c.width=1024;c.height=640;var cx=c.getContext("2d");
+  cx.strokeStyle="rgba(34,211,238,0.03)";cx.lineWidth=1;
+  for(var x=0;x<1024;x+=30){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,640);cx.stroke();}
+  for(var y=0;y<640;y+=30){cx.beginPath();cx.moveTo(0,y);cx.lineTo(1024,y);cx.stroke();}
+  cx.fillStyle="rgba(34,211,238,0.04)";cx.roundRect(40,30,400,36,18);cx.fill();
+  cx.fillStyle="rgba(34,211,238,0.5)";cx.font="bold 16px monospace";cx.textAlign="left";cx.textBaseline="middle";
+  cx.fillText("AVERON v4.0.0  SYSTEM ARCHITECTURE  MAINNET",56,48);
+  var archSections=["User Layer Wallet (secp256k1)","KYC/AML (4 Tiers)","Asset Tokenization (14-State FSM)","AI Pipeline (Gemini 2.0 Flash)","Blockchain (SHA-256 PoW)","Smart Contracts (Merkle Trees)","Liquidity Pools (Escrow)","Secondary Markets (Order Book)","Portfolio Dashboard"];
+  archSections.forEach(function(s,i){var bx=60+Math.random()*200,by=100+i*55;cx.fillStyle="rgba(34,211,238,0.03)";cx.roundRect(bx,by,340,28,14);cx.fill();cx.fillStyle="rgba(34,211,238,0.2)";cx.font="12px monospace";cx.textAlign="left";cx.fillText("  "+s,bx+16,by+16);});
+  var stats=["TX/s: 2,847","VALIDATORS: 143","FINALITY: 2.1s","TVL: $48.2M","ASSETS: 12,400"];
+  stats.forEach(function(s,i){cx.fillStyle="rgba(139,92,246,0.06)";cx.roundRect(800,40+i*38,170,26,13);cx.fill();cx.fillStyle="rgba(139,92,246,0.3)";cx.font="10px monospace";cx.textAlign="right";cx.fillText(s,960,56+i*38);});
+  return new THREE.CanvasTexture(c);
+}
+var bgDataSprM=new THREE.SpriteMaterial({map:mkArchCanvas(),transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});
+var bgDataSpr=new THREE.Sprite(bgDataSprM);bgDataSpr.scale.set(26,16.25,1);bgDataSpr.position.set(0,7,-14.5);scene.add(bgDataSpr);
+var vFC=300;var vFP=new Float32Array(vFC*3);var vFPh=new Float32Array(vFC);var vFSp=new Float32Array(vFC);
+var flowPath=[new THREE.Vector3(-5,5.5,0),new THREE.Vector3(0,6.5,2),new THREE.Vector3(4,3.5,0),new THREE.Vector3(0,2.5,-6),new THREE.Vector3(2,1.5,5.5),new THREE.Vector3(0,0.5,16)];
+for(var i=0;i<vFC;i++){vFPh[i]=Math.random()*TAU;vFSp[i]=0.06+Math.random()*0.08;vFP[i*3]=0;vFP[i*3+1]=0;vFP[i*3+2]=0;}
+var vFG2=new THREE.BufferGeometry();vFG2.setAttribute("position",new THREE.BufferAttribute(vFP,3));
+var vFM2=new THREE.PointsMaterial({color:C.blueL,size:0.04,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,sizeAttenuation:true});
+var vfP=new THREE.Points(vFG2,vFM2);scene.add(vfP);
+var vfLM=new THREE.LineBasicMaterial({color:C.blueL,transparent:true,opacity:0});
+var vfLP=[];for(var i=0;i<flowPath.length;i++){vfLP.push(flowPath[i]);if(i<flowPath.length-1)vfLP.push(flowPath[i+1]);}
+var vfL=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(vfLP),vfLM);scene.add(vfL);
+var ui2=document.getElementById("ui");var lbs={};
+var lDefs=[
+  {id:"title-main",text:"AVERON",cls:"stage-title",wp:[-5,7,-2]},
+  {id:"subtitle-main",text:"Where Value Becomes Infinite",cls:"badge",wp:[-5,6.2,-2]},
+  {id:"ai-title",text:"The Mind Awakens  AI Core",cls:"stage-title",wp:[-5,7,2]},
+  {id:"ai-gemini",text:"Gemini 2.0 Flash  Multi-Modal Intelligence",cls:"badge",wp:[-5,6.3,2]},
+  {id:"ai-ingest",text:"Data Streams Ingested",cls:"small",wp:[-5,3.8,2]},
+  {id:"ai-dup",text:"Immutability Verified",cls:"small",wp:[-5,2.4,2]},
+  {id:"ai-gemini-main",text:"Deep Analysis & Valuation",cls:"emerald",wp:[-5,1.0,2]},
+  {id:"ai-fraud",text:"Trust Shield  Fraud Scan",cls:"gold",wp:[-5,-0.4,2]},
+  {id:"ai-token-rec",text:"Token Blueprint Generated",cls:"badge",wp:[-5,-1.8,2]},
+  {id:"fsm-title",text:"The Lifecycle Engine  14 States",cls:"stage-title",wp:[4,7,-2]},
+  {id:"fsm-flow",text:"From Spark to Immortality",cls:"pink",wp:[4,0.5,-2]},
+  {id:"fsm-detail",text:"Every Asset Journeys Through the Machine",cls:"gold",wp:[4,-0.8,-2]},
+  {id:"bc-title",text:"The Chain Forges On",cls:"stage-title",wp:[0,5.5,-5]},
+  {id:"bc-merkle",text:"Truth Branches  Merkle Roots",cls:"emerald",wp:[0,5.5,-7]},
+  {id:"bc-mine",text:"Proof of Work  30s Blocks",cls:"badge",wp:[0,3.8,-5]},
+  {id:"bc-consensus",text:"Unbreakable Consensus",cls:"gold",wp:[0,2.2,-5]},
+  {id:"bc-ecdsa",text:"Keys to the Universe  secp256k1",cls:"pink",wp:[0,0.5,-5]},
+  {id:"tok-title",text:"Value Dissolves into Tokens",cls:"stage-title",wp:[0,5.5,5.5]},
+  {id:"tok-fractional",text:"Infinity in Fractions",cls:"badge",wp:[0,4.0,5.5]},
+  {id:"tok-escrow",text:"The Vault  Escrow Guardian",cls:"gold",wp:[0,1.5,-7]},
+  {id:"tok-math",text:"Whole   Countless Pieces",cls:"pink",wp:[0,2.5,5.5]},
+  {id:"tr-title",text:"Markets Pulse  Trading Arena",cls:"stage-title",wp:[0,4.5,7]},
+  {id:"tr-circuit",text:"The Circuit Breaker Stands Watch",cls:"gold",wp:[0,3.0,7]},
+  {id:"tr-price-time",text:"Speed  Priority  Precision",cls:"badge",wp:[0,1.5,7]},
+  {id:"tr-investors",text:"A Network of Believers",cls:"emerald",wp:[0,0,7]},
+  {id:"fin-title",text:"The Financial Frontier",cls:"stage-title",wp:[2,6.5,-9.5]},
+  {id:"fin-kyc",text:"Trust Ascends  4 Tiers of Identity",cls:"badge",wp:[2,5.5,-9.5]},
+  {id:"fin-aml",text:"The Watchtower  AML Defense Grid",cls:"pink",wp:[2,3,-9.5]},
+  {id:"fin-gateways",text:"Four Portals: Razorpay  Stripe  UPI  Wire",cls:"emerald",wp:[2,1,-9.5]},
+  {id:"eco-title",text:"AVERON  The Universe Unfolds",cls:"stage-title",wp:[0,18,0]},
+  {id:"subtitle-eco",text:"Real World Assets | AI | Blockchain | Boundless Liquidity",cls:"pink",wp:[0,16.5,0]},
+];
+lDefs.forEach(function(d){var el=document.createElement("div");el.className="label"+(d.cls?" "+d.cls:"");el.textContent=d.text;el.id="l-"+d.id;if(d.id==="title-main"){el.style.color="#22d3ee";el.style.fontSize="32px";el.style.letterSpacing="10px";el.style.fontWeight="800";el.style.background="transparent";el.style.backdropFilter="none";el.style.border="none";el.style.boxShadow="none";}if(d.id==="eco-title"){el.style.color="#22d3ee";el.style.fontSize="28px";el.style.letterSpacing="8px";el.style.fontWeight="700";el.style.background="transparent";el.style.backdropFilter="none";el.style.border="none";el.style.boxShadow="none";}ui2.appendChild(el);lbs[d.id]={el:el,wp:d.wp};});
+ecoTypes.forEach(function(a,i){var ang=(i/ecoTypes.length)*TAU-Math.PI/2;var el=document.createElement("div");el.className="label small";el.textContent=a.name;el.id="l-ec-"+i;ui2.appendChild(el);lbs["ec-"+i]={el:el,wp:[Math.cos(ang)*30,1.8+Math.sin(ang*2)*0.5,Math.sin(ang)*30]};});
+var lcEls=[];var lcStps=["Identity","Wallet","Mint Asset","Feed the AI","Awaken","Compliance","Tokenize","Invest","Fund","Payout","Refund","Archive"];
+lcStps.forEach(function(s,i){var c=document.createElement("div");c.className="label lifecycle";var n=document.createElement("div");n.className="num";n.textContent=i+1;var t=document.createElement("div");t.className="text";t.textContent=s;c.appendChild(n);c.appendChild(t);if(i<lcStps.length-1){var a=document.createElement("div");a.className="arrow";a.innerHTML="-";c.appendChild(a);}ui2.appendChild(c);lcEls.push({el:c,step:s,index:i});});
+var ckf=[
+  {t:0,th:0.2,ph:0.46,r:14,tx:-5,ty:3.5,tz:0},
+  {t:1.5,th:0.08,ph:0.44,r:10,tx:-5,ty:3.8,tz:0},
+  {t:3,th:-0.04,ph:0.4,r:8,tx:-5,ty:3,tz:0},
+  {t:4.5,th:0.06,ph:0.34,r:12,tx:4,ty:1.8,tz:-1},
+  {t:6,th:-0.04,ph:0.32,r:10,tx:4,ty:2.2,tz:-1},
+  {t:7.5,th:PI*0.22,ph:0.28,r:14,tx:0,ty:2.2,tz:-3},
+  {t:9,th:PI*0.32,ph:0.26,r:11,tx:0,ty:2.8,tz:-3},
+  {t:10.5,th:PI*0.55,ph:0.22,r:12,tx:0,ty:2.8,tz:0},
+  {t:12,th:PI*0.62,ph:0.2,r:10,tx:0,ty:3,tz:0},
+  {t:13.5,th:PI*0.35,ph:0.16,r:14,tx:0,ty:1.5,tz:2},
+  {t:15,th:PI*0.3,ph:0.14,r:11,tx:0,ty:2,tz:2},
+  {t:16.5,th:PI*0.1,ph:0.1,r:16,tx:2,ty:2,tz:-8},
+  {t:18,th:PI*0.15,ph:0.08,r:13,tx:2,ty:2.5,tz:-8},
+  {t:19.5,th:PI*0.4,ph:0.06,r:20,tx:0,ty:0.5,tz:0},
+  {t:21,th:PI*0.6,ph:0.05,r:24,tx:0,ty:0.8,tz:0},
+  {t:23,th:PI*0.8,ph:0.04,r:30,tx:0,ty:0,tz:0},
+  {t:25,th:PI*0.15,ph:0.03,r:38,tx:0,ty:-1,tz:0},
+  {t:27,th:PI*0.22,ph:0.02,r:48,tx:0,ty:-2,tz:0},
+  {t:29,th:PI*0.28,ph:0.01,r:60,tx:0,ty:-3,tz:0},
+];
+function gCS(time){time=Math.max(0,Math.min(time,DURATION));var b=ckf[0],a=ckf[ckf.length-1];for(var i=0;i<ckf.length-1;i++)if(time>=ckf[i].t&&time<=ckf[i+1].t){b=ckf[i];a=ckf[i+1];break;}var r=a.t-b.t,lt=r>0?clamp((time-b.t)/r,0,1):0,et=easeInOut(lt);return{th:lerp(b.th,a.th,et),ph:lerp(b.ph,a.ph,et),r:lerp(b.r,a.r,et),tg:[lerp(b.tx,a.tx,et),lerp(b.ty,a.ty,et),lerp(b.tz,a.tz,et)]};}
+var clock=new THREE.Clock();var elps=0;
+function updL(cam){
+  var vw=window.innerWidth,vh=window.innerHeight;
+  Object.entries(lbs).forEach(function(e){var id=e[0],l=e[1];var v=new THREE.Vector3(l.wp[0],l.wp[1],l.wp[2]);v.project(cam);var x=(v.x*0.5+0.5)*vw,y=(-v.y*0.5+0.5)*vh;if(v.z<1&&x>-200&&x<vw+200&&y>-200&&y<vh+200){l.el.style.display="block";l.el.style.transform="translate(-50%,-50%) translate("+x+"px,"+y+"px)";}else l.el.style.display="none";});
+  lcEls.forEach(function(le,i){var px=0,py=9-i*0.7,pz=7;var vw2=window.innerWidth,vh2=window.innerHeight;var v=new THREE.Vector3(px,py,pz);v.project(cam);var x=(v.x*0.5+0.5)*vw2,y=(-v.y*0.5+0.5)*vh2;if(v.z<1&&x>-100&&x<vw2+100&&y>-100&&y<vh2+100){le.el.style.display="flex";le.el.style.transform="translate(-50%,-50%) translate("+x+"px,"+y+"px)";}else le.el.style.display="none";});
+}
+function animate(){
+  requestAnimationFrame(animate);
+  var dt=Math.min(clock.getDelta(),0.05);elps+=dt;if(elps>DURATION)elps-=DURATION;var t=elps;
+  var cs=gCS(t);
+  camera.position.x=cs.r*Math.sin(cs.th)*Math.cos(cs.ph);camera.position.y=cs.r*Math.sin(cs.ph);camera.position.z=cs.r*Math.cos(cs.th)*Math.cos(cs.ph);
+  camera.lookAt(cs.tg[0],cs.tg[1],cs.tg[2]);
+  // Scene 1: AI Core
+  var s1a=normalize(t,0,2);
+  aiNodes.forEach(function(n,i){var ap=clamp((s1a-i*0.05)*2,0,1);n.core.material.opacity=lerp(0,1,easeOut(ap));n.glow.material.opacity=lerp(0,0.15,easeOut(ap))*(0.5+0.5*Math.sin(t*2+i));n.ring.material.opacity=lerp(0,0.3,easeOut(ap));n.ring.scale.setScalar(1+Math.sin(t*1.5+i*1.2)*0.15);n.core.scale.setScalar(1+Math.sin(t*2+i*0.7)*0.05);});
+  var aip=aipSys.geometry.attributes.position.array;
+  for(var i=0;i<aipC;i++){var prog=(t*0.15+aipT[i])%5;var sIdx=Math.floor(prog);var n1=aiNodes[Math.min(sIdx,4)];if(n1){aip[i*3]=lerp(0,n1.yPos,0)+Math.sin(t*3+aipPh[i])*0.2;aip[i*3+1]=lerp(0,n1.yPos,prog%1)+Math.cos(t*2+aipPh[i])*0.2;aip[i*3+2]=Math.sin(t*2.5+aipPh[i])*0.2;}}
+  aipSys.geometry.attributes.position.needsUpdate=true;
+  aipMat.opacity=0.4*clamp(s1a*2,0,1)*clamp((1-normalize(t,4.5,5.5)),0,1);
+  document.getElementById("l-title-main").style.opacity=clamp(s1a*2,0,1)*clamp((1-normalize(t,2.5,3.5)),0,1);
+  document.getElementById("l-subtitle-main").style.opacity=clamp(s1a*2,0,1)*clamp((1-normalize(t,2.5,3.5)),0,1);
+  document.getElementById("l-ai-title").style.opacity=clamp(normalize(t,1.5,3)*2,0,1)*clamp((1-normalize(t,4.5,5.5)),0,1);
+  document.getElementById("l-ai-gemini").style.opacity=clamp(normalize(t,1.8,3)*2,0,1)*clamp((1-normalize(t,4.5,5.5)),0,1);
+  ['ai-ingest','ai-dup','ai-gemini-main','ai-fraud','ai-token-rec'].forEach(function(id,i){document.getElementById('l-'+id).style.opacity=clamp(normalize(t,1.5+i*0.2,2.5+i*0.2)*3,0,1)*clamp((1-normalize(t,4.5,5.5)),0,1);});
+  // Scene 2: FSM
+  var s2=normalize(t,3,6.5);
+  fsmEls.forEach(function(fe,i){var ap=clamp((s2-i*0.04)*2,0,1);fe.box.material.opacity=lerp(0,0.6,easeOut(ap));fe.ring.material.opacity=lerp(0,0.2,easeOut(ap))*(0.4+0.6*Math.sin(t*1.5+i));fe.ring.scale.setScalar(1+Math.sin(t+i)*0.15);});
+  fsmPM.opacity=0.25*clamp(s2*2,0,1);
+  var fsmp=fsmP.geometry.attributes.position.array;
+  for(var i=0;i<fsmPC;i++){var prog=(t*0.2+fsmPPh[i])%1;var idx=Math.floor(prog*(fsmStates.length-1));var nxt=Math.min(idx+1,fsmStates.length-1);var lr=prog*(fsmStates.length-1)-idx;var y0=fsmEls[idx]?fsmEls[idx].yPos:0;var y1=fsmEls[nxt]?fsmEls[nxt].yPos:0;fsmp[i*3]=Math.sin(t*2+fsmPPh[i])*0.3;fsmp[i*3+1]=lerp(y0,y1,lr)+Math.cos(t*1.5+fsmPPh[i])*0.1;fsmp[i*3+2]=Math.sin(t*1.8+fsmPPh[i])*0.3;}
+  fsmP.geometry.attributes.position.needsUpdate=true;
+  document.getElementById("l-fsm-title").style.opacity=clamp(normalize(t,3,4.5)*2,0,1)*clamp((1-normalize(t,7,8)),0,1);
+  document.getElementById("l-fsm-flow").style.opacity=clamp(normalize(t,3.5,5)*2,0,1)*clamp((1-normalize(t,7,8)),0,1);
+  // Scene 3: Blockchain
+  var s3=normalize(t,4,8);
+  bcB.forEach(function(b,i){var bAp=clamp((s3-i*0.06)*2,0,1);b.body.material.opacity=lerp(0,0.4,easeOut(bAp));b.shell.material.opacity=lerp(0,0.15,easeOut(bAp));b.edge.material.opacity=lerp(0,0.3,easeOut(bAp))*(0.5+0.5*Math.sin(t*1.2+i));b.dtMat.opacity=lerp(0,0.5,easeOut(bAp));if(b.ring){b.ring.material.opacity=lerp(0,0.1,easeOut(bAp))*(0.4+0.6*Math.sin(t*1.5+i*1.3));b.ring.scale.setScalar(1+Math.sin(t*1.2+i)*0.12);}b.group.rotation.y=lerp(-b.a*0.2,-b.a*0.2+0.2,bAp)+Math.sin(t*0.2+i)*0.02;b.group.position.y=1.5+Math.cos(b.a*0.8)*2.2+Math.sin(t*0.3+i)*0.05;if(b.beam)b.beam.material.opacity=0.15*easeOut(bAp);b.dgs.forEach(function(d,j){d.material.opacity=lerp(0,0.35,easeOut(bAp))*(0.2+0.8*Math.sin(t*d.userData.speed+d.userData.phase));var da=d.userData.angle+t*0.25*d.userData.speed;d.position.x=Math.cos(da)*d.userData.rad;d.position.z=Math.sin(da)*d.userData.rad;d.position.y=d.userData.dy+Math.sin(t*0.4+d.userData.phase)*0.1;});});
+  var mpT=t%2.0;var mp=normalize(mpT,0,2.0);var mIdx=Math.floor(mp*BC)%BC;
+  bcB.forEach(function(b,i){var dist=Math.abs(i-mIdx);var pulse=Math.max(0,1-dist*0.5)*Math.sin(mp*PI)*0.5;if(pulse>0.01){b.shell.material.emissiveIntensity=0.5*pulse;b.body.material.emissiveIntensity=0.05+pulse*0.3;}});
+  bcPM.opacity=0.35*clamp((s3-0.2)*2,0,1);bcDigM.opacity=0.12*clamp((s3-0.2)*2,0,1);
+  var bcp=bcP.geometry.attributes.position.array;
+  for(var i=0;i<bcPC;i++){var ph=bcPPh[i];var prog=(t*0.2+ph)%1;var idx=Math.floor(prog*(BC-1));var nxt=Math.min(idx+1,BC-1);var lr=prog*(BC-1)-idx;var b0=bcB[idx],b1=bcB[nxt];if(b0&&b1){bcp[i*3]=lerp(b0.group.position.x,b1.group.position.x,lr)+Math.sin(t*1.5+ph)*0.1;bcp[i*3+1]=lerp(b0.group.position.y,b1.group.position.y,lr)+Math.cos(t+ph)*0.08;bcp[i*3+2]=lerp(b0.group.position.z,b1.group.position.z,lr)+Math.sin(t*1.2+ph)*0.1;}}
+  bcP.geometry.attributes.position.needsUpdate=true;
+  var bcd=bcDigP.geometry.attributes.position.array;for(var i=0;i<bcDigC;i++){bcd[i*3]+=Math.sin(t*0.3+bcDigPh[i])*0.003;bcd[i*3+1]+=Math.sin(t*0.5+bcDigPh[i]*0.7)*0.002;bcd[i*3+2]+=Math.cos(t*0.2+bcDigPh[i])*0.003;}
+  bcDigP.geometry.attributes.position.needsUpdate=true;
+  var merkleA=normalize(t,4.5,7);
+  merkle.g.children.forEach(function(c){if(c.isMesh){c.material.opacity=lerp(0,0.5,easeOut(clamp((merkleA-0.2)*2,0,1)))*clamp((1-normalize(t,8,9)),0,1);}else if(c.isLine){c.material.opacity=lerp(0,0.15,easeOut(clamp((merkleA-0.2)*2,0,1)))*clamp((1-normalize(t,8,9)),0,1);}});
+  document.getElementById("l-bc-title").style.opacity=clamp((s3-0.2)*2,0,1)*clamp((1-normalize(t,8.5,9.5)),0,1);
+  document.getElementById("l-bc-merkle").style.opacity=clamp(normalize(t,5,6.5)*2,0,1)*clamp((1-normalize(t,8.5,9.5)),0,1);
+  document.getElementById("l-bc-mine").style.opacity=clamp(normalize(t,5,6.5)*2,0,1)*clamp((1-normalize(t,8.5,9.5)),0,1);
+  document.getElementById("l-bc-consensus").style.opacity=clamp(normalize(t,5.5,7)*2,0,1)*clamp((1-normalize(t,9,10)),0,1);
+  // Glass panels
+  var gbA=normalize(t,5,9);var gbHide=clamp((1-normalize(t,18,20)),0,1);
+  bgGlassM.opacity=lerp(0,0.06,easeOut(clamp((gbA-0.2)*2,0,1)))*gbHide;
+  bgGlassL.material.opacity=lerp(0,0.04,easeOut(clamp((gbA-0.3)*2,0,1)))*gbHide;
+  bgGlassR.material.opacity=lerp(0,0.04,easeOut(clamp((gbA-0.3)*2,0,1)))*gbHide;
+  bdr1.material.opacity=lerp(0,0.05,easeOut(clamp((gbA-0.1)*2,0,1)))*gbHide;
+  bdr2.material.opacity=lerp(0,0.03,easeOut(clamp((gbA-0.2)*2,0,1)))*gbHide;
+  bdr3.material.opacity=lerp(0,0.03,easeOut(clamp((gbA-0.2)*2,0,1)))*gbHide;
+  bgDataSprM.opacity=lerp(0,0.1,easeOut(clamp((gbA-0.3)*2,0,1)))*gbHide;
+  // Scene 4: Tokenization
+  var s4=normalize(t,7,10.5);
+  tokRM.opacity=0.4*clamp(s4*2,0,1)*clamp((1-normalize(t,14,15)),0,1);
+  tokIRM.opacity=0.25*clamp(s4*2,0,1)*clamp((1-normalize(t,14,15)),0,1);
+  tokPMat.opacity=0.2*clamp(s4*2,0,1)*clamp((1-normalize(t,14,15)),0,1);
+  tokDM.opacity=0.06*clamp(s4*2,0,1)*clamp((1-normalize(t,14,15)),0,1);
+  fracRing.material.opacity=0.08*clamp((s4-0.2)*2,0,1)*clamp((1-normalize(t,14,15)),0,1);
+  fracRing2.material.opacity=0.06*clamp((s4-0.3)*2,0,1)*clamp((1-normalize(t,14,15)),0,1);
+  tokR.rotation.z=lerp(0,TAU*0.4,easeInOut(clamp(s4*1.5,0,1)));
+  tokIR.rotation.z=-lerp(0,TAU*0.3,easeInOut(clamp(s4*1.5,0,1)));
+  tokDome.rotation.y=t*0.08;fracRing.rotation.x=PI/3+Math.sin(t*0.5)*0.05;fracRing2.rotation.x=-PI/4+Math.sin(t*0.5+1)*0.05;
+  var tkAp=normalize(t,7.5,10);var tkSp=normalize(t,8.5,11);var pA=tkp.geometry.attributes.position.array;
+  var sp=easeInOut(clamp((tkSp-0.2)*1.5,0,1));
+  for(var i=0;i<tkCount;i++){var ph=tkPh[i],sx=tkSP[i*3],sy=tkSP[i*3+1],sz=tkSP[i*3+2],ex=tkEP[i*3],ey=tkEP[i*3+1],ez=tkEP[i*3+2];var spiral=Math.sin(t*3+ph)*0.6*(1-sp);pA[i*3]=lerp(sx+Math.cos(t*4+ph)*spiral*0.3,ex,sp)+Math.cos(t*0.5+ph)*0.08*sp;pA[i*3+1]=lerp(sy+Math.cos(t*2+ph*0.5)*spiral*0.12,ey,sp)+Math.sin(t+ph)*0.03*sp;pA[i*3+2]=lerp(sz+Math.sin(t*4+ph)*spiral*0.3,ez,sp)+Math.sin(t*0.5+ph)*0.08*sp;}
+  tkp.geometry.attributes.position.needsUpdate=true;tkm.opacity=clamp((tkAp-0.2)*2,0,1);
+  var escA=normalize(t,7.5,10);escM.opacity=lerp(0,0.4,easeOut(escA))*clamp((1-normalize(t,14,15)),0,1);escL.material.opacity=lerp(0,0.3,easeOut(escA))*clamp((1-normalize(t,14,15)),0,1);escBox.position.y=0.5+Math.sin(t*0.8)*0.04;
+  document.getElementById('l-tok-title').style.opacity=clamp((s4-0.2)*2,0,1)*clamp((1-normalize(t,14,15)),0,1);
+  document.getElementById('l-tok-fractional').style.opacity=clamp((s4-0.1)*2,0,1)*clamp((1-normalize(t,14,15)),0,1);
+  document.getElementById('l-tok-math').style.opacity=clamp((s4-0.3)*2,0,1)*clamp((1-normalize(t,14,15)),0,1);
+  document.getElementById('l-tok-escrow').style.opacity=clamp(normalize(t,7.5,9.5)*2,0,1)*clamp((1-normalize(t,14,15)),0,1);
+  // Scene 5: Trading
+  var s5=normalize(t,9,12.5);
+  trInvs.forEach(function(inv,i){var ap=clamp((s5-0.03*(i%20))*2,0,1);inv.mesh.children.forEach(function(m){if(m.material)m.material.opacity=lerp(0,1,easeOut(ap));});inv.mesh.position.y=inv.baseY+Math.sin(t*0.7+inv.phase)*0.03;});
+  trPths.forEach(function(tp,i){tp.line.material.opacity=0.12*clamp(s5*2,0,1)*(0.4+0.6*Math.sin(t*tp.speed+tp.phase));});
+  trPM.opacity=0.4*clamp(s5*2,0,1);
+  var trpp=trP.geometry.attributes.position.array;
+  for(var i=0;i<trPC;i++){var pIdx=Math.floor(Math.random()*trPths.length)%trPths.length;if(trPths[pIdx]){var progress=(t*0.3+i/trPC)%1;var ppos=trPths[pIdx].line.geometry.attributes.position;var idx=Math.floor(progress*(ppos.count-1));if(idx<ppos.count){trpp[i*3]=ppos.array[idx*3];trpp[i*3+1]=ppos.array[idx*3+1]+Math.sin(t*3+i)*0.05;trpp[i*3+2]=ppos.array[idx*3+2];}}}
+  trP.geometry.attributes.position.needsUpdate=true;
+  var obA=normalize(t,9.5,11.5);
+  obBgM.opacity=lerp(0,0.06,easeOut(obA))*clamp((1-normalize(t,17,18)),0,1);
+  obGridM.opacity=lerp(0,0.04,easeOut(obA))*clamp((1-normalize(t,17,18)),0,1);
+  obG.children.forEach(function(c){if(c.isMesh&&c.geometry.type==="BoxGeometry"&&c.material!==obBgM){c.material.opacity=lerp(0,0.4,easeOut(obA))*clamp((1-normalize(t,17,18)),0,1);}});
+  obPts.forEach(function(p,i){p.material.opacity=lerp(0,0.3,easeOut(obA))*(0.3+0.7*Math.sin(t*2+i))*clamp((1-normalize(t,17,18)),0,1);p.position.y+=Math.sin(t+i)*0.002;});
+  document.getElementById('l-tr-title').style.opacity=clamp((s5-0.2)*2,0,1)*clamp((1-normalize(t,17,18)),0,1);
+  document.getElementById('l-tr-circuit').style.opacity=clamp((s5-0.1)*2,0,1)*clamp((1-normalize(t,17,18)),0,1);
+  document.getElementById('l-tr-price-time').style.opacity=clamp((s5-0.3)*2,0,1)*clamp((1-normalize(t,17,18)),0,1);
+  document.getElementById('l-tr-investors').style.opacity=clamp((s5-0.4)*2,0,1)*clamp((1-normalize(t,17,18)),0,1);
+  // Scene 6: Financial
+  var s6=normalize(t,11,14.5);
+  kycTiers.forEach(function(kt,i){var ap=clamp((s6-i*0.08)*2,0,1);kt.shield.material.opacity=lerp(0,0.3,easeOut(ap));kt.check.material.opacity=lerp(0,0.15,easeOut(ap));kt.ring2.material.opacity=lerp(0,0.1,easeOut(ap))*(0.4+0.6*Math.sin(t*1.5+i));kt.ring2.scale.setScalar(1+Math.sin(t*0.8+i)*0.1);});
+  gwMeshes.forEach(function(gw,i){var ap=clamp((s6-i*0.06-0.6)*2,0,1);gw.panel.material.opacity=lerp(0,0.15,easeOut(ap));gw.glow.material.opacity=lerp(0,0.08,easeOut(ap))*(0.5+0.5*Math.sin(t+i));});
+  amlShield.material.opacity=0.06*clamp((s6-0.3)*2,0,1)*Math.sin(t*0.8)*0.5+0.03;
+  var amlFlagsArr=amlFlags.children;amlFlagsArr.forEach(function(f,i){f.material.opacity=lerp(0,0.2,easeOut(clamp((s6-0.3)*2,0,1)))*(0.3+0.7*Math.sin(t*1.5+i*0.8));f.position.y=3.5+Math.sin(t*0.5+i)*0.2;});
+  finPM.opacity=0.15*clamp((s6-0.2)*2,0,1);
+  document.getElementById('l-fin-title').style.opacity=clamp((s6-0.2)*2,0,1)*clamp((1-normalize(t,20,21)),0,1);
+  document.getElementById('l-fin-kyc').style.opacity=clamp((s6-0.1)*2,0,1)*clamp((1-normalize(t,20,21)),0,1);
+  document.getElementById('l-fin-aml').style.opacity=clamp((s6-0.2)*2,0,1)*clamp((1-normalize(t,20,21)),0,1);
+  document.getElementById('l-fin-gateways').style.opacity=clamp((s6-0.3)*2,0,1)*clamp((1-normalize(t,20,21)),0,1);
+  // Scene 7: Universe
+  var s7=normalize(t,12,16);
+  eAs.forEach(function(a,i){var ap=clamp((s7-0.02*i)*2.5,0,1);a.mesh.material.opacity=lerp(0,0.8,easeOut(ap));a.glowRing.material.opacity=lerp(0,0.1,easeOut(ap));a.group.position.y=1.5+Math.sin(t*0.2+a.phase)*0.04;a.group.rotation.y=t*0.05+a.angle;a.glowRing.rotation.z=t*0.08;});
+  cM2.opacity=0.05*clamp((s7-0.2)*2,0,1);
+  var glbA=normalize(t,11,14);glbWM.opacity=0.06*clamp(glbA*2,0,1);glbLM.opacity=0.04*clamp(glbA*2,0,1);glbDM.opacity=0.1*clamp(glbA*2,0,1);
+  glbW.rotation.y=t*0.02;glbW.rotation.x=Math.sin(t*0.01)*0.08;glbD.rotation.y=t*0.02;glbD.rotation.x=Math.sin(t*0.01)*0.06;
+  var hubA=normalize(t,11.5,14.5);hubM.opacity=0.4*clamp((hubA-0.1)*2,0,1);hubGM.opacity=0.06*clamp((hubA-0.2)*2,0,1);hubRM.opacity=0.05*clamp((hubA-0.3)*2,0,1)*Math.sin(t*1.5)*0.5+0.02;
+  hubG2.scale.setScalar(1+Math.sin(t*0.8)*0.08);hub.rotation.x=t*0.05;hub.rotation.y=t*0.08;
+  fAPM.opacity=0.4*clamp((hubA-0.3)*2,0,1);
+  var fap=fAP.geometry.attributes.position.array;
+  for(var i=0;i<fAPC;i++){var ea=eAs[i];if(!ea)continue;var ang=ea.angle;var r2=eR2;var prog=(t*0.12+fAPPh[i])%1;fap[i*3]=lerp(0,Math.cos(ang)*r2,prog)+Math.sin(t*2+i)*0.12;fap[i*3+1]=lerp(0,1.5+Math.sin(ang*2)*0.5+Math.sin(t*0.5+i)*0.3,prog)+Math.cos(t*1.5+i)*0.06;fap[i*3+2]=lerp(0,Math.sin(ang)*r2,prog)+Math.sin(t*2+i)*0.12;}
+  fAP.geometry.attributes.position.needsUpdate=true;
+  for(var i=0;i<ecoTypes.length;i++){document.getElementById("l-ec-"+i).style.opacity=clamp((s7-0.02*i-0.1)*2,0,1);}
+  document.getElementById('l-eco-title').style.opacity=clamp((s7-0.3)*2,0,1);
+  document.getElementById('l-subtitle-eco').style.opacity=clamp((s7-0.35)*2,0,1);
+  // Lifecycle + Enter
+  var lcA=normalize(t,14,18);lcEls.forEach(function(le,i){le.el.style.opacity=clamp((lcA-i*0.06)*3,0,1);});
+  document.getElementById("enter-btn").style.opacity=clamp((normalize(t,16,22)-0.15)*2,0,1);
+  // Value flow
+  var vfA=normalize(t,2,5);vFM2.opacity=0.3*clamp(vfA*2,0,1);vfLM.opacity=0.03*clamp(vfA*2,0,1);
+  var vfpa=vfP.geometry.attributes.position.array;
+  for(var i=0;i<vFC;i++){var ph=vFPh[i];var prog=(t*vFSp[i]+ph)%1;var idx=Math.floor(prog*(flowPath.length-1));var nxt=Math.min(idx+1,flowPath.length-1);var lr=prog*(flowPath.length-1)-idx;var p0=flowPath[idx],p1=flowPath[nxt];vfpa[i*3]=lerp(p0.x,p1.x,lr)+Math.sin(t*2+ph)*0.12;vfpa[i*3+1]=lerp(p0.y,p1.y,lr)+Math.cos(t*1.5+ph)*0.08;vfpa[i*3+2]=lerp(p0.z,p1.z,lr)+Math.sin(t*1.8+ph)*0.12;}
+  vfP.geometry.attributes.position.needsUpdate=true;
+  // Ambient
+  updBg(t);updGlitch(t);envWallM.opacity=0.02+Math.sin(t*0.06)*0.015;stars.rotation.y=t*0.003;stars.rotation.x=Math.sin(t*0.002)*0.02;
+  var apa=atm.geometry.attributes.position.array;for(var i=0;i<aPC;i++){apa[i*3]+=Math.sin(t*0.05+i)*0.001;apa[i*3+1]+=Math.cos(t*0.03+i)*0.0005;if(apa[i*3+1]>35)apa[i*3+1]=-5;if(apa[i*3+1]<-5)apa[i*3+1]=35;}
+  atm.geometry.attributes.position.needsUpdate=true;
+  // Ribbons
+  ribbons.forEach(function(rb,i){var pts=rb.pts;for(var j=0;j<pts.length;j++){var ang=j/pts.length*TAU+rb.phase+t*0.08;var r=8+Math.sin(t*0.1+j*0.5+rb.phase)*4;pts[j].set(Math.cos(ang)*r,Math.sin(j*PI/5.5+t*0.06+rb.phase)*3+2,Math.sin(ang)*r);}rb.curve.points=pts;var newGeo=new THREE.TubeGeometry(rb.curve,40,0.03,6,false);rb.mesh.geometry.dispose();rb.mesh.geometry=newGeo;});
+  // Dot traces
+  var dtChildren=dotTraceG.children;for(var tIdx=0;tIdx<dtChildren.length;tIdx++){var p=dtChildren[tIdx];if(!p||!p.geometry)continue;var pos=p.geometry.attributes.position.array;var aOff=tIdx*PI/2+t*0.03;for(var i=0;i<pos.length/3;i++){var prog=i/(pos.length/3-1);var ang=aOff+prog*TAU*1.5;var r=6+Math.sin(prog*PI*4+t*0.05+tIdx)*3;pos[i*3]=Math.cos(ang)*r;pos[i*3+1]=Math.sin(prog*PI*2+t*0.04+tIdx)*4+Math.sin(ang+t*0.03)*1.5;pos[i*3+2]=Math.sin(ang)*r;}p.geometry.attributes.position.needsUpdate=true;}
+  // Lights
+  glowOrb1.position.x=-22+Math.sin(t*0.04)*4;glowOrb1.position.z=-28+Math.cos(t*0.035)*5;
+  glowOrb2.position.x=28+Math.sin(t*0.035+1)*4;glowOrb2.position.z=-32+Math.cos(t*0.04)*5;
+  glowOrb3.position.x=5+Math.sin(t*0.05+2)*5;glowOrb3.position.z=-22+Math.cos(t*0.03)*5;
+  rmL.position.x=Math.sin(t*0.12)*8;rmL.position.z=Math.cos(t*0.12)*8;
+  aL.position.x=Math.sin(t*0.2)*6;aL.position.z=Math.cos(t*0.2)*6;
+  bLp.position.x=Math.sin(t*0.18+1)*5;bLp.position.z=Math.cos(t*0.18+1)*5;
+  renderer.render(scene,camera);updL(camera);
+}
+window.addEventListener("resize",function(){var w2=window.innerWidth,h2=window.innerHeight;camera.aspect=w2/h2;camera.updateProjectionMatrix();renderer.setSize(w2,h2);});
+document.getElementById("enter-btn").addEventListener("click",function(){document.body.style.opacity=0;setTimeout(function(){window.location.href="/app.html";},600);});
+animate();
+</script>
 </body>
 </html>
