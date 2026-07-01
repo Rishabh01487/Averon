@@ -635,7 +635,9 @@ function animate(){
   renderer.render(scene,camera);updL(camera);
 }
 window.addEventListener("resize",function(){var w2=window.innerWidth,h2=window.innerHeight;camera.aspect=w2/h2;camera.updateProjectionMatrix();renderer.setSize(w2,h2);});
-document.getElementById("enter-btn").addEventListener("click",function(){document.body.style.opacity=0;setTimeout(function(){window.location.href="/app.html";},600);});
+function goToApp(){document.body.style.opacity=0;setTimeout(function(){window.location.href="/app.html";},600);}
+document.getElementById("enter-btn").addEventListener("click",goToApp);
+document.addEventListener("click",function(e){if(e.target.closest("#ui")||e.target.closest("#enter-btn")||e.target.closest("#glitch"))return;goToApp();});
 animate();
 </script>
 </body>
