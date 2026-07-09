@@ -5,8 +5,8 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#000;--bg1:#070707;--bg2:#0c0c0c;--bg3:#141414;--bg4:#1c1c1c;
-  --bdr:rgba(255,255,255,0.04);--bdr2:rgba(255,255,255,0.07);--bdr3:rgba(255,255,255,0.1);
-  --txt:#e8e8e8;--txt2:#707070;--txt3:#454545;
+  --bdr:rgba(255,255,255,0.06);--bdr2:rgba(255,255,255,0.1);--bdr3:rgba(255,255,255,0.15);
+  --txt:#f0f0f0;--txt2:#a0a0a0;--txt3:#787878;
   --cyan:#22d3ee;--cyan-dim:rgba(34,211,238,0.06);
   --green:#22c55e;--green-dim:rgba(34,197,94,0.06);
   --red:#ef4444;--red-dim:rgba(239,68,68,0.06);
@@ -47,7 +47,7 @@ h1{font-size:22px}h2{font-size:17px}h3{font-size:14px}h4{font-size:12px}
 .field label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.8px;color:var(--txt2)}
 .field input,.field select,.field textarea{padding:10px 12px;background:var(--bg2);border:1px solid var(--bdr2);border-radius:var(--r-sm);color:var(--txt);font-size:13px;font-family:var(--font);transition:var(--tr);outline:none;width:100%;font-weight:400}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--bdr3);box-shadow:0 0 0 2px var(--cyan-dim)}
-.field input::placeholder,.field textarea::placeholder{color:var(--txt3)}
+.field input::placeholder,.field textarea::placeholder{color:var(--txt2);opacity:.5}
 .field textarea{resize:vertical;min-height:70px}
 .field-row{display:flex;gap:14px}
 .field-row .field{flex:1}

@@ -112,6 +112,18 @@ function logout() {
   localStorage.removeItem('averon_session');
   $('authOverlay').classList.remove('hidden');
   $('mainApp').classList.add('hidden');
+  // Reset to login tab
+  $$('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('.auth-tab[data-tab="login"]')?.classList.add('active');
+  $('loginForm').classList.remove('hidden');
+  $('registerForm').classList.add('hidden');
+  $('authError').classList.add('hidden');
+  // Clear form fields
+  if($('loginEmail')) $('loginEmail').value = '';
+  if($('loginPassword')) $('loginPassword').value = '';
+  if($('regName')) $('regName').value = '';
+  if($('regEmail')) $('regEmail').value = '';
+  if($('regPassword')) $('regPassword').value = '';
 }
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
