@@ -33,7 +33,7 @@ async function api(path, opts = {}) {
   try {
     const res = await fetch(API + path, { headers, ...opts });
 
-    // Token refresh
+    // Token refresh on 401
     if (res.status === 401 && state.refreshToken) {
       const refreshed = await fetch(API + '/api/auth/refresh', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -46,10 +46,14 @@ async function api(path, opts = {}) {
         saveSession();
         headers['Authorization'] = `Bearer ${state.accessToken}`;
         const retry = await fetch(API + path, { headers, ...opts });
+        if (!retry.ok) {
+          const errData = await retry.json().catch(() => ({}));
+          throw new Error(errData.error || `HTTP ${retry.status}`);
+        }
         return retry.json();
       } else {
         logout();
-        return null;
+        throw new Error('Session expired. Please log in again.');
       }
     }
 
