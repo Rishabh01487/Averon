@@ -594,34 +594,6 @@ app.post('/api/admin/config', authenticate, requireRole(C.ROLES.ADMIN), (req, re
   res.json({ success: true });
 });
 
-app.post('/api/debug/git', (req, res) => {
-  const { execSync } = require('child_process');
-  const results = [];
-  try {
-    const run = (cmd) => {
-      results.push({ cmd });
-      try {
-        const out = execSync(cmd, { cwd: __dirname, encoding: 'utf8', stdio: 'pipe' });
-        results[results.length - 1].success = true;
-        results[results.length - 1].output = out;
-      } catch (err) {
-        results[results.length - 1].success = false;
-        results[results.length - 1].output = err.stdout || '';
-        results[results.length - 1].error = err.stderr || err.message;
-      }
-    };
-
-    run('git status');
-    run('git add .');
-    run('git commit -m "Fix login validation, CSP blocks, security headers, and CSS variables"');
-    run('git push');
-
-    res.json({ results });
-  } catch (e) {
-    res.status(500).json({ error: e.message, results });
-  }
-});
-
 // ── Health ────────────────────────────────────────────────────────────────────
 
 app.get('/health', (req, res) => {
