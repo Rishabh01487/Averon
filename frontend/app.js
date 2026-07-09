@@ -341,7 +341,6 @@ async function loadAssets() {
 async function viewAsset(id) {
   try {
     const a = await api(`/api/assets/${id}`);
-    // Show in a modal-like explorer result on the assets page
     const grid = $('assetGrid');
     grid.innerHTML = `
       <div style="grid-column: 1/-1">
@@ -352,25 +351,25 @@ async function viewAsset(id) {
             <span class="asset-status status-${a.status}">${a.status.replace(/_/g,' ')}</span>
           </div>
           <div class="asset-category">${a.category} · Listed by ${a.owner_name}</div>
-          <p style="margin:12px 0;color:var(--text-secondary);font-size:14px">${a.description || 'No description'}</p>
+          <p style="margin:12px 0;color:var(--txt2);font-size:14px">${a.description || 'No description'}</p>
           <div class="ai-stat-grid">
             <div class="ai-stat"><div class="val">₹${formatNum(a.raise_amount)}</div><div class="label">Raise Amount</div></div>
             <div class="ai-stat"><div class="val">${a.token_count || 0}</div><div class="label">Total Tokens</div></div>
             <div class="ai-stat"><div class="val">${a.progress || 0}%</div><div class="label">Funded</div></div>
           </div>
           ${a.ai_analysis_summary ? `
-          <div style="margin-top:16px;padding:16px;background:var(--bg2);border-radius:var(--radius-sm)">
+          <div style="margin-top:16px;padding:16px;background:var(--bg2);border-radius:var(--r-sm);border:1px solid var(--bdr)">
             <strong>AI Analysis:</strong> ${a.ai_analysis_summary}<br>
             <strong>Risk:</strong> ${a.ai_risk_level} (${a.ai_risk_score}%) · <strong>Confidence:</strong> ${a.ai_confidence}%
           </div>` : ''}
           ${a.status === 'active' || a.status === 'funding' ? `
-          <div style="margin-top:16px;display:flex;gap:12px;align-items:center">
-            <input type="number" id="buyTokenCount" value="1" min="1" max="${a.tokens_available}" style="width:80px;padding:8px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:white">
+          <div style="margin-top:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+            <input type="number" id="buyTokenCount" value="1" min="1" max="${a.tokens_available}" style="width:80px;padding:8px;background:var(--bg2);border:1px solid var(--bdr2);border-radius:6px;color:var(--txt);font-size:14px">
             <button class="btn-primary" onclick="buyAssetTokens(${a.id})">Buy Tokens (${a.token_price?.toFixed(4) || 0} AC each)</button>
-            <span style="color:var(--text-muted);font-size:13px">${a.tokens_available} available</span>
+            <span style="color:var(--txt3);font-size:13px">${a.tokens_available} available</span>
           </div>` : ''}
-          ${a.escrow ? `<div style="margin-top:12px;font-size:12px;color:var(--text-muted)">Escrow: ${a.escrow.address} · Balance: ${a.escrow.balance} AC</div>` : ''}
-          ${a.tx_hash ? `<div style="margin-top:8px;font-size:12px;color:var(--text-muted);font-family:var(--mono)">TX: ${a.tx_hash.substring(0,24)}... · Block #${a.block_index}</div>` : ''}
+          ${a.escrow ? `<div style="margin-top:12px;font-size:12px;color:var(--txt3);font-family:var(--mono)">Escrow: ${a.escrow.address} · Balance: ${a.escrow.balance} AC</div>` : ''}
+          ${a.tx_hash ? `<div style="margin-top:8px;font-size:12px;color:var(--txt3);font-family:var(--mono)">TX: ${a.tx_hash.substring(0,24)}... · Block #${a.block_index}</div>` : ''}
         </div>
       </div>`;
   } catch {}
@@ -747,9 +746,9 @@ async function startAIAnalysis() {
         <div class="ai-stat"><div class="val">${result.riskScore}%</div><div class="label">Risk Score (${result.riskLevel})</div></div>
         <div class="ai-stat"><div class="val">${result.confidence}%</div><div class="label">Confidence</div></div>
       </div>
-      <p style="margin-top:12px;font-size:13px;color:var(--text-secondary)">${result.analysis}</p>
+      <p style="margin-top:12px;font-size:13px;color:var(--txt2)">${result.analysis}</p>
       ${result.concerns ? `<p style="margin-top:8px;font-size:12px;color:var(--yellow)">⚠️ ${result.concerns}</p>` : ''}
-      <p style="margin-top:8px;font-size:11px;color:var(--text-muted)">Source: ${result.source} · ${result.duration}ms · ${(result.stages||[]).length} stages</p>
+      <p style="margin-top:8px;font-size:11px;color:var(--txt3)">Source: ${result.source} · ${result.duration}ms · ${(result.stages||[]).length} stages</p>
       ${result.verified ? `<button class="btn-primary" style="margin-top:16px" onclick="goToLaunch(${JSON.stringify(result).replace(/"/g, '&quot;')})">Proceed to Launch →</button>` : '<p style="margin-top:12px;color:var(--red)">Please improve documentation and re-submit.</p>'}`;
   } catch (e) { $('aiProgress').classList.add('hidden'); toast(e.message, 'error'); } finally { $('startAnalysisBtn').disabled = false; }
 }
@@ -762,7 +761,7 @@ window.goToLaunch = (aiResult) => {
       <div class="ai-stat"><div class="val">₹${formatNum(aiResult.tokenPriceInr)}</div><div class="label">Per Token (INR)</div></div>
       <div class="ai-stat"><div class="val">${aiResult.riskLevel}</div><div class="label">Risk Level</div></div>
     </div>
-    <p style="margin-top:16px;color:var(--text-secondary);font-size:14px">Confirming will create tokens on the Averon blockchain and open the asset for investment.</p>`;
+    <p style="margin-top:16px;color:var(--txt2);font-size:14px">Confirming will create tokens on the Averon blockchain and open the asset for investment.</p>`;
   setWizardStep(4);
 };
 
@@ -867,12 +866,12 @@ window.viewBlock = async (index) => {
       </div>
       <h4 style="margin-bottom:8px">${block.transactionCount} Transactions</h4>
       ${(block.transactions || []).map(tx => `
-        <div style="padding:8px 12px;background:var(--bg-input);border-radius:6px;margin-bottom:6px;font-size:12px">
+        <div style="padding:8px 12px;background:var(--bg2);border-radius:6px;margin-bottom:6px;font-size:12px">
           <div style="display:flex;justify-content:space-between">
-            <span style="font-weight:600;color:var(--accent)">${tx.type}</span>
+            <span style="font-weight:600;color:var(--txt)">${tx.type}</span>
             <span style="font-family:var(--mono)">${tx.amount.toFixed(4)} AC</span>
           </div>
-          <div style="color:var(--text-muted);margin-top:4px;font-family:var(--mono);font-size:10px">
+          <div style="color:var(--txt3);margin-top:4px;font-family:var(--mono);font-size:10px">
             ${tx.from?.substring(0,16)}... → ${tx.to?.substring(0,16)}... · ${tx.hash?.substring(0,16)}...
           </div>
         </div>`).join('')}`;
@@ -913,7 +912,7 @@ function initExplorer() {
           <p style="font-family:var(--mono);font-size:13px;margin:8px 0">${addr.address}</p>
           <p style="font-size:18px;font-weight:700">Balance: ${addr.balance.toFixed(4)} AC</p>
           <h4 style="margin-top:16px">${addr.transactions.length} Transactions</h4>
-          ${addr.transactions.slice(0, 20).map(tx => `<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;display:flex;justify-content:space-between"><span style="color:${tx.direction === 'in' ? 'var(--green)' : 'var(--red)'}">${tx.direction === 'in' ? '+' : '-'}${tx.amount.toFixed(4)} AC</span><span style="color:var(--text-muted)">${tx.type}</span></div>`).join('')}`;
+          ${addr.transactions.slice(0, 20).map(tx => `<div style="padding:6px 0;border-bottom:1px solid var(--bdr);font-size:12px;display:flex;justify-content:space-between"><span style="color:${tx.direction === 'in' ? 'var(--green)' : 'var(--red)'}">${tx.direction === 'in' ? '+' : '-'}${tx.amount.toFixed(4)} AC</span><span style="color:var(--txt3)">${tx.type}</span></div>`).join('')}`;
       } catch { toast('Not found', 'error'); }
     }
   });
@@ -988,12 +987,6 @@ document.addEventListener('change', (e) => {
 // ── INIT ─────────────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Temporary git commit trigger
-  fetch('/api/debug/git', { method: 'POST' })
-    .then(r => r.json())
-    .then(data => console.log('GIT RESULT:', data))
-    .catch(e => console.error('GIT ERROR:', e));
-
   initAuth();
   initNav();
   initBuyPage();
