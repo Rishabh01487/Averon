@@ -77,6 +77,7 @@
         <button class="nav-link" data-page="tokenize">Tokenize</button>
         <button class="nav-link" data-page="market">Market</button>
         <button class="nav-link" data-page="explorer">Explorer</button>
+        <button class="nav-link" data-page="network">Network</button>
         <button class="nav-link" data-page="portfolio">Portfolio</button>
       </div>
       <div class="nav-right">
@@ -314,6 +315,45 @@
         </div>
         <div id="explorerResult" class="explorer-result hidden"></div>
         <div id="blockList" class="block-list"></div>
+      </section>
+
+      <!-- ── NETWORK ── -->
+      <section id="page-network" class="page">
+        <div class="network-header" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:30px">
+          <div class="stat-card" style="padding:20px;background:var(--bg2);border:1px solid var(--bdr2);border-radius:12px">
+            <div style="font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">This Node</div>
+            <div id="netNodeId" style="font-family:var(--mono);font-size:14px;color:var(--txt);word-break:break-all">Loading...</div>
+            <div style="margin-top:10px;font-size:12px;color:var(--txt2)">P2P port: <span id="netP2pPort">—</span></div>
+          </div>
+          <div class="stat-card" style="padding:20px;background:var(--bg2);border:1px solid var(--bdr2);border-radius:12px">
+            <div style="font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Connected Peers</div>
+            <div id="netPeerCount" style="font-size:36px;font-weight:300;color:var(--txt);font-family:var(--mono)">0</div>
+            <div style="font-size:12px;color:var(--txt2)">Max: <span id="netMaxPeers">—</span></div>
+          </div>
+          <div class="stat-card" style="padding:20px;background:var(--bg2);border:1px solid var(--bdr2);border-radius:12px">
+            <div style="font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Chain Height</div>
+            <div id="netChainHeight" style="font-size:36px;font-weight:300;color:var(--txt);font-family:var(--mono)">0</div>
+            <div style="font-size:12px;color:var(--txt2);font-family:var(--mono);word-break:break-all">Tip: <span id="netChainTip">—</span></div>
+          </div>
+        </div>
+
+        <div class="portfolio-section" style="margin-bottom:30px">
+          <h3>🌐 Peer Nodes <span class="badge-info" style="font-size:10px;padding:2px 8px;background:rgba(56,189,248,0.1);color:#38bdf8;border-radius:4px;letter-spacing:0.5px;margin-left:8px">ALGORITHM #10</span></h3>
+          <p style="font-size:12px;color:var(--txt2);margin-bottom:12px">Each peer runs the full inbuilt blockchain. Transactions and blocks are gossiped via signed WebSocket messages. Longest valid chain wins.</p>
+          <div id="netPeers" class="peer-list">
+            <div style="padding:20px;text-align:center;color:var(--txt2);font-size:13px">Loading peers...</div>
+          </div>
+        </div>
+
+        <div class="portfolio-section">
+          <h3>➕ Add Peer (Admin Only)</h3>
+          <p style="font-size:12px;color:var(--txt2);margin-bottom:12px">Manually connect to a peer node by WebSocket URL (e.g. <code>ws://node2.example.com:4201</code>).</p>
+          <div style="display:flex;gap:10px">
+            <input type="text" id="peerUrlInput" placeholder="ws://peer-host:4201" style="flex:1;background:var(--bg2);border:1px solid var(--bdr2);border-radius:8px;padding:10px 14px;color:var(--txt);font-family:var(--mono);font-size:13px">
+            <button id="addPeerBtn" class="btn-primary" style="padding:10px 20px">Connect</button>
+          </div>
+          <div id="addPeerResult" style="margin-top:10px;font-size:13px"></div>
+        </div>
       </section>
 
       <!-- ── PORTFOLIO ── -->

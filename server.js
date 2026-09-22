@@ -61,6 +61,7 @@ const { EscrowService } = require('./backend/services/escrowService');
 const { AssetService } = require('./backend/services/assetService');
 const { VestingService } = require('./backend/services/vestingService');
 const { TradingEngine } = require('./backend/services/tradingEngine');
+const { P2PNode } = require('./backend/blockchain/p2p');
 const { FeeService } = require('./backend/services/feeService');
 const { PriceService } = require('./backend/services/priceService');
 const { ComplianceService } = require('./backend/services/complianceService');
@@ -104,7 +105,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage, limits: { fileSize: C.LIMITS.MAX_FILE_SIZE_BYTES, files: C.LIMITS.MAX_DOCUMENTS } });
 
 // ── Service instances (initialized after DB) ─────────────────────────────────
-let blockchain, walletManager, systemWallet, escrowService, vestingService, assetService, tradingEngine;
+let blockchain, walletManager, systemWallet, escrowService, vestingService, assetService, tradingEngine, p2pNode;
 let feeService, priceService, complianceService, kycService, paymentService, settlementService;
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -634,6 +635,42 @@ app.get('/api/admin/stats', authenticate, requireRole(C.ROLES.ADMIN), (req, res)
   res.json({ stats, chainInfo, auditIntegrity, recentAudit, pendingAssets, systemConfig, frozenUsers });
 });
 
+// ═══ Algorithm #10: P2P Network API Routes ═══════════════════════════════════
+
+// Get network status (any user can view)
+app.get('/api/network/status', (req, res) => {
+  if (!p2pNode) return res.json({ enabled: false });
+  res.json({ enabled: true, ...p2pNode.getStatus() });
+});
+
+// Get connected peers (any user can view)
+app.get('/api/network/peers', (req, res) => {
+  if (!p2pNode) return res.json({ enabled: false, peers: [] });
+  res.json({ enabled: true, peers: p2pNode.getPeerList() });
+});
+
+// Admin: manually add a peer to connect to
+app.post('/api/network/peers/add', authenticate, requireRole(C.ROLES.ADMIN), (req, res) => {
+  const { url } = req.body;
+  if (!url) return res.status(400).json({ error: 'Peer URL required (e.g. ws://host:4201)' });
+  if (!p2pNode) return res.status(503).json({ error: 'P2P node not initialized' });
+  const result = p2pNode.connectToPeer(url);
+  logAudit('PEER_ADDED', { url }, { userId: req.user.userId });
+  res.json({ success: true, ...result });
+});
+
+// Admin: get full network status (including trusted nodes config)
+app.get('/api/admin/network', authenticate, requireRole(C.ROLES.ADMIN), (req, res) => {
+  if (!p2pNode) return res.json({ enabled: false });
+  res.json({
+    enabled: true,
+    status: p2pNode.getStatus(),
+    peers: p2pNode.getPeerList(),
+    trustedNodesConfigured: (process.env.TRUSTED_NODES || '').split(',').filter(Boolean).length,
+    seedsConfigured: (process.env.PEERS || '').split(',').filter(Boolean).length,
+  });
+});
+
 app.post('/api/admin/freeze/:userId', authenticate, requireRole(C.ROLES.ADMIN), (req, res) => {
   DB.run('UPDATE users SET is_frozen = 1 WHERE id = ?', [req.params.userId]);
   logAudit('ACCOUNT_FROZEN', { targetUser: req.params.userId }, { userId: req.user.userId });
@@ -735,6 +772,29 @@ const timerRefs = [];
   paymentService = new PaymentService(DB, blockchain, walletManager, kycService);
   settlementService = new SettlementService(DB, blockchain, walletManager);
 
+  // ── Algorithm #10: Initialize P2P node (decentralization) ───────────────
+  // The blockchain is inbuilt (custom code), but it's now synchronized across
+  // multiple Averon server instances via WebSocket gossip + longest-chain-wins.
+  p2pNode = new P2PNode(blockchain);
+  p2pNode.start();
+
+  // Wire blockchain events to P2P gossip
+  blockchain.on('transaction-added', (tx) => {
+    p2pNode.broadcastTransaction(tx);
+  });
+  blockchain.on('block-mined', (block) => {
+    p2pNode.broadcastBlock(block);
+  });
+  p2pNode.on('tx-received', (tx) => {
+    eventBus.emit(EVENTS.TX_RECEIVED, tx);
+  });
+  p2pNode.on('block-received', (block) => {
+    eventBus.emit(EVENTS.BLOCK_RECEIVED, block);
+  });
+  p2pNode.on('chain-replaced', ({ oldHeight, newHeight }) => {
+    eventBus.emit(EVENTS.CHAIN_SYNCED, { oldHeight, newHeight });
+  });
+
   startTimers();
 
   const http = require('http');
@@ -761,6 +821,9 @@ const timerRefs = [];
     console.log(`\n  ⚡ ${signal} received — shutting down gracefully...`);
     wsServer.broadcast('system', { type: 'SHUTDOWN', message: 'Server is shutting down' });
     timerRefs.forEach(t => clearInterval(t));
+
+    // Stop P2P node (closes all peer connections)
+    if (p2pNode) p2pNode.stop();
 
     httpServer.close(() => {
       DB.persist();

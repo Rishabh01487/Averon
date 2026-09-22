@@ -288,4 +288,24 @@ module.exports = {
     },
     SWEEP_INTERVAL_MS: 5 * 60 * 1000, // Refresh all vesting records every 5 min
   },
+
+  // ── Algorithm #10: P2P Decentralization ──────────────────────────────────
+  // Configures the in-built blockchain's peer-to-peer networking layer.
+  // The chain remains inbuilt (custom code, no external dependencies) but
+  // runs across multiple synchronized nodes for decentralization.
+  NETWORK: {
+    DEFAULT_P2P_PORT: 4201,         // WebSocket port for P2P gossip (separate from API port 4200)
+    MAX_PEERS: 25,                    // Max inbound+outbound peer connections
+    HANDSHAKE_TIMEOUT_MS: 10000,     // 10s to complete handshake
+    PING_INTERVAL_MS: 30000,         // Send ping every 30s to keep connection alive
+    RECONNECT_BASE_DELAY: 2000,     // Initial reconnect delay (2s)
+    RECONNECT_MAX_DELAY: 60000,     // Max reconnect delay (1 min — exponential backoff cap)
+    MAX_RECONNECT_ATTEMPTS: 10,     // Give up after 10 failed reconnect attempts
+    CHAIN_SYNC_BATCH_SIZE: 100,    // Blocks per chain-sync message
+    MESSAGE_TTL_MS: 60000,         // Reject messages older than 60s (replay protection)
+    MAX_MESSAGE_SIZE: 64 * 1024 * 1024, // 64 MB max P2P message size
+    // Consortium whitelist: comma-separated list of trusted node IDs in TRUSTED_NODES env var.
+    // If empty, accepts any signed handshake (open mode).
+    DEFAULT_TRUSTED_NODES: [],
+  },
 };

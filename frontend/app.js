@@ -1169,3 +1169,115 @@ window.loadPortfolio = async function() {
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(initVestingPreview, 100);
 });
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Algorithm #10 — P2P Network UI Logic
+// ══════════════════════════════════════════════════════════════════════════════
+
+async function loadNetworkStatus() {
+  try {
+    const status = await api('/api/network/status');
+    if (!status.enabled) {
+      $('netNodeId').textContent = 'P2P disabled';
+      $('netPeerCount').textContent = '—';
+      $('netChainHeight').textContent = '—';
+      return;
+    }
+    $('netNodeId').textContent = status.shortId || status.nodeId;
+    $('netP2pPort').textContent = status.p2pPort;
+    $('netPeerCount').textContent = status.peerCount;
+    $('netMaxPeers').textContent = status.maxPeers;
+    $('netChainHeight').textContent = status.chainHeight;
+    $('netChainTip').textContent = (status.chainTip || '0').substring(0, 16) + '...';
+  } catch (e) {
+    if ($('netNodeId')) $('netNodeId').textContent = 'Failed to load: ' + e.message;
+  }
+}
+
+async function loadNetworkPeers() {
+  const container = document.getElementById('netPeers');
+  if (!container) return;
+  try {
+    const data = await api('/api/network/peers');
+    if (!data.enabled || !data.peers || data.peers.length === 0) {
+      container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--txt2);font-size:13px">No peers connected. Set <code>PEERS=ws://host:4201</code> env var or use the form below to add peers manually.</div>';
+      return;
+    }
+    container.innerHTML = data.peers.map(p => `
+      <div class="peer-card" style="padding:14px;background:var(--bg2);border:1px solid var(--bdr2);border-radius:10px;margin-bottom:10px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center">
+        <div>
+          <div style="font-family:var(--mono);font-size:13px;color:var(--txt);word-break:break-all">${p.shortId}</div>
+          <div style="margin-top:4px;font-size:11px;color:var(--txt3);font-family:var(--mono)">
+            Chain height: ${p.chainHeight} · Last seen: ${timeAgo(p.lastSeen)} · ${p.isOutbound ? 'Outbound' : 'Inbound'}
+          </div>
+        </div>
+        <div style="text-align:right">
+          <span class="badge-info" style="font-size:10px;padding:3px 8px;background:rgba(74,222,128,0.1);color:var(--green);border-radius:4px;letter-spacing:0.5px">● ONLINE</span>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    container.innerHTML = `<div style="padding:20px;text-align:center;color:var(--red);font-size:13px">Failed to load peers: ${e.message}</div>`;
+  }
+}
+
+function initNetworkPage() {
+  const addBtn = document.getElementById('addPeerBtn');
+  const urlInput = document.getElementById('peerUrlInput');
+  const result = document.getElementById('addPeerResult');
+  if (!addBtn || !urlInput) return;
+
+  addBtn.addEventListener('click', async () => {
+    const url = urlInput.value.trim();
+    if (!url) {
+      result.innerHTML = '<span style="color:var(--red)">Please enter a peer URL</span>';
+      return;
+    }
+    if (!url.startsWith('ws://') && !url.startsWith('wss://')) {
+      result.innerHTML = '<span style="color:var(--red)">URL must start with ws:// or wss://</span>';
+      return;
+    }
+    result.innerHTML = '<span style="color:var(--txt2)">Connecting...</span>';
+    try {
+      const r = await api('/api/network/peers/add', {
+        method: 'POST',
+        body: JSON.stringify({ url }),
+      });
+      result.innerHTML = `<span style="color:var(--green)">✓ ${r.dialing} — connecting in background</span>`;
+      urlInput.value = '';
+      // Reload peer list after a delay
+      setTimeout(() => { loadNetworkStatus(); loadNetworkPeers(); }, 3000);
+    } catch (e) {
+      result.innerHTML = `<span style="color:var(--red)">✗ ${e.message}</span>`;
+    }
+  });
+}
+
+// Add Network page to navigation
+const _origInitNav = window.initNav;
+if (_origInitNav) {
+  window.initNav = function() {
+    _origInitNav();
+    document.querySelectorAll('.nav-link[data-page="network"]')?.forEach(btn => {
+      btn.addEventListener('click', () => {
+        loadNetworkStatus();
+        loadNetworkPeers();
+      });
+    });
+    initNetworkPage();
+  };
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    initNetworkPage();
+    // Auto-refresh network status every 10s when on network page
+    setInterval(() => {
+      const networkPage = document.getElementById('page-network');
+      if (networkPage && networkPage.classList.contains('active')) {
+        loadNetworkStatus();
+        loadNetworkPeers();
+      }
+    }, 10000);
+  }, 200);
+});

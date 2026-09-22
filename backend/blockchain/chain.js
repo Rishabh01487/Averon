@@ -4,14 +4,16 @@
 
 const fs = require('fs');
 const path = require('path');
+const { EventEmitter } = require('events');
 const { Block } = require('./block');
 const { Transaction } = require('./transaction');
 const { MerkleTree } = require('./merkle');
 const { adjustDifficulty, validateChain, getChainStats } = require('./consensus');
 const C = require('../config/constants');
 
-class Blockchain {
+class Blockchain extends EventEmitter {
   constructor(dataDir) {
+    super();
     this.dataDir = dataDir;
     this.chainPath = path.join(dataDir, 'chain.json');
     this.chain = [];
@@ -105,6 +107,8 @@ class Blockchain {
     }
 
     this.pendingTransactions.push(transaction);
+    // Emit event so P2P layer can gossip the tx to peers
+    this.emit('transaction-added', transaction);
     return transaction;
   }
 
@@ -162,7 +166,44 @@ class Blockchain {
     // Persist
     this.save();
 
+    // Emit event so P2P layer can broadcast the new block to peers
+    this.emit('block-mined', newBlock);
+
     return newBlock;
+  }
+
+  // ── Replace Chain (Consensus — longest valid chain wins) ─────────────────
+  // Used by the P2P layer when a peer advertises a longer chain than ours.
+
+  replaceChain(newChain) {
+    if (!Array.isArray(newChain) || newChain.length <= this.chain.length) return false;
+
+    // Validate the new chain (full re-validation)
+    const validation = validateChain(newChain);
+    if (!validation.valid) {
+      console.error(`  ⚠ Chain replacement rejected: ${validation.error}`);
+      return false;
+    }
+
+    const oldChain = this.chain;
+    this.chain = newChain;
+    this.difficulty = adjustDifficulty(this.chain);
+
+    // Reset pending pool — any txs that were in our old chain but not the new
+    // one are now orphaned. We could re-broadcast them, but for simplicity we drop them.
+    const newChainTxHashes = new Set();
+    for (const b of newChain) {
+      for (const tx of b.transactions) newChainTxHashes.add(tx.hash);
+    }
+    const orphanedTxs = this.pendingTransactions.filter(tx => !newChainTxHashes.has(tx.hash));
+    // Re-add orphaned txs back to mempool (they were valid, just not yet mined)
+    this.pendingTransactions = orphanedTxs;
+
+    this.save();
+
+    console.log(`  🔄 Chain replaced: ${oldChain.length} → ${newChain.length} blocks`);
+    this.emit('chain-replaced', { oldHeight: oldChain.length, newHeight: newChain.length });
+    return true;
   }
 
   // ── Balance Calculation (UTXO-style) ───────────────────────────────────────
