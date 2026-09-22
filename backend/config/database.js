@@ -514,6 +514,48 @@ function createSchema() {
     created_at INTEGER NOT NULL
   )`);
 
+  // ── Algorithm #9: Vesting & Lockup Tables ────────────────────────────────
+  // Per-asset vesting schedule (set at tokenization time)
+  db.run(`CREATE TABLE IF NOT EXISTS vesting_schedules (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    asset_id INTEGER NOT NULL,
+    model TEXT NOT NULL DEFAULT 'hybrid',     -- linear | cliff | hybrid | milestone
+    cliff_days INTEGER NOT NULL DEFAULT 30,
+    vesting_days INTEGER NOT NULL DEFAULT 365,
+    created_at INTEGER NOT NULL,
+    UNIQUE(asset_id)
+  )`);
+
+  // Per-token-per-user vesting record (created on each token purchase)
+  db.run(`CREATE TABLE IF NOT EXISTS token_vesting_records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    asset_id INTEGER NOT NULL,
+    token_id INTEGER NOT NULL,
+    user_id TEXT NOT NULL,
+    schedule_id INTEGER NOT NULL,
+    model TEXT NOT NULL,
+    cliff_ends_at INTEGER,                     -- ms epoch
+    fully_vested_at INTEGER,                  -- ms epoch
+    total_tokens INTEGER NOT NULL DEFAULT 1,
+    unlocked_tokens INTEGER NOT NULL DEFAULT 0,
+    last_unlock_at INTEGER,
+    purchase_tx_hash TEXT DEFAULT '',
+    created_at INTEGER NOT NULL
+  )`);
+
+  // Vesting events log (milestones reached, admin overrides)
+  db.run(`CREATE TABLE IF NOT EXISTS vesting_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    asset_id INTEGER NOT NULL,
+    user_id TEXT DEFAULT '',
+    event_type TEXT NOT NULL,                  -- MILESTONE_* | ADMIN_FORCE_UNLOCK
+    unlock_percent REAL DEFAULT 0,
+    tokens_unlocked INTEGER DEFAULT 0,
+    reason TEXT DEFAULT '',
+    admin_id TEXT DEFAULT '',
+    created_at INTEGER NOT NULL
+  )`);
+
   // ── Indexes ──────────────────────────────────────────────────────────────
   db.run(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_users_wallet ON users(wallet_address)`);
@@ -540,6 +582,13 @@ function createSchema() {
   db.run(`CREATE INDEX IF NOT EXISTS idx_status_history_asset ON asset_status_history(asset_id)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_escrow_tx ON escrow_transactions(escrow_id)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_doc_hash ON asset_documents(doc_hash)`);
+
+  // ── Vesting indexes (Algorithm #9) ───────────────────────────────────────
+  db.run(`CREATE INDEX IF NOT EXISTS idx_vesting_sched_asset ON vesting_schedules(asset_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_vesting_records_user ON token_vesting_records(user_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_vesting_records_asset ON token_vesting_records(asset_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_vesting_records_token ON token_vesting_records(token_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_vesting_events_asset ON vesting_events(asset_id)`);
 }
 
 function seedDefaults() {

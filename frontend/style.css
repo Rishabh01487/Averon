@@ -247,3 +247,45 @@ h2{font-size:17px;font-weight:400}h3{font-size:14px;font-weight:400}h4{font-size
 @media(max-width:1100px){.market-layout{grid-template-columns:1fr}.buy-layout{grid-template-columns:1fr}}
 @media(max-width:900px){.nav-links{display:none}.hero-stat{grid-column:span 1}.dashboard-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}}
 @media(max-width:640px){.navbar{padding:0 16px}.main-content{padding:16px}.portfolio-header{flex-direction:column}}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   Algorithm #9 — Vesting & Lockup UI Styles
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.vesting-card{padding:18px;background:var(--bg2);border:1px solid var(--bdr2);border-radius:12px;margin-bottom:14px;transition:all .2s}
+.vesting-card:hover{border-color:var(--bdr3)}
+.vesting-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.vesting-asset-title{font-size:14px;font-weight:500;color:var(--txt);margin-bottom:4px}
+.vesting-asset-meta{font-size:11px;color:var(--txt3);font-family:var(--mono)}
+.vesting-model-badge{padding:4px 10px;border-radius:6px;font-size:10px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase}
+.vesting-model-badge.hybrid{background:rgba(56,189,248,0.12);color:#38bdf8;border:1px solid rgba(56,189,248,0.25)}
+.vesting-model-badge.linear{background:rgba(74,222,128,0.12);color:var(--green);border:1px solid rgba(74,222,128,0.25)}
+.vesting-model-badge.cliff{background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.25)}
+.vesting-model-badge.milestone{background:rgba(168,85,247,0.12);color:#a855f7;border:1px solid rgba(168,85,247,0.25)}
+
+.vesting-progress-wrap{margin:14px 0}
+.vesting-progress-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--txt2);margin-bottom:6px;font-family:var(--mono)}
+.vesting-progress-bar{height:8px;background:var(--bg1);border-radius:4px;overflow:hidden;position:relative;border:1px solid var(--bdr)}
+.vesting-progress-fill{height:100%;background:linear-gradient(90deg,#38bdf8 0%,#818cf8 100%);transition:width .8s cubic-bezier(.4,0,.2,1);border-radius:4px}
+.vesting-progress-fill.locked{background:linear-gradient(90deg,#475569 0%,#64748b 100%)}
+
+.vesting-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid var(--bdr)}
+.vesting-stat{text-align:center}
+.vesting-stat-value{font-size:18px;font-weight:500;color:var(--txt);font-family:var(--mono)}
+.vesting-stat-value.unlocked{color:var(--green)}
+.vesting-stat-value.locked{color:#fbbf24}
+.vesting-stat-label{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.8px;margin-top:2px}
+
+.vesting-timeline{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:11px;color:var(--txt2);font-family:var(--mono)}
+.vesting-timeline-dot{width:6px;height:6px;border-radius:50%;background:var(--txt3)}
+.vesting-timeline-dot.active{background:#38bdf8;box-shadow:0 0 8px rgba(56,189,248,0.5)}
+.vesting-timeline-dot.completed{background:var(--green)}
+
+.vesting-cliff-warning{padding:10px 14px;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.2);border-radius:8px;font-size:12px;color:#fbbf24;margin-top:10px}
+.vesting-cliff-warning::before{content:"⚠️ ";margin-right:4px}
+
+.vesting-config input,.vesting-config select{background:var(--bg1) !important}
+.vesting-config small{display:block;margin-top:4px;line-height:1.4}
+
+.vesting-empty{text-align:center;padding:32px;color:var(--txt3);font-size:13px}
+.vesting-empty::before{content:"⏳";display:block;font-size:32px;margin-bottom:8px;opacity:0.4}

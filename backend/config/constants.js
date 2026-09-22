@@ -259,5 +259,33 @@ module.exports = {
     'ORDER_PLACED', 'ORDER_FILLED', 'ORDER_CANCELLED',
     'PAYOUT_INITIATED', 'PAYOUT_COMPLETED',
     'ADMIN_ACTION', 'COMPLIANCE_FLAG', 'SYSTEM_CONFIG_CHANGE',
+    'VESTING_SCHEDULE_CREATED', 'VESTING_RECORD_CREATED',
+    'VESTING_UNLOCK', 'VESTING_MILESTONE', 'VESTING_ADMIN_OVERRIDE',
   ],
+
+  // ── Algorithm #9: Vesting & Lockup ────────────────────────────────────────
+  // Default vesting config applied when an asset owner doesn't specify one
+  VESTING: {
+    DEFAULT_MODEL: 'hybrid',         // 0% during cliff, then linear
+    DEFAULT_CLIFF_DAYS: 30,          // 30-day cliff
+    DEFAULT_VESTING_DAYS: 365,       // 365-day linear vesting post-cliff
+    BOUNDS: {
+      MIN_CLIFF_DAYS: 0,
+      MAX_CLIFF_DAYS: 180,           // 6 months max cliff
+      MIN_VESTING_DAYS: 7,            // 1 week minimum
+      MAX_VESTING_DAYS: 730,          // 2 years max vesting
+    },
+    MODELS: {
+      LINEAR: 'linear',              // Linear unlock from day 0 (no cliff)
+      CLIFF: 'cliff',                 // 0% until cliff, then 100%
+      HYBRID: 'hybrid',              // 0% during cliff, then linear (default)
+      MILESTONE: 'milestone',         // Unlock on asset events
+    },
+    MILESTONE_UNLOCKS: {
+      ASSET_FUNDED: 25,              // 25% unlocked when asset fully funded
+      PAYOUT_DONE: 50,               // 50% unlocked when owner receives payout
+      ASSET_COMPLETED: 100,          // 100% unlocked when asset lifecycle ends
+    },
+    SWEEP_INTERVAL_MS: 5 * 60 * 1000, // Refresh all vesting records every 5 min
+  },
 };

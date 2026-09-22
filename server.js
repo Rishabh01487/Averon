@@ -59,6 +59,7 @@ const { WalletManager } = require('./backend/blockchain/wallet');
 const { analyzeAsset } = require('./backend/services/aiPipeline');
 const { EscrowService } = require('./backend/services/escrowService');
 const { AssetService } = require('./backend/services/assetService');
+const { VestingService } = require('./backend/services/vestingService');
 const { TradingEngine } = require('./backend/services/tradingEngine');
 const { FeeService } = require('./backend/services/feeService');
 const { PriceService } = require('./backend/services/priceService');
@@ -103,7 +104,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage, limits: { fileSize: C.LIMITS.MAX_FILE_SIZE_BYTES, files: C.LIMITS.MAX_DOCUMENTS } });
 
 // ── Service instances (initialized after DB) ─────────────────────────────────
-let blockchain, walletManager, systemWallet, escrowService, assetService, tradingEngine;
+let blockchain, walletManager, systemWallet, escrowService, vestingService, assetService, tradingEngine;
 let feeService, priceService, complianceService, kycService, paymentService, settlementService;
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -472,8 +473,66 @@ app.post('/api/assets/:id/analyze', authenticate, (req, res) => {
 app.post('/api/assets/:id/confirm', authenticate, (req, res) => {
   try {
     const assetId = parseInt(req.params.id);
-    const result = assetService.tokenizeAsset(assetId, req.user.userId, req.body.aiResult || {});
+    // Pass optional vesting config from request body (Algorithm #9)
+    const vestingConfig = req.body.vesting || null;
+    const result = assetService.tokenizeAsset(assetId, req.user.userId, req.body.aiResult || {}, vestingConfig);
     res.json({ success: true, ...result, asset: assetService.getAsset(assetId) });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// ═══ Algorithm #9: Vesting API Routes ════════════════════════════════════════
+
+// Get vesting schedule for an asset
+app.get('/api/assets/:id/vesting', (req, res) => {
+  try {
+    const schedule = vestingService.getSchedule(parseInt(req.params.id));
+    if (!schedule) return res.json({ hasVesting: false });
+    res.json({ hasVesting: true, schedule });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// Get current user's vesting summary for an asset (used by Portfolio page)
+app.get('/api/portfolio/:assetId/vesting', authenticate, (req, res) => {
+  try {
+    const summary = vestingService.getUserVestingSummary(parseInt(req.params.assetId), req.user.userId);
+    res.json(summary || { hasVesting: false });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// Get all vesting summaries for the logged-in user (across all assets)
+app.get('/api/portfolio/vesting', authenticate, (req, res) => {
+  try {
+    const holdings = DB.query(
+      `SELECT DISTINCT asset_id FROM token_vesting_records WHERE user_id = ?`,
+      [req.user.userId]
+    );
+    const summaries = holdings.map(h => ({
+      assetId: h.asset_id,
+      ...vestingService.getUserVestingSummary(h.asset_id, req.user.userId)
+    }));
+    res.json({ holdings: summaries });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// Check if a specific token is locked (used by Marketplace before allowing sell)
+app.get('/api/assets/:assetId/tokens/:tokenId/locked', authenticate, (req, res) => {
+  try {
+    const locked = vestingService.isTokenLocked(
+      parseInt(req.params.assetId),
+      parseInt(req.params.tokenId),
+      req.user.userId
+    );
+    res.json({ locked, assetId: parseInt(req.params.assetId), tokenId: parseInt(req.params.tokenId) });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// Admin: force-unlock all tokens for a user on an asset (compliance override)
+app.post('/api/admin/vesting/force-unlock', authenticate, requireAdmin, (req, res) => {
+  try {
+    const { assetId, userId, reason } = req.body;
+    if (!assetId || !userId || !reason) throw new Error('assetId, userId, reason required');
+    const result = vestingService.adminForceUnlock(assetId, userId, reason, req.user.userId);
+    res.json({ success: true, ...result });
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
 
@@ -635,6 +694,18 @@ function startTimers() {
 
   timerRefs.push(setInterval(() => assetService.checkDeadlines(), 60000));
 
+  // Algorithm #9: Refresh all vesting records every 5 minutes (keeps unlocked_tokens current)
+  timerRefs.push(setInterval(() => {
+    try {
+      const result = vestingService.refreshAll();
+      if (result.refreshed > 0) {
+        console.log(`[Averon] Vesting sweep: refreshed ${result.refreshed}/${result.recordsChecked} records`);
+      }
+    } catch (err) {
+      console.error('[Averon] Vesting sweep failed:', err.message);
+    }
+  }, C.VESTING.SWEEP_INTERVAL_MS));
+
   timerRefs.push(setInterval(() => DB.run('DELETE FROM sessions WHERE expires_at < ?', [Date.now()]), C.AUTH.SESSION_CLEANUP_INTERVAL_MS));
 }
 
@@ -653,7 +724,8 @@ const timerRefs = [];
   systemWallet = walletManager.getSystemWallet();
 
   escrowService = new EscrowService(DB, blockchain, walletManager);
-  assetService = new AssetService(DB, blockchain, walletManager, escrowService);
+  vestingService = new VestingService(DB, blockchain, walletManager);
+  assetService = new AssetService(DB, blockchain, walletManager, escrowService, vestingService);
   tradingEngine = new TradingEngine(DB, blockchain, walletManager);
 
   feeService = new FeeService(DB, blockchain, walletManager);

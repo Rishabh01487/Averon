@@ -208,6 +208,30 @@
               <div class="field"><label>Raise Amount (₹)</label><input type="number" id="assetRaise" placeholder="50000" min="100"></div>
               <div class="field"><label>Listing Duration (days)</label><input type="number" id="assetDays" placeholder="30" min="1" max="365" value="30"></div>
             </div>
+
+            <!-- Algorithm #9: Vesting & Lockup Configuration -->
+            <div class="vesting-config" style="margin-top:24px;padding:20px;background:var(--bg2);border:1px solid var(--bdr2);border-radius:12px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+                <span style="font-size:20px">⏳</span>
+                <h3 style="margin:0;font-size:15px;font-weight:500">Vesting & Lockup Schedule</h3>
+                <span class="badge-info" style="margin-left:auto;font-size:10px;padding:3px 8px;background:rgba(56,189,248,0.1);color:#38bdf8;border-radius:4px;letter-spacing:0.5px">ALGORITHM #9</span>
+              </div>
+              <p style="font-size:12px;color:var(--txt2);margin-bottom:16px;line-height:1.6">Investor tokens will be locked per this schedule. Prevents flippers from dumping tokens immediately after purchase, protecting long-term alignment with your asset.</p>
+              <div class="field"><label>Vesting Model</label><select id="vestingModel">
+                <option value="hybrid" selected>Hybrid (Cliff + Linear) — recommended</option>
+                <option value="linear">Linear (unlock from day 0)</option>
+                <option value="cliff">Cliff (0% until cliff, then 100%)</option>
+                <option value="milestone">Milestone (unlock on asset events)</option>
+              </select></div>
+              <div class="field-row">
+                <div class="field"><label>Cliff Period (days)</label><input type="number" id="vestingCliff" value="30" min="0" max="180"><small style="color:var(--txt2);font-size:11px">No tokens unlockable during cliff (0-180 days)</small></div>
+                <div class="field"><label>Vesting Period (days)</label><input type="number" id="vestingDays" value="365" min="7" max="730"><small style="color:var(--txt2);font-size:11px">Linear unlock duration post-cliff (7-730 days)</small></div>
+              </div>
+              <div id="vestingPreview" style="margin-top:12px;padding:12px;background:var(--bg1);border-radius:8px;font-size:12px;color:var(--txt2)">
+                <strong style="color:var(--txt)">Preview:</strong> Investors who buy tokens will see <span id="vpCliff">30</span> days of zero unlock, then linear vesting over <span id="vpVest">365</span> days. Total lockup: <span id="vpTotal">395</span> days.
+              </div>
+            </div>
+
             <button id="createAssetBtn" class="btn-primary">Create Asset & Continue →</button>
           </div>
 
@@ -312,6 +336,13 @@
           <div class="portfolio-section">
             <h3>My Token Holdings</h3>
             <div id="myTokens" class="token-holdings"></div>
+          </div>
+          <div class="portfolio-section">
+            <h3>⏳ Vesting Progress <span class="badge-info" style="font-size:10px;padding:2px 8px;background:rgba(56,189,248,0.1);color:#38bdf8;border-radius:4px;letter-spacing:0.5px;margin-left:8px">ALGORITHM #9</span></h3>
+            <p style="font-size:12px;color:var(--txt2);margin-bottom:12px">Locked tokens cannot be sold or withdrawn until their vesting schedule unlocks them.</p>
+            <div id="myVesting" class="vesting-holdings">
+              <div style="padding:20px;text-align:center;color:var(--txt2);font-size:13px">Loading vesting schedules...</div>
+            </div>
           </div>
           <div class="portfolio-section">
             <h3>My Listed Assets</h3>

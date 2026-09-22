@@ -1014,3 +1014,158 @@ document.addEventListener('DOMContentLoaded', () => {
     enterApp();
   }
 });
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Algorithm #9 — Vesting & Lockup UI Logic
+// ══════════════════════════════════════════════════════════════════════════════
+
+const fmtDate = (ts) => {
+  if (!ts) return '—';
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+};
+
+const fmtCountdown = (ts) => {
+  if (!ts) return '—';
+  const diff = ts - Date.now();
+  if (diff <= 0) return 'now';
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  if (days > 0) return `${days}d ${hours}h`;
+  return `${hours}h ${Math.floor((diff % 3600000) / 60000)}m`;
+};
+
+// Load vesting summaries for the Portfolio page
+async function loadVestingSummaries() {
+  const container = document.getElementById('myVesting');
+  if (!container) return;
+  try {
+    const res = await api('/api/portfolio/vesting');
+    const summaries = res?.holdings || [];
+    if (summaries.length === 0) {
+      container.innerHTML = '<div class="vesting-empty">No vesting schedules yet. Buy asset tokens to see vesting progress here.</div>';
+      return;
+    }
+    container.innerHTML = summaries.map(s => renderVestingCard(s)).join('');
+  } catch (e) {
+    container.innerHTML = `<div class="vesting-empty">Failed to load vesting data: ${e.message}</div>`;
+  }
+}
+
+function renderVestingCard(s) {
+  if (!s || !s.schedule) return '';
+  const pct = s.percentVested || 0;
+  const unlocked = s.unlockedTokens || 0;
+  const locked = s.lockedTokens || 0;
+  const total = s.totalTokens || 0;
+  const model = s.model || 'hybrid';
+  const cliffPassed = s.cliffEndsAt && Date.now() >= s.cliffEndsAt;
+  const fullyVested = s.fullyVestedAt && Date.now() >= s.fullyVestedAt;
+
+  let cliffWarning = '';
+  if (model === 'hybrid' && !cliffPassed && s.cliffEndsAt) {
+    cliffWarning = `<div class="vesting-cliff-warning">Tokens are locked until cliff ends in ${fmtCountdown(s.cliffEndsAt)} (${fmtDate(s.cliffEndsAt)}). No transfers or sales allowed.</div>`;
+  }
+
+  // Timeline dots
+  const dots = [
+    { class: 'completed', label: 'Purchased' },
+    { class: cliffPassed ? 'completed' : (model === 'hybrid' ? 'active' : 'completed'), label: 'Cliff End' },
+    { class: fullyVested ? 'completed' : (cliffPassed ? 'active' : ''), label: 'Vesting' },
+    { class: fullyVested ? 'completed' : '', label: 'Fully Vested' },
+  ];
+
+  return `
+    <div class="vesting-card">
+      <div class="vesting-card-header">
+        <div>
+          <div class="vesting-asset-title">Asset #${s.assetId}</div>
+          <div class="vesting-asset-meta">${model.toUpperCase()} · ${total} token${total !== 1 ? 's' : ''}</div>
+        </div>
+        <span class="vesting-model-badge ${model}">${model}</span>
+      </div>
+
+      <div class="vesting-progress-wrap">
+        <div class="vesting-progress-labels">
+          <span>${pct.toFixed(1)}% vested</span>
+          <span>${unlocked}/${total} unlocked</span>
+        </div>
+        <div class="vesting-progress-bar">
+          <div class="vesting-progress-fill ${locked === 0 ? '' : ''}" style="width:${pct}%"></div>
+        </div>
+      </div>
+
+      <div class="vesting-stats">
+        <div class="vesting-stat">
+          <div class="vesting-stat-value unlocked">${unlocked}</div>
+          <div class="vesting-stat-label">Unlocked</div>
+        </div>
+        <div class="vesting-stat">
+          <div class="vesting-stat-value locked">${locked}</div>
+          <div class="vesting-stat-label">Locked</div>
+        </div>
+        <div class="vesting-stat">
+          <div class="vesting-stat-value">${s.cliffEndsAt ? fmtCountdown(s.cliffEndsAt) : '—'}</div>
+          <div class="vesting-stat-label">Cliff Ends</div>
+        </div>
+        <div class="vesting-stat">
+          <div class="vesting-stat-value">${s.fullyVestedAt ? fmtCountdown(s.fullyVestedAt) : '—'}</div>
+          <div class="vesting-stat-label">Full Unlock</div>
+        </div>
+      </div>
+
+      <div class="vesting-timeline">
+        ${dots.map(d => `<div class="vesting-timeline-dot ${d.class}" title="${d.label}"></div><span style="font-size:10px;color:var(--txt3)">${d.label}</span>`).join('<span style="flex:1;height:1px;background:var(--bdr);margin:0 4px"></span>')}
+      </div>
+
+      ${cliffWarning}
+    </div>
+  `;
+}
+
+// Update vesting preview on Tokenize page when user changes inputs
+function initVestingPreview() {
+  const model = document.getElementById('vestingModel');
+  const cliff = document.getElementById('vestingCliff');
+  const days = document.getElementById('vestingDays');
+  const vpCliff = document.getElementById('vpCliff');
+  const vpVest = document.getElementById('vpVest');
+  const vpTotal = document.getElementById('vpTotal');
+  const preview = document.getElementById('vestingPreview');
+  if (!model || !cliff || !days || !preview) return;
+
+  const update = () => {
+    const m = model.value;
+    const c = parseInt(cliff.value) || 0;
+    const v = parseInt(days.value) || 0;
+    if (vpCliff) vpCliff.textContent = c;
+    if (vpVest) vpVest.textContent = v;
+    if (vpTotal) vpTotal.textContent = c + v;
+    let txt = '';
+    if (m === 'hybrid') {
+      txt = `<strong style="color:var(--txt)">Preview:</strong> Investors will see <strong>${c} days</strong> of zero unlock (cliff), then linear vesting over <strong>${v} days</strong>. Total lockup: <strong>${c + v} days</strong>.`;
+    } else if (m === 'linear') {
+      txt = `<strong style="color:var(--txt)">Preview:</strong> No cliff. Tokens unlock linearly over <strong>${v} days</strong> from purchase date.`;
+    } else if (m === 'cliff') {
+      txt = `<strong style="color:var(--txt)">Preview:</strong> 0% unlocked until cliff (${c} days), then <strong>100% unlocked instantly</strong> at cliff end.`;
+    } else if (m === 'milestone') {
+      txt = `<strong style="color:var(--txt)">Preview:</strong> Tokens unlock on asset milestones: 25% when funded, 50% on payout, 100% on completion.`;
+    }
+    preview.innerHTML = txt;
+  };
+
+  [model, cliff, days].forEach(el => el.addEventListener('input', update));
+  update();
+}
+
+// Override the default loadPortfolio to also load vesting
+const _origLoadPortfolio = window.loadPortfolio;
+window.loadPortfolio = async function() {
+  if (_origLoadPortfolio) await _origLoadPortfolio();
+  loadVestingSummaries();
+};
+
+// Initialize vesting preview on DOMContentLoaded (in addition to existing init)
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initVestingPreview, 100);
+});

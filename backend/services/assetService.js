@@ -4,13 +4,15 @@
 
 const C = require('../config/constants');
 const { Transaction } = require('../blockchain/transaction');
+const { VestingService, DEFAULT_VESTING } = require('./vestingService');
 
 class AssetService {
-  constructor(db, blockchain, walletManager, escrowService) {
+  constructor(db, blockchain, walletManager, escrowService, vestingService) {
     this.db = db;
     this.blockchain = blockchain;
     this.walletManager = walletManager;
     this.escrow = escrowService;
+    this.vesting = vestingService || new VestingService(db, blockchain, walletManager);
   }
 
   // ── State Machine ──────────────────────────────────────────────────────────
@@ -68,7 +70,7 @@ class AssetService {
 
   // ── Tokenize (after AI verification) ─────────────────────────────────────
 
-  tokenizeAsset(assetId, userId, aiResult) {
+  tokenizeAsset(assetId, userId, aiResult, vestingConfig = null) {
     const asset = this.db.queryOne('SELECT * FROM assets WHERE id = ?', [assetId]);
     if (!asset) throw new Error('Asset not found');
     if (asset.owner_id !== userId) throw new Error('Not the owner');
@@ -129,7 +131,27 @@ class AssetService {
     this.db.run('INSERT INTO activity_log (user_id, action, details, tx_hash, block_index, created_at) VALUES (?,?,?,?,?,?)',
       [userId, 'ASSET_LISTED', `"${asset.title}" — ${tokenCount} tokens at ${tokenPriceAC.toFixed(4)} AC`, txHash, blockIdx, Date.now()]);
 
-    return { tokenCount, tokenPriceInr, tokenPriceAC, txHash, blockIndex: blockIdx };
+    // ── Algorithm #9: Create vesting schedule for this asset ────────────────
+    // Use owner-provided config, or fall back to platform default (Hybrid 30d/365d)
+    const finalVestingConfig = vestingConfig || {
+      model: C.VESTING.DEFAULT_MODEL,
+      cliffDays: C.VESTING.DEFAULT_CLIFF_DAYS,
+      vestingDays: C.VESTING.DEFAULT_VESTING_DAYS,
+    };
+
+    let vestingSchedule = null;
+    try {
+      vestingSchedule = this.vesting.createSchedule(assetId, finalVestingConfig);
+      this.db.run('INSERT INTO activity_log (user_id, action, details, created_at) VALUES (?,?,?,?)',
+        [userId, 'VESTING_SCHEDULE_CREATED',
+         `Asset ${assetId}: ${vestingSchedule.model} (cliff=${vestingSchedule.cliffDays}d, vesting=${vestingSchedule.vestingDays}d)`,
+         Date.now()]);
+    } catch (err) {
+      // Non-fatal: if schedule creation fails, asset still lists without lockup
+      console.error('[Averon] Vesting schedule creation failed:', err.message);
+    }
+
+    return { tokenCount, tokenPriceInr, tokenPriceAC, txHash, blockIndex: blockIdx, vestingSchedule };
   }
 
   // ── Buy Tokens ───────────────────────────────────────────────────────────
@@ -212,7 +234,17 @@ class AssetService {
       [asset.owner_id, 'TOKEN_SOLD', 'Token Purchased',
        `${count} token(s) of "${asset.title}" purchased. ${sold}/${asset.token_count} tokens sold.`, Date.now()]);
 
-    return { tokensBought: count, totalCost, newBalance, txHash: investTx.hash, blockIndex: block?.index, funded };
+    // ── Algorithm #9: Create vesting records for purchased tokens ───────────
+    // Each purchased token gets a vesting timeline starting NOW.
+    // Locked tokens cannot be sold on the marketplace or withdrawn.
+    let vestingInfo = null;
+    try {
+      vestingInfo = this.vesting.createVestingRecord(assetId, userId, claimedTokenIds, investTx.hash);
+    } catch (err) {
+      console.error('[Averon] Vesting record creation failed:', err.message);
+    }
+
+    return { tokensBought: count, totalCost, newBalance, txHash: investTx.hash, blockIndex: block?.index, funded, vestingInfo };
   }
 
   // ── Fully Funded Processing ──────────────────────────────────────────────
@@ -247,6 +279,15 @@ class AssetService {
     this.db.run('INSERT INTO notifications (user_id, type, title, message, created_at) VALUES (?,?,?,?,?)',
       [asset.owner_id, 'ASSET_FUNDED', '🎉 Asset Fully Funded!',
        `"${asset.title}" has been fully funded! ${payoutResult.payout.toFixed(4)} AC payout processed.`, Date.now()]);
+
+    // ── Algorithm #9: Milestone unlocks for MILESTONE vesting model ────────
+    // When asset is fully funded + payout done, unlock 50% of MILESTONE-vested tokens
+    try {
+      this.vesting.markMilestoneReached(assetId, 'ASSET_FUNDED', C.VESTING.MILESTONE_UNLOCKS.ASSET_FUNDED);
+      this.vesting.markMilestoneReached(assetId, 'PAYOUT_DONE', C.VESTING.MILESTONE_UNLOCKS.PAYOUT_DONE);
+    } catch (err) {
+      console.error('[Averon] Milestone unlock failed:', err.message);
+    }
 
     return payoutResult;
   }
