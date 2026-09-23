@@ -3,729 +3,840 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Averon — Transforming Idle Assets into Productive Capital</title>
+<title>Averon — A Protocol for Idle Capital</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-<!-- Phosphor Icons (regular weight = refined, not heavy) -->
-<script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
+<!-- Editorial pairing: Playfair Display (display serif) + Inter (body sans) + JetBrains Mono (data) -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;450;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
   :root {
-    /* Restrained palette: one accent (emerald), neutral grays, no rainbow */
-    --bg: #08090D;
-    --bg-soft: #0E1015;
-    --bg-card: #12141B;
-    --bg-elevated: #181B24;
+    /* Editorial palette — paper, ink, and one warm accent. No rainbow. */
+    --paper: #F5F1EA;          /* warm cream — the page */
+    --paper-2: #EDE8DF;         /* slightly darker cream for cards */
+    --ink: #1A1814;             /* near-black, warm — primary text */
+    --ink-2: #4A453C;           /* secondary text */
+    --ink-3: #7A7468;           /* muted text */
+    --ink-4: #B5AE9F;           /* very muted */
+    --rule: #D8D2C5;            /* horizontal rules, dividers */
+    --rule-soft: #E8E2D4;
 
-    --border: rgba(255, 255, 255, 0.05);
-    --border-strong: rgba(255, 255, 255, 0.1);
+    --accent: #B8451F;          /* terracotta — single accent, used sparingly */
+    --accent-soft: #E8D5C5;     /* terracotta tint */
+    --accent-deep: #8B3517;     /* deeper terracotta for hover */
 
-    --text: #F4F5F7;
-    --text-muted: #9BA1AE;
-    --text-dim: #5C6373;
-    --text-faint: #3A3F4C;
+    --green: #4A6741;           /* deep olive — for positive/finance */
+    --red: #8B2C1F;             /* deep red — for negative */
 
-    --accent: #34D399;             /* emerald 400 — money, growth */
-    --accent-dim: #10B981;          /* emerald 500 */
-    --accent-soft: rgba(52, 211, 153, 0.08);
-    --accent-glow: rgba(52, 211, 153, 0.2);
-
-    --warn: #FBBF24;
-    --danger: #F87171;
-
-    --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --mono: 'JetBrains Mono', ui-monospace, monospace;
-
-    --radius: 10px;
-    --radius-lg: 16px;
-    --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    --font-display: 'Playfair Display', 'Tiempos Headline', Georgia, serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body {
-    font-family: var(--font);
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.5;
+    font-family: var(--font-body);
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.6;
+    font-weight: 400;
+    font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    letter-spacing: -0.011em;
-    overflow-x: hidden;
+    letter-spacing: -0.005em;
   }
 
-  /* Subtle grain texture overlay for depth */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-    opacity: 0.025;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  /* Single ambient glow, top-right */
-  body::after {
-    content: '';
-    position: fixed;
-    top: -30%;
-    right: -10%;
-    width: 50%;
-    height: 70%;
-    background: radial-gradient(circle at center, rgba(52, 211, 153, 0.06) 0%, transparent 60%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* ─── NAV ─────────────────────────────────────────────────────── */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
+  /* ─── TOP BAR (minimal, editorial) ──────────────────────────────── */
+  .topbar {
+    border-bottom: 1px solid var(--rule);
+    padding: 18px 48px;
     display: flex;
-    align-items: center;
+    align-items: baseline;
     justify-content: space-between;
-    padding: 16px 40px;
-    background: rgba(8, 9, 13, 0.7);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border-bottom: 1px solid var(--border);
+    background: var(--paper);
+    position: sticky;
+    top: 0;
+    z-index: 100;
   }
-  .nav-brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 18px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    color: var(--text);
-  }
-  .nav-mark {
-    width: 28px;
-    height: 28px;
-    border-radius: 7px;
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.2),
-                0 4px 12px rgba(16, 185, 129, 0.25);
-  }
-  .nav-mark i {
-    font-size: 16px;
-    color: var(--bg);
-  }
-  .nav-brand .dim { color: var(--text-dim); font-weight: 400; }
-
-  .nav-links {
-    display: flex;
-    gap: 32px;
-    align-items: center;
-  }
-  .nav-links a {
-    color: var(--text-muted);
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 450;
-    transition: color var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .nav-links a:hover { color: var(--text); }
-  .nav-links a i { font-size: 15px; opacity: 0.7; }
-
-  .btn {
-    padding: 9px 18px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    border: none;
-    font-family: var(--font);
-    transition: all var(--transition);
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    letter-spacing: -0.01em;
-  }
-  .btn-ghost {
-    background: transparent;
-    color: var(--text-muted);
-    border: 1px solid var(--border-strong);
-  }
-  .btn-ghost:hover {
-    color: var(--text);
-    border-color: rgba(255, 255, 255, 0.18);
-    background: rgba(255, 255, 255, 0.02);
-  }
-  .btn-primary {
-    background: var(--accent);
-    color: var(--bg);
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15) inset,
-                0 0 0 1px rgba(52, 211, 153, 0.3),
-                0 4px 14px rgba(16, 185, 129, 0.25);
-  }
-  .btn-primary:hover {
-    background: var(--accent-dim);
-    transform: translateY(-1px);
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15) inset,
-                0 0 0 1px rgba(52, 211, 153, 0.4),
-                0 6px 18px rgba(16, 185, 129, 0.35);
-  }
-  .btn-large {
-    padding: 12px 24px;
-    font-size: 15px;
-  }
-
-  /* ─── HERO ─────────────────────────────────────────────────────── */
-  .hero {
-    position: relative;
-    z-index: 2;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 140px 32px 80px;
-    text-align: center;
-  }
-  .hero-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    color: var(--accent);
-    text-transform: uppercase;
-    font-weight: 500;
-    padding: 5px 12px;
-    background: var(--accent-soft);
-    border: 1px solid rgba(52, 211, 153, 0.15);
-    border-radius: 100px;
-    margin-bottom: 32px;
-    opacity: 0;
-    animation: fadeUp 700ms 100ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  }
-  .hero-eyebrow i { font-size: 13px; }
-  .hero-eyebrow .dot {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 8px var(--accent);
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  .hero h1 {
-    font-size: clamp(38px, 5.5vw, 64px);
-    font-weight: 600;
-    letter-spacing: -0.03em;
-    line-height: 1.05;
-    margin-bottom: 24px;
-    max-width: 880px;
-    opacity: 0;
-    animation: fadeUp 700ms 250ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    color: var(--text);
-  }
-  .hero h1 .accent {
-    color: var(--accent);
-    font-weight: 500;
-  }
-
-  .hero p.lead {
-    font-size: clamp(16px, 1.4vw, 19px);
-    color: var(--text-muted);
-    max-width: 580px;
-    margin: 0 auto 40px;
-    font-weight: 400;
-    line-height: 1.55;
-    opacity: 0;
-    animation: fadeUp 700ms 400ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  }
-
-  .hero-cta {
-    display: flex;
-    gap: 12px;
-    opacity: 0;
-    animation: fadeUp 700ms 550ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  }
-
-  /* Hero stats — subtle, not the focus */
-  .hero-stats {
-    display: flex;
-    gap: 48px;
-    margin-top: 96px;
-    opacity: 0;
-    animation: fadeUp 700ms 700ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  }
-  .hero-stat {
-    text-align: center;
-  }
-  .hero-stat .val {
-    font-family: var(--mono);
+  .topbar-brand {
+    font-family: var(--font-display);
     font-size: 22px;
     font-weight: 500;
-    color: var(--text);
     letter-spacing: -0.02em;
+    color: var(--ink);
   }
-  .hero-stat .lbl {
-    font-size: 12px;
-    color: var(--text-dim);
-    margin-top: 4px;
+  .topbar-brand .ital {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+  .topbar-nav {
+    display: flex;
+    gap: 36px;
+    align-items: baseline;
+  }
+  .topbar-nav a {
+    font-size: 13px;
+    color: var(--ink-2);
+    text-decoration: none;
     font-weight: 450;
-  }
-  .hero-stat-divider {
-    width: 1px;
-    background: var(--border);
-  }
-
-  /* ─── SECTIONS ────────────────────────────────────────────────── */
-  section.content {
+    transition: color 150ms;
     position: relative;
-    z-index: 2;
-    padding: 120px 40px;
-    max-width: 1200px;
-    margin: 0 auto;
+  }
+  .topbar-nav a:hover { color: var(--accent); }
+  .topbar-actions {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+  }
+  .btn-link {
+    background: none;
+    border: none;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--ink-2);
+    cursor: pointer;
+    padding: 8px 14px;
+    font-weight: 450;
+    text-decoration: none;
+    transition: color 150ms;
+  }
+  .btn-link:hover { color: var(--accent); }
+  .btn-solid {
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 9px 18px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 2px;
+    text-decoration: none;
+    transition: background 150ms;
+    display: inline-block;
+  }
+  .btn-solid:hover { background: var(--accent); }
+
+  /* ─── ISSUE HEADER (magazine masthead) ──────────────────────────── */
+  .masthead {
+    border-bottom: 2px solid var(--ink);
+    padding: 16px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .masthead .left, .masthead .right {
+    display: flex;
+    gap: 24px;
+    align-items: baseline;
   }
 
-  .section-eyebrow {
-    font-family: var(--mono);
+  /* ─── HERO (editorial cover) ────────────────────────────────────── */
+  .cover {
+    padding: 80px 48px 100px;
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: end;
+    border-bottom: 1px solid var(--rule);
+  }
+  .cover-left .eyebrow {
+    font-family: var(--font-mono);
     font-size: 11px;
     color: var(--accent);
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 500;
-    margin-bottom: 16px;
-    text-align: center;
-  }
-  .section-title {
-    font-size: clamp(28px, 3.5vw, 40px);
-    font-weight: 600;
-    letter-spacing: -0.025em;
-    line-height: 1.15;
-    margin-bottom: 16px;
-    text-align: center;
-    max-width: 680px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .section-sub {
-    color: var(--text-muted);
-    font-size: 16px;
-    line-height: 1.6;
-    text-align: center;
-    max-width: 580px;
-    margin: 0 auto 72px;
-  }
-
-  /* ─── FEATURE GRID (3 columns, more breathing room) ───────────── */
-  .feature-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-  }
-  .feature-card {
-    background: var(--bg-card);
-    padding: 36px 32px;
-    transition: background var(--transition);
-    position: relative;
-  }
-  .feature-card:hover {
-    background: var(--bg-elevated);
-  }
-  .feature-card .icon {
-    width: 36px;
-    height: 36px;
+    margin-bottom: 32px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 12px;
+  }
+  .cover-left .eyebrow::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--accent);
+  }
+  .cover h1 {
+    font-family: var(--font-display);
+    font-size: clamp(48px, 6vw, 88px);
+    font-weight: 500;
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    margin-bottom: 32px;
+  }
+  .cover h1 em {
+    font-style: italic;
+    font-weight: 400;
     color: var(--accent);
-    margin-bottom: 24px;
   }
-  .feature-card .icon i {
-    font-size: 24px;
+  .cover-lead {
+    font-family: var(--font-body);
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--ink-2);
+    max-width: 520px;
+    margin-bottom: 40px;
+    font-weight: 400;
   }
-  .feature-card h3 {
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 10px;
-    letter-spacing: -0.015em;
+  .cover-cta {
+    display: flex;
+    gap: 14px;
+    align-items: center;
   }
-  .feature-card p {
-    color: var(--text-muted);
+  .btn-large {
+    padding: 14px 28px;
     font-size: 14px;
-    line-height: 1.6;
-  }
-  .feature-card .meta {
-    margin-top: 18px;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text-faint);
-    letter-spacing: 0.02em;
   }
 
-  /* ─── HOW IT WORKS (vertical narrative, not generic timeline) ──── */
-  .how-section {
-    background: var(--bg-soft);
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
+  /* Right side — table of contents (magazine style) */
+  .cover-toc {
+    border-left: 1px solid var(--rule);
+    padding-left: 48px;
   }
-  .how-steps {
-    max-width: 720px;
+  .toc-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .toc-item {
+    display: grid;
+    grid-template-columns: 28px 1fr 40px;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    align-items: baseline;
+    transition: background 150ms;
+    text-decoration: none;
+    color: inherit;
+  }
+  .toc-item:hover { background: var(--paper-2); padding-left: 8px; padding-right: 8px; margin: 0 -8px; }
+  .toc-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-4);
+    font-weight: 500;
+  }
+  .toc-title {
+    font-family: var(--font-display);
+    font-size: 17px;
+    color: var(--ink);
+    font-weight: 500;
+    line-height: 1.3;
+  }
+  .toc-title .toc-sub {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--ink-3);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+  .toc-page {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    text-align: right;
+  }
+
+  /* ─── SECTION STRUCTURE ─────────────────────────────────────────── */
+  .section {
+    padding: 100px 48px;
+    max-width: 1280px;
     margin: 0 auto;
+    border-bottom: 1px solid var(--rule);
+  }
+  .section-header {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 48px;
+    margin-bottom: 64px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .section-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .section-title-block h2 {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    color: var(--ink);
+  }
+  .section-title-block h2 em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 400;
+  }
+  .section-title-block .dek {
+    font-size: 17px;
+    color: var(--ink-2);
+    line-height: 1.55;
+    max-width: 580px;
+    font-weight: 400;
+  }
+
+  /* ─── FEATURES (editorial 2-column grid) ─────────────────────────── */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+  }
+  .feature {
+    padding: 40px 0;
+    border-bottom: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+  .feature:nth-child(odd) {
+    border-right: 1px solid var(--rule);
+    padding-right: 48px;
+  }
+  .feature:nth-child(even) {
+    padding-left: 48px;
+  }
+  .feature-num {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 28px;
+    color: var(--accent);
+    font-weight: 400;
+    line-height: 1;
+  }
+  .feature-body h3 {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 12px;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+  }
+  .feature-body p {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--ink-2);
+    margin-bottom: 16px;
+  }
+  .feature-body .tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* ─── HOW IT WORKS (narrative prose, not timeline) ──────────────── */
+  .how-narrative {
+    max-width: 760px;
+    margin: 0 auto;
+    font-family: var(--font-body);
   }
   .how-step {
     display: grid;
-    grid-template-columns: 56px 1fr;
-    gap: 24px;
-    padding: 32px 0;
-    border-bottom: 1px solid var(--border);
+    grid-template-columns: 80px 1fr;
+    gap: 40px;
+    padding: 36px 0;
+    border-bottom: 1px solid var(--rule);
+    align-items: start;
   }
   .how-step:last-child { border-bottom: none; }
   .how-step-num {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--text-dim);
-    font-weight: 500;
-    padding-top: 4px;
-  }
-  .how-step-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 9px;
-    background: var(--bg-elevated);
-    border: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 56px;
     color: var(--accent);
-    margin-bottom: 16px;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.04em;
   }
-  .how-step-icon i { font-size: 18px; }
   .how-step h3 {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 8px;
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 14px;
     letter-spacing: -0.015em;
+    line-height: 1.2;
   }
   .how-step p {
-    color: var(--text-muted);
-    font-size: 15px;
-    line-height: 1.6;
-    max-width: 540px;
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--ink-2);
+  }
+  .how-step p strong {
+    color: var(--ink);
+    font-weight: 500;
   }
 
-  /* ─── CTA ─────────────────────────────────────────────────────── */
-  .cta {
-    text-align: center;
-    padding: 120px 40px 80px;
-    max-width: 720px;
+  /* ─── STATS (large numbers, magazine style) ──────────────────────── */
+  .stats-band {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 80px 48px;
+  }
+  .stats-grid {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+  }
+  .stat {
+    padding: 0 32px;
+    border-right: 1px solid rgba(245, 241, 234, 0.15);
+  }
+  .stat:last-child { border-right: none; }
+  .stat:first-child { padding-left: 0; }
+  .stat-num {
+    font-family: var(--font-display);
+    font-size: 56px;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--paper);
+    margin-bottom: 12px;
+    letter-spacing: -0.03em;
+  }
+  .stat-num em {
+    font-style: italic;
+    color: var(--accent-soft);
+    font-weight: 400;
+  }
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(245, 241, 234, 0.6);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  /* ─── ALGORITHMS (numbered editorial list) ──────────────────────── */
+  .algo-list {
+    max-width: 900px;
     margin: 0 auto;
   }
-  .cta h2 {
-    font-size: clamp(28px, 3.5vw, 40px);
-    font-weight: 600;
-    letter-spacing: -0.025em;
-    line-height: 1.15;
-    margin-bottom: 20px;
+  .algo-row {
+    display: grid;
+    grid-template-columns: 60px 200px 1fr;
+    gap: 32px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--rule);
+    align-items: baseline;
   }
-  .cta p {
-    color: var(--text-muted);
-    font-size: 17px;
-    line-height: 1.55;
-    margin-bottom: 36px;
+  .algo-row:first-child {
+    border-top: 1px solid var(--ink);
+    padding-top: 24px;
+  }
+  .algo-num {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 22px;
+    color: var(--accent);
+    font-weight: 400;
+  }
+  .algo-name {
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .algo-desc {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.5;
   }
 
-  /* ─── FOOTER ───────────────────────────────────────────────────── */
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 32px 40px;
+  /* ─── CTA (closing) ─────────────────────────────────────────────── */
+  .closing {
+    padding: 120px 48px;
+    max-width: 760px;
+    margin: 0 auto;
     text-align: center;
-    color: var(--text-dim);
-    font-size: 13px;
-    position: relative;
-    z-index: 2;
+  }
+  .closing-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .closing h2 {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 4.5vw, 56px);
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    margin-bottom: 24px;
+    color: var(--ink);
+  }
+  .closing h2 em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 400;
+  }
+  .closing p {
+    font-size: 18px;
+    color: var(--ink-2);
+    line-height: 1.55;
+    margin-bottom: 40px;
+    max-width: 580px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
-  /* ─── ANIMATIONS ───────────────────────────────────────────────── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+  /* ─── FOOTER (signed, editorial) ────────────────────────────────── */
+  footer {
+    border-top: 1px solid var(--rule);
+    padding: 48px;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    letter-spacing: 0.06em;
   }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-
-  /* Reveal on scroll */
-  .reveal {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 700ms cubic-bezier(0.4, 0, 0.2, 1),
-                transform 700ms cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
+  footer .signoff {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 16px;
+    color: var(--ink-2);
+    margin-bottom: 16px;
+    letter-spacing: -0.01em;
   }
 
-  /* ─── RESPONSIVE ───────────────────────────────────────────────── */
+  /* ─── RESPONSIVE ──────────────────────────────────────────────────── */
   @media (max-width: 900px) {
-    nav { padding: 14px 20px; }
-    .nav-links { display: none; }
-    .hero { padding: 100px 20px 60px; }
-    .hero-stats { gap: 24px; flex-wrap: wrap; justify-content: center; }
-    .hero-stat-divider { display: none; }
-    .feature-grid { grid-template-columns: 1fr; }
-    section.content { padding: 80px 20px; }
-    .how-step { grid-template-columns: 48px 1fr; gap: 16px; padding: 24px 0; }
-    .hero-cta { flex-direction: column; align-items: stretch; width: 100%; }
-    .hero-cta .btn { justify-content: center; }
+    .topbar { padding: 14px 20px; flex-wrap: wrap; gap: 12px; }
+    .topbar-nav { display: none; }
+    .masthead { padding: 12px 20px; font-size: 10px; gap: 12px; flex-wrap: wrap; }
+    .masthead .left, .masthead .right { gap: 12px; }
+    .cover { grid-template-columns: 1fr; padding: 40px 20px 60px; gap: 48px; }
+    .cover-toc { border-left: none; padding-left: 0; border-top: 1px solid var(--rule); padding-top: 32px; }
+    .section { padding: 60px 20px; }
+    .section-header { grid-template-columns: 1fr; gap: 16px; }
+    .features { grid-template-columns: 1fr; }
+    .feature:nth-child(odd) { border-right: none; padding-right: 0; }
+    .feature:nth-child(even) { padding-left: 0; }
+    .how-step { grid-template-columns: 60px 1fr; gap: 20px; }
+    .how-step-num { font-size: 40px; }
+    .stats-band { padding: 48px 20px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 32px 0; }
+    .stat { padding: 0 16px; border-bottom: 1px solid rgba(245,241,234,0.1); padding-bottom: 24px; }
+    .stat-num { font-size: 36px; }
+    .algo-row { grid-template-columns: 40px 1fr; gap: 16px; }
+    .algo-name { grid-column: 2; }
+    .algo-desc { grid-column: 2; }
+    .closing { padding: 80px 20px; }
   }
 </style>
 </head>
 <body>
 
-<nav>
-  <a href="/" class="nav-brand">
-    <div class="nav-mark"><i class="ph-fill ph-cube"></i></div>
-    Averon<span class="dim">.</span>
-  </a>
-  <div class="nav-links">
-    <a href="#features"><i class="ph ph-squares-four"></i> Features</a>
-    <a href="#how"><i class="ph ph-path"></i> How it works</a>
-    <a href="#algorithms"><i class="ph ph-cpu"></i> Architecture</a>
+<!-- Top bar -->
+<div class="topbar">
+  <div class="topbar-brand">Averon<span class="ital">.</span></div>
+  <nav class="topbar-nav">
+    <a href="#features">Features</a>
+    <a href="#how">How it works</a>
+    <a href="#algorithms">Architecture</a>
+    <a href="#stats">Network</a>
+  </nav>
+  <div class="topbar-actions">
+    <a href="/app.html" class="btn-link">Sign in</a>
+    <a href="/app.html" class="btn-solid">Get started →</a>
   </div>
-  <div style="display:flex;gap:8px">
-    <a href="/app.html"><button class="btn btn-ghost"><i class="ph ph-sign-in"></i> Sign in</button></a>
-    <a href="/app.html"><button class="btn btn-primary">Get started<i class="ph ph-arrow-right"></i></button></a>
-  </div>
-</nav>
+</div>
 
-<section class="hero">
-  <div class="hero-eyebrow">
-    <span class="dot"></span>
-    Asset Infrastructure Protocol
+<!-- Masthead -->
+<div class="masthead">
+  <div class="left">
+    <span>Vol. IV · Issue 1</span>
+    <span>September 2026</span>
   </div>
-  <h1>Transform idle assets<br>into <span class="accent">productive capital.</span></h1>
-  <p class="lead">A programmable financial ecosystem where real-world assets, AI verification, and a custom blockchain converge — enabling liquidity without permanent sale.</p>
-  <div class="hero-cta">
-    <a href="/app.html"><button class="btn btn-primary btn-large">Launch platform<i class="ph ph-arrow-right"></i></button></a>
-    <a href="#how"><button class="btn btn-ghost btn-large"><i class="ph ph-play"></i> See how it works</button></a>
+  <div class="right">
+    <span>A protocol for idle capital</span>
   </div>
+</div>
 
-  <div class="hero-stats">
-    <div class="hero-stat">
-      <div class="val" id="hsPrice">₹1.00</div>
-      <div class="lbl">AC spot price</div>
-    </div>
-    <div class="hero-stat-divider"></div>
-    <div class="hero-stat">
-      <div class="val" id="hsAssets">0</div>
-      <div class="lbl">Tokenized assets</div>
-    </div>
-    <div class="hero-stat-divider"></div>
-    <div class="hero-stat">
-      <div class="val" id="hsUsers">0</div>
-      <div class="lbl">Holders</div>
-    </div>
-    <div class="hero-stat-divider"></div>
-    <div class="hero-stat">
-      <div class="val" id="hsBlocks">1</div>
-      <div class="lbl">Blocks mined</div>
+<!-- Cover / Hero -->
+<section class="cover">
+  <div class="cover-left">
+    <div class="eyebrow">Asset Infrastructure Protocol</div>
+    <h1>Transforming idle assets into <em>productive capital.</em></h1>
+    <p class="cover-lead">A programmable financial ecosystem where real-world assets, AI verification, and a custom blockchain converge — enabling liquidity without permanent sale, and capital that flows continuously through verified opportunities.</p>
+    <div class="cover-cta">
+      <a href="/app.html" class="btn-solid btn-large">Launch platform →</a>
+      <a href="#how" class="btn-link">Read how it works</a>
     </div>
   </div>
-</section>
 
-<section class="content" id="features">
-  <div class="section-eyebrow reveal">Capabilities</div>
-  <h2 class="section-title reveal">Built for the asset economy.</h2>
-  <p class="section-sub reveal">Three integrated layers — tokenization, financing, and capital mobility — in one protocol.</p>
-
-  <div class="feature-grid reveal">
-    <div class="feature-card">
-      <div class="icon"><i class="ph ph-stack"></i></div>
-      <h3>Asset tokenization</h3>
-      <p>Transform any verified real-world asset into programmable fractional tokens on a custom PoW blockchain with SHA-256 mining and ECDSA wallets.</p>
-      <div class="meta">SHA-256 · secp256k1</div>
-    </div>
-    <div class="feature-card">
-      <div class="icon"><i class="ph ph-brain"></i></div>
-      <h3>AI verification</h3>
-      <p>A five-stage AI pipeline using Gemini 2.0 Flash analyzes your documents for legitimacy, valuation, and risk — onboarding in minutes, not days.</p>
-      <div class="meta">Gemini 2.0 · 5-stage</div>
-    </div>
-    <div class="feature-card">
-      <div class="icon"><i class="ph ph-bank"></i></div>
-      <h3>Asset-backed financing</h3>
-      <p>Unlock liquidity without selling your assets. Borrowers receive fiat INR; investors participate through Averon Coin. Event-driven repayment, no lock-in.</p>
-      <div class="meta">Razorpay · UPI · Wire</div>
-    </div>
-    <div class="feature-card">
-      <div class="icon"><i class="ph ph-hourglass"></i></div>
-      <h3>Vesting & lockup</h3>
-      <p>Investor tokens follow a hybrid vesting schedule — 30-day cliff, then linear unlock over 365 days. Prevents flippers, protects long-term alignment.</p>
-      <div class="meta">Algorithm #9</div>
-    </div>
-    <div class="feature-card">
-      <div class="icon"><i class="ph ph-shield-check"></i></div>
-      <h3>Escrow & compliance</h3>
-      <p>On-chain escrow with atomic token claiming, four-tier KYC, eight-flag AML screening, and tamper-proof hash-chained audit logging.</p>
-      <div class="meta">KYC Tier 1–4 · AML 8-flag</div>
-    </div>
-    <div class="feature-card">
-      <div class="icon"><i class="ph ph-network"></i></div>
-      <h3>P2P decentralization</h3>
-      <p>Multiple Averon nodes sync chain state via WebSocket gossip with longest-chain-wins consensus. Inbuilt chain, decentralized across nodes.</p>
-      <div class="meta">Algorithm #10</div>
-    </div>
+  <div class="cover-toc">
+    <div class="toc-label">In this issue</div>
+    <a href="#features" class="toc-item">
+      <span class="toc-num">01</span>
+      <div class="toc-title">Built for the asset economy<span class="toc-sub">Six capabilities across three layers</span></div>
+      <span class="toc-page">p.02</span>
+    </a>
+    <a href="#how" class="toc-item">
+      <span class="toc-num">02</span>
+      <div class="toc-title">From submission to capital<span class="toc-sub">A five-step journey</span></div>
+      <span class="toc-page">p.04</span>
+    </a>
+    <a href="#stats" class="toc-item">
+      <span class="toc-num">03</span>
+      <div class="toc-title">Network at a glance<span class="toc-sub">Live on-chain metrics</span></div>
+      <span class="toc-page">p.06</span>
+    </a>
+    <a href="#algorithms" class="toc-item">
+      <span class="toc-num">04</span>
+      <div class="toc-title">Eleven algorithms<span class="toc-sub">The engine room</span></div>
+      <span class="toc-page">p.07</span>
+    </a>
   </div>
 </section>
 
-<section class="how-section" id="how">
-  <div class="content">
-    <div class="section-eyebrow reveal">End-to-end flow</div>
-    <h2 class="section-title reveal">From asset submission to capital receipt.</h2>
-    <p class="section-sub reveal">A five-step journey that transforms ownership documents into liquid capital.</p>
+<!-- Section 01: Features -->
+<section class="section" id="features">
+  <div class="section-header">
+    <div class="section-num">01 — Features</div>
+    <div class="section-title-block">
+      <h2>Built for the <em>asset economy.</em></h2>
+      <p class="dek">Three integrated layers — tokenization, financing, and capital mobility — in one protocol. Each capability is purpose-built, not bolted on.</p>
+    </div>
+  </div>
 
-    <div class="how-steps">
-      <div class="how-step reveal">
-        <div class="how-step-num">01</div>
-        <div>
-          <div class="how-step-icon"><i class="ph ph-upload-simple"></i></div>
-          <h3>Submit your asset</h3>
-          <p>Upload asset details — title, category, raise amount, listing duration — along with ownership documents (PDFs, images). SHA-256 hashes computed for duplicate detection.</p>
-        </div>
+  <div class="features">
+    <div class="feature">
+      <div class="feature-num">i</div>
+      <div class="feature-body">
+        <h3>Asset tokenization</h3>
+        <p>Transform any verified real-world asset into programmable fractional tokens on a custom PoW blockchain with SHA-256 mining and ECDSA secp256k1 wallets.</p>
+        <div class="tag">SHA-256 · secp256k1</div>
       </div>
-      <div class="how-step reveal">
-        <div class="how-step-num">02</div>
-        <div>
-          <div class="how-step-icon"><i class="ph ph-brain"></i></div>
-          <h3>AI verification & valuation</h3>
-          <p>Gemini 2.0 Flash analyzes your documents across five stages — ingestion, duplicate check, multimodal analysis, fraud detection, and tokenization recommendation. Confidence-scored, with fallback engine.</p>
-        </div>
+    </div>
+    <div class="feature">
+      <div class="feature-num">ii</div>
+      <div class="feature-body">
+        <h3>AI verification</h3>
+        <p>A five-stage AI pipeline using Gemini 2.0 Flash analyzes your documents for legitimacy, valuation, and risk — onboarding in minutes, not days.</p>
+        <div class="tag">Gemini 2.0 · 5-stage</div>
       </div>
-      <div class="how-step reveal">
-        <div class="how-step-num">03</div>
-        <div>
-          <div class="how-step-icon"><i class="ph ph-stack"></i></div>
-          <h3>Tokenize & list for funding</h3>
-          <p>Verified asset is split into fractional tokens on the blockchain. Escrow account created, compliance checks run, vesting schedule applied. Asset goes live for funding.</p>
-        </div>
+    </div>
+    <div class="feature">
+      <div class="feature-num">iii</div>
+      <div class="feature-body">
+        <h3>Asset-backed financing</h3>
+        <p>Unlock liquidity without selling your assets. Borrowers receive fiat INR; investors participate through Averon Coin. Event-driven repayment, no lock-in.</p>
+        <div class="tag">Razorpay · UPI · Wire</div>
       </div>
-      <div class="how-step reveal">
-        <div class="how-step-num">04</div>
-        <div>
-          <div class="how-step-icon"><i class="ph ph-currency-inr"></i></div>
-          <h3>Receive capital</h3>
-          <p>Once fully funded, escrow releases 99% to your wallet and 1% platform fee. AC price boosts 2–5%. Payout recorded immutably on-chain. Repay on your schedule.</p>
-        </div>
+    </div>
+    <div class="feature">
+      <div class="feature-num">iv</div>
+      <div class="feature-body">
+        <h3>Vesting & lockup</h3>
+        <p>Investor tokens follow a hybrid vesting schedule — 30-day cliff, then linear unlock over 365 days. Prevents flippers, protects long-term alignment.</p>
+        <div class="tag">Algorithm #9</div>
       </div>
-      <div class="how-step reveal">
-        <div class="how-step-num">05</div>
-        <div>
-          <div class="how-step-icon"><i class="ph ph-arrows-clockwise"></i></div>
-          <h3>Capital recycles</h3>
-          <p>Repaid capital flows back into the network, automatically redeployed to new verified opportunities through risk-tiered liquidity pools — a continuously compounding economy.</p>
-        </div>
+    </div>
+    <div class="feature">
+      <div class="feature-num">v</div>
+      <div class="feature-body">
+        <h3>Escrow & compliance</h3>
+        <p>On-chain escrow with atomic token claiming, four-tier KYC, eight-flag AML screening, and tamper-proof hash-chained audit logging.</p>
+        <div class="tag">KYC Tier 1–4 · AML 8-flag</div>
+      </div>
+    </div>
+    <div class="feature">
+      <div class="feature-num">vi</div>
+      <div class="feature-body">
+        <h3>P2P decentralization</h3>
+        <p>Multiple Averon nodes sync chain state via WebSocket gossip with longest-chain-wins consensus. Inbuilt chain, decentralized across nodes.</p>
+        <div class="tag">Algorithm #10</div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="content" id="algorithms">
-  <div class="section-eyebrow reveal">The engine room</div>
-  <h2 class="section-title reveal">Eleven algorithms, one protocol.</h2>
-  <p class="section-sub reveal">Every layer of Averon is powered by a purpose-built algorithm — from cryptographic consensus to AI verification to token vesting.</p>
+<!-- Section 02: How it works -->
+<section class="section" id="how">
+  <div class="section-header">
+    <div class="section-num">02 — Process</div>
+    <div class="section-title-block">
+      <h2>From asset submission to <em>capital receipt.</em></h2>
+      <p class="dek">A five-step journey that transforms ownership documents into liquid capital. Each step is verifiable, signed, and recorded on-chain.</p>
+    </div>
+  </div>
 
-  <div class="feature-grid reveal" style="grid-template-columns: repeat(4, 1fr); gap: 1px;">
-    <div class="feature-card" style="padding: 24px;">
-      <div class="meta" style="margin-bottom:12px">01</div>
-      <h3 style="font-size:15px">SHA-256 PoW</h3>
-      <p style="font-size:13px">Dynamic difficulty adjustment every 10 blocks.</p>
+  <div class="how-narrative">
+    <div class="how-step">
+      <div class="how-step-num">01</div>
+      <div>
+        <h3>Submit your asset</h3>
+        <p>Upload asset details — title, category, raise amount, listing duration — along with ownership documents (PDFs, images). <strong>SHA-256 hashes</strong> are computed for duplicate detection across the entire document corpus.</p>
+      </div>
     </div>
-    <div class="feature-card" style="padding: 24px;">
-      <div class="meta" style="margin-bottom:12px">02</div>
-      <h3 style="font-size:15px">5-stage AI pipeline</h3>
-      <p style="font-size:13px">Gemini 2.0 Flash + fallback engine.</p>
+    <div class="how-step">
+      <div class="how-step-num">02</div>
+      <div>
+        <h3>AI verification & valuation</h3>
+        <p><strong>Gemini 2.0 Flash</strong> analyzes your documents across five stages — ingestion, duplicate check, multimodal analysis, fraud detection, and tokenization recommendation. Confidence-scored, with a fallback engine if Gemini is unavailable.</p>
+      </div>
     </div>
-    <div class="feature-card" style="padding: 24px;">
-      <div class="meta" style="margin-bottom:12px">03</div>
-      <h3 style="font-size:15px">Asset state machine</h3>
-      <p style="font-size:13px">16-state FSM governing lifecycle.</p>
+    <div class="how-step">
+      <div class="how-step-num">03</div>
+      <div>
+        <h3>Tokenize & list for funding</h3>
+        <p>Verified asset is split into fractional tokens on the blockchain. <strong>Escrow account</strong> created, compliance checks run, vesting schedule applied. Asset goes live for funding.</p>
+      </div>
     </div>
-    <div class="feature-card" style="padding: 24px;">
-      <div class="meta" style="margin-bottom:12px">04</div>
-      <h3 style="font-size:15px">Atomic claiming</h3>
-      <p style="font-size:13px">Race-condition-safe token purchases.</p>
+    <div class="how-step">
+      <div class="how-step-num">04</div>
+      <div>
+        <h3>Receive capital</h3>
+        <p>Once fully funded, escrow releases <strong>99% to your wallet</strong> and 1% platform fee. AC price boosts 2–5%. Payout recorded immutably on-chain. Repay on your schedule.</p>
+      </div>
     </div>
-    <div class="feature-card" style="padding: 24px;">
-      <div class="meta" style="margin-bottom:12px">05</div>
-      <h3 style="font-size:15px">Price-time matching</h3>
-      <p style="font-size:13px">Maker-price-wins order book.</p>
-    </div>
-    <div class="feature-card" style="padding: 24px;">
-      <div class="meta" style="margin-bottom:12px">06</div>
-      <h3 style="font-size:15px">Circuit breaker</h3>
-      <p style="font-size:13px">Halts on 10% price moves in 1h.</p>
-    </div>
-    <div class="feature-card" style="padding: 24px;">
-      <div class="meta" style="margin-bottom:12px">07</div>
-      <h3 style="font-size:15px">Hash-chained audit</h3>
-      <p style="font-size:13px">Tamper-detectable SHA-256 log.</p>
-    </div>
-    <div class="feature-card" style="padding: 24px;">
-      <div class="meta" style="margin-bottom:12px">08</div>
-      <h3 style="font-size:15px">Token-bucket limiter</h3>
-      <p style="font-size:13px">4-tier rate limiting across routes.</p>
-    </div>
-    <div class="feature-card" style="padding: 24px;">
-      <div class="meta" style="margin-bottom:12px">09</div>
-      <h3 style="font-size:15px">Vesting & lockup</h3>
-      <p style="font-size:13px">Hybrid cliff + linear token unlock.</p>
-    </div>
-    <div class="feature-card" style="padding: 24px;">
-      <div class="meta" style="margin-bottom:12px">10</div>
-      <h3 style="font-size:15px">P2P decentralization</h3>
-      <p style="font-size:13px">Longest-chain-wins consensus.</p>
-    </div>
-    <div class="feature-card" style="padding: 24px;">
-      <div class="meta" style="margin-bottom:12px">11</div>
-      <h3 style="font-size:15px">MongoDB auth</h3>
-      <p style="font-size:13px">Persistent across server restarts.</p>
-    </div>
-    <div class="feature-card" style="padding: 24px; background: var(--bg-elevated);">
-      <div class="meta" style="margin-bottom:12px">+</div>
-      <h3 style="font-size:15px">12 transaction types</h3>
-      <p style="font-size:13px">MINT, INVEST, PAYOUT, REFUND, TRADE…</p>
+    <div class="how-step">
+      <div class="how-step-num">05</div>
+      <div>
+        <h3>Capital recycles</h3>
+        <p>Repaid capital flows back into the network, automatically redeployed to new verified opportunities through <strong>risk-tiered liquidity pools</strong> — a continuously compounding economy.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="cta">
-  <h2 class="reveal">Ready to unlock your assets?</h2>
-  <p class="reveal">Join the Averon protocol — transform idle wealth into productive capital. Built on a custom blockchain with AI verification, escrow-backed funding, and decentralized consensus.</p>
-  <div class="reveal" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-    <a href="/app.html"><button class="btn btn-primary btn-large">Launch platform<i class="ph ph-arrow-right"></i></button></a>
-    <a href="#features"><button class="btn btn-ghost btn-large">Explore features</button></a>
+<!-- Section 03: Stats band -->
+<section class="stats-band" id="stats">
+  <div class="stats-grid">
+    <div class="stat">
+      <div class="stat-num"><em>₹</em><span id="hsPrice">1.00</span></div>
+      <div class="stat-label">AC spot price</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="hsAssets">0</div>
+      <div class="stat-label">Tokenized assets</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="hsUsers">0</div>
+      <div class="stat-label">Holders</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="hsBlocks">1</div>
+      <div class="stat-label">Blocks mined</div>
+    </div>
   </div>
+</section>
+
+<!-- Section 04: Algorithms -->
+<section class="section" id="algorithms">
+  <div class="section-header">
+    <div class="section-num">03 — Architecture</div>
+    <div class="section-title-block">
+      <h2>Eleven algorithms, <em>one protocol.</em></h2>
+      <p class="dek">Every layer of Averon is powered by a purpose-built algorithm — from cryptographic consensus to AI verification to token vesting.</p>
+    </div>
+  </div>
+
+  <div class="algo-list">
+    <div class="algo-row">
+      <div class="algo-num">i</div>
+      <div class="algo-name">SHA-256 Proof of Work</div>
+      <div class="algo-desc">Mining with dynamic difficulty adjustment every 10 blocks.</div>
+    </div>
+    <div class="algo-row">
+      <div class="algo-num">ii</div>
+      <div class="algo-name">5-stage AI pipeline</div>
+      <div class="algo-desc">Gemini 2.0 Flash multimodal analysis + fallback engine.</div>
+    </div>
+    <div class="algo-row">
+      <div class="algo-num">iii</div>
+      <div class="algo-name">Asset state machine</div>
+      <div class="algo-desc">16-state finite state machine governing the asset lifecycle.</div>
+    </div>
+    <div class="algo-row">
+      <div class="algo-num">iv</div>
+      <div class="algo-name">Atomic token claiming</div>
+      <div class="algo-desc">Race-condition-safe UPDATE WHERE owner_id IS NULL.</div>
+    </div>
+    <div class="algo-row">
+      <div class="algo-num">v</div>
+      <div class="algo-name">Price-time matching</div>
+      <div class="algo-desc">Order book with maker-price-wins semantics.</div>
+    </div>
+    <div class="algo-row">
+      <div class="algo-num">vi</div>
+      <div class="algo-name">Circuit breaker</div>
+      <div class="algo-desc">Halts trading if price moves >10% within 1 hour.</div>
+    </div>
+    <div class="algo-row">
+      <div class="algo-num">vii</div>
+      <div class="algo-name">Hash-chained audit log</div>
+      <div class="algo-desc">Tamper-detectable SHA-256 chain over every action.</div>
+    </div>
+    <div class="algo-row">
+      <div class="algo-num">viii</div>
+      <div class="algo-name">Token-bucket rate limiter</div>
+      <div class="algo-desc">4 tiers: 100/10/5/10 requests per window.</div>
+    </div>
+    <div class="algo-row">
+      <div class="algo-num">ix</div>
+      <div class="algo-name">Vesting & token lockup</div>
+      <div class="algo-desc">Hybrid cliff + linear unlock for investor tokens.</div>
+    </div>
+    <div class="algo-row">
+      <div class="algo-num">x</div>
+      <div class="algo-name">P2P decentralization</div>
+      <div class="algo-desc">WebSocket gossip + longest-chain-wins consensus.</div>
+    </div>
+    <div class="algo-row">
+      <div class="algo-num">xi</div>
+      <div class="algo-name">MongoDB auth persistence</div>
+      <div class="algo-desc">Survives server restarts via MongoDB Atlas.</div>
+    </div>
+  </div>
+</section>
+
+<!-- Closing -->
+<section class="closing">
+  <div class="closing-eyebrow">— End of issue —</div>
+  <h2>Ready to unlock <em>your assets?</em></h2>
+  <p>Join the Averon protocol — transform idle wealth into productive capital. Built on a custom blockchain with AI verification, escrow-backed funding, and decentralized consensus.</p>
+  <a href="/app.html" class="btn-solid btn-large">Launch platform →</a>
 </section>
 
 <footer>
-  Averon Protocol · Built by Rishabh Gupta · © 2026 Averon Technologies Pvt. Ltd.
+  <div class="signoff">Averon Protocol, built by Rishabh Gupta.</div>
+  <div>© 2026 Averon Technologies Pvt. Ltd. · All rights reserved.</div>
 </footer>
 
 <script>
@@ -734,7 +845,7 @@ async function loadStats() {
     const r = await fetch('/api/config');
     if (!r.ok) return;
     const d = await r.json();
-    document.getElementById('hsPrice').textContent = '₹' + (d.price || 1).toFixed(2);
+    document.getElementById('hsPrice').textContent = (d.price || 1).toFixed(2);
     document.getElementById('hsAssets').textContent = d.economy?.assets?.total || 0;
     document.getElementById('hsUsers').textContent = d.economy?.holders || 0;
     document.getElementById('hsBlocks').textContent = d.blockchain?.blocks || 1;
@@ -742,18 +853,6 @@ async function loadStats() {
 }
 loadStats();
 setInterval(loadStats, 15000);
-
-// Reveal on scroll
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-      observer.unobserve(entry.target);
-    }
-  });
-}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 </script>
 </body>
 </html>
