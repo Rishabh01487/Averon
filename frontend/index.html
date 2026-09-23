@@ -66,11 +66,43 @@
     font-weight: 500;
     letter-spacing: -0.02em;
     color: var(--ink);
+    text-decoration: none;
+    background: linear-gradient(
+      100deg,
+      var(--ink) 0%,
+      var(--ink) 40%,
+      var(--accent) 50%,
+      var(--ink) 60%,
+      var(--ink) 100%
+    );
+    background-size: 250% 100%;
+    background-position: 100% 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 7s ease-in-out infinite;
   }
   .topbar-brand .ital {
     font-style: italic;
     font-weight: 400;
     color: var(--accent);
+    -webkit-text-fill-color: var(--accent);
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 100% 0; }
+    50% { background-position: 0% 0; }
+    100% { background-position: 100% 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .topbar-brand {
+      animation: none;
+      background: var(--ink);
+      -webkit-background-clip: initial;
+      background-clip: initial;
+      -webkit-text-fill-color: var(--ink);
+    }
   }
   .topbar-nav {
     display: flex;

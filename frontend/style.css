@@ -111,12 +111,30 @@ body {
   letter-spacing: -0.025em;
   color: var(--ink);
   margin-bottom: 12px;
+  position: relative;
+  display: inline-block;
+  background: linear-gradient(
+    100deg,
+    var(--ink) 0%,
+    var(--ink) 35%,
+    var(--accent) 48%,
+    var(--accent-deep) 52%,
+    var(--ink) 65%,
+    var(--ink) 100%
+  );
+  background-size: 300% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 6s ease-in-out infinite;
 }
 
 .logo-large span {
   color: var(--accent);
   font-style: italic;
   font-weight: 400;
+  -webkit-text-fill-color: var(--accent);
 }
 
 .auth-subtitle {
@@ -315,12 +333,28 @@ body {
   font-weight: 500;
   color: var(--ink);
   letter-spacing: -0.02em;
+  background: linear-gradient(
+    100deg,
+    var(--ink) 0%,
+    var(--ink) 40%,
+    var(--accent) 50%,
+    var(--ink) 60%,
+    var(--ink) 100%
+  );
+  background-size: 250% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 8s ease-in-out infinite;
+  cursor: default;
 }
 
 .logo span {
   color: var(--accent);
   font-style: italic;
   font-weight: 400;
+  -webkit-text-fill-color: var(--accent);
 }
 
 .version-badge {
@@ -918,4 +952,48 @@ body {
   .balance-value { font-size: 28px; }
   .stat-value { font-size: 24px; }
   .vesting-stats { grid-template-columns: 1fr 1fr; }
+}
+
+/* ─── WORDMARK SHIMMER EFFECT ──────────────────────────────────────────
+   A slow gradient sweep that moves across the "Averon" wordmark every
+   6-8 seconds. The gradient is mostly ink-colored (matches the text),
+   with a thin band of terracotta that sweeps left-to-right like light
+   catching the surface of engraved metal.
+
+   How it works:
+   - Background is a 5-stop linear gradient (300% wider than the text)
+   - Most stops are --ink (the text color), so the text looks normal
+   - Stops 48-52% are terracotta (the "shimmer" band)
+   - Animation moves background-position from 100% to 0% over 6s
+   - Result: a thin terracotta highlight sweeps across the letters
+
+   This is the same technique Apple uses on their product logos.
+   ════════════════════════════════════════════════════════════════════ */
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  50% {
+    background-position: 0% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
+}
+
+/* Respect reduced-motion preference — disable animation for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .logo-large,
+  .logo {
+    animation: none;
+    background: var(--ink);
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    -webkit-text-fill-color: var(--ink);
+  }
+  .logo-large span,
+  .logo span {
+    -webkit-text-fill-color: var(--accent);
+  }
 }
