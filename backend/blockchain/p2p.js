@@ -50,15 +50,15 @@ const MSG = {
 };
 
 class P2PNode extends EventEmitter {
-  constructor(blockchain, port = null) {
+  constructor(blockchain, port = null, sharedWss = null) {
     super();
     this.blockchain = blockchain;
     this.identity = new NodeIdentity();
 
     this.port = port || (process.env.P2P_PORT ? parseInt(process.env.P2P_PORT) : C.NETWORK.DEFAULT_P2P_PORT);
     this.server = null;
-    this.peers = new Map();  // nodeId -> { ws, identity, chainTip, lastSeen, isOutbound }
-    this.server = null;
+    this.sharedWss = sharedWss;  // if set, use shared WebSocket server (port multiplexing)
+    this.peers = new Map();
     this.maxPeers = C.NETWORK.MAX_PEERS;
     this.handshakeTimeoutMs = C.NETWORK.HANDSHAKE_TIMEOUT_MS;
     this.pingIntervalMs = C.NETWORK.PING_INTERVAL_MS;
@@ -67,8 +67,6 @@ class P2PNode extends EventEmitter {
     this.isStarted = false;
 
     // Whitelist of approved node IDs (consortium model).
-    // If empty, accepts any node that completes a valid signed handshake.
-    // Set via env var: TRUSTED_NODES=node_abc123,node_def456
     this.trustedNodes = (process.env.TRUSTED_NODES || '')
       .split(',')
       .map(s => s.trim())
@@ -78,22 +76,36 @@ class P2PNode extends EventEmitter {
   // ── Lifecycle ──────────────────────────────────────────────────────────
 
   /**
-   * Start the P2P node: open WebSocket server + dial seed peers.
+   * Start the P2P node.
+   * If sharedWss was passed, we use it (port multiplexing on the API port).
+   * Otherwise, we create our own WebSocket.Server on this.port.
    */
   start() {
     if (this.isStarted) return;
     this.isStarted = true;
 
-    // Start WebSocket server (accept inbound peer connections)
-    this.server = new WebSocket.Server({ port: this.port, maxPayload: 64 * 1024 * 1024 });
-    this.server.on('connection', (ws, req) => this._onInboundConnection(ws, req));
-    this.server.on('error', (err) => {
-      console.error(`  🌐 P2P server error: ${err.message}`);
-    });
-    console.log(`  🌐 P2P server listening on port ${this.port}`);
-    console.log(`  🔑 Node ID: ${this.identity.getShortId()}`);
+    if (this.sharedWss) {
+      // ── Multiplexed mode: share the API port via path-based routing ──
+      // The sharedWss is already configured to route /p2p connections to us.
+      // We just listen to its 'connection' events.
+      this.sharedWss.on('connection', (ws, req) => {
+        this._onInboundConnection(ws, req);
+      });
+      console.log(`  🌐 P2P multiplexed on API port (path: /p2p)`);
+      console.log(`  🔑 Node ID: ${this.identity.getShortId()}`);
+    } else {
+      // ── Standalone mode: own port ──
+      this.server = new WebSocket.Server({ port: this.port, maxPayload: 64 * 1024 * 1024 });
+      this.server.on('connection', (ws, req) => this._onInboundConnection(ws, req));
+      this.server.on('error', (err) => {
+        console.error(`  🌐 P2P server error: ${err.message}`);
+      });
+      console.log(`  🌐 P2P server listening on port ${this.port}`);
+      console.log(`  🔑 Node ID: ${this.identity.getShortId()}`);
+    }
 
     // Dial seed peers from PEERS env var
+    // In multiplexed mode, peers connect to ws://host:PORT/p2p (not :PORT+1)
     const seeds = (process.env.PEERS || '')
       .split(',')
       .map(s => s.trim())

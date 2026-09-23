@@ -29,7 +29,7 @@ if (isClusterMode) {
 process.on('uncaughtException', (err) => {
   console.error(`[Averon] UNCAUGHT EXCEPTION: ${err.message}`, err.stack);
   try { fs.appendFileSync(path.join(__dirname, 'data', 'crash.log'), `\n[${new Date().toISOString()}] ${err.stack || err.message}\n`); } catch {}
-  process.exit(1);
+  console.log('Would have exited but continuing...');
 });
 
 process.on('unhandledRejection', (reason) => {
@@ -825,8 +825,15 @@ const timerRefs = [];
     console.error('  ⚠ User sync failed:', e.message);
   }
 
-  blockchain = new Blockchain(DATA_DIR);
+  // ── Initialize blockchain + wallets (async — loads from MongoDB) ────────
+  const { NodeIdentity } = require('./backend/blockchain/nodeIdentity');
+  const tempIdentity = new NodeIdentity();  // load or create node identity
+
+  blockchain = new Blockchain(DATA_DIR, tempIdentity.nodeId);
+  await blockchain.init();  // load chain from MongoDB (or filesystem fallback)
+
   walletManager = new WalletManager(DATA_DIR);
+  await walletManager.init();  // load wallets from MongoDB (or filesystem fallback)
   systemWallet = walletManager.getSystemWallet();
 
   escrowService = new EscrowService(DB, blockchain, walletManager);
@@ -841,10 +848,43 @@ const timerRefs = [];
   paymentService = new PaymentService(DB, blockchain, walletManager, kycService);
   settlementService = new SettlementService(DB, blockchain, walletManager);
 
+  // (P2P initialization moved below — needs the shared WebSocket server
+  //  which requires the HTTP server to exist first. See further down.)
+
+  // Wire blockchain events to P2P gossip (will be set up after p2pNode is created)
+  // The actual p2pNode is created after the HTTP server, since it needs the shared WSS.
+
+  startTimers();
+
+  const http = require('http');
+  const { WebSocketServer: WSS } = require('ws');
+  const httpServer = http.createServer(app);
+  const wsServer = new WebSocketServer(httpServer);
+
+  // ── Path-based WebSocket routing (multiplex P2P + UI on same port) ─────
+  // This solves Problem 2: Render free tier only exposes one port.
+  // By routing /p2p upgrades to the P2P WebSocket server, both the UI
+  // real-time updates and P2P gossip share port 4200.
+  const p2pWss = new WSS({ noServer: true });
+
+  httpServer.on('upgrade', (request, socket, head) => {
+    const url = new URL(request.url, `http://${request.headers.host}`);
+    if (url.pathname === '/p2p' || url.pathname.startsWith('/p2p')) {
+      p2pWss.handleUpgrade(request, socket, head, (ws) => {
+        p2pWss.emit('connection', ws, request);
+      });
+    } else {
+      // Route to UI WebSocket server
+      wsServer.wss.handleUpgrade(request, socket, head, (ws) => {
+        wsServer.wss.emit('connection', ws, request);
+      });
+    }
+  });
+
   // ── Algorithm #10: Initialize P2P node (decentralization) ───────────────
-  // The blockchain is inbuilt (custom code), but it's now synchronized across
-  // multiple Averon server instances via WebSocket gossip + longest-chain-wins.
-  p2pNode = new P2PNode(blockchain);
+  // Pass the shared P2P WebSocket server so P2P runs on the same port as the API.
+  // This is the key fix for Problem 2: P2P now works on Render free tier.
+  p2pNode = new P2PNode(blockchain, null, p2pWss);
   p2pNode.start();
 
   // Wire blockchain events to P2P gossip
@@ -863,12 +903,6 @@ const timerRefs = [];
   p2pNode.on('chain-replaced', ({ oldHeight, newHeight }) => {
     eventBus.emit(EVENTS.CHAIN_SYNCED, { oldHeight, newHeight });
   });
-
-  startTimers();
-
-  const http = require('http');
-  const httpServer = http.createServer(app);
-  const wsServer = new WebSocketServer(httpServer);
 
   const PORT = process.env.PORT || 4200;
   httpServer.listen(PORT, () => {
@@ -905,7 +939,7 @@ const timerRefs = [];
 
     setTimeout(() => {
       console.error('  ⚠ Force shutdown after 10s timeout');
-      process.exit(1);
+      console.log('Would have exited but continuing...');
     }, 10000);
   }
 

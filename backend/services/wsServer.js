@@ -13,8 +13,10 @@ class WebSocketServer {
   _init() {
     try {
       const { WebSocketServer: WSS } = require('ws');
-      this.wss = new WSS({ server: this.server });
-      console.log('  🔌 WebSocket server ready');
+      // Use noServer mode so we can share the port with P2P via path-based routing.
+      // server.js handles the 'upgrade' event and routes based on URL path.
+      this.wss = new WSS({ noServer: true });
+      console.log('  🔌 WebSocket server ready (noServer mode)');
 
       this.wss.on('connection', (ws, req) => {
         const clientId = 'client_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);

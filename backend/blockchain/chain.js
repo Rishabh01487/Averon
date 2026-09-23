@@ -9,20 +9,36 @@ const { Block } = require('./block');
 const { Transaction } = require('./transaction');
 const { MerkleTree } = require('./merkle');
 const { adjustDifficulty, validateChain, getChainStats } = require('./consensus');
+const { loadChainState, saveChainState } = require('../services/chainStore');
 const C = require('../config/constants');
 
 class Blockchain extends EventEmitter {
-  constructor(dataDir) {
+  constructor(dataDir, nodeId = 'default') {
     super();
     this.dataDir = dataDir;
     this.chainPath = path.join(dataDir, 'chain.json');
+    this.nodeId = nodeId;  // used for multi-node MongoDB keying
     this.chain = [];
     this.pendingTransactions = [];
     this.difficulty = C.BLOCKCHAIN.DIFFICULTY;
     this.miningReward = C.BLOCKCHAIN.MINING_REWARD;
 
-    this.load();
-    if (this.chain.length === 0) {
+    // Note: load() is now async — called separately via init()
+    // to avoid blocking the constructor. See server.js for the init call.
+  }
+
+  /**
+   * Async initialization — loads chain from MongoDB (or filesystem fallback).
+   * Must be called after construction, before the chain is used.
+   */
+  async init() {
+    const state = await loadChainState(this.nodeId);
+    if (state && state.chain && state.chain.length > 0) {
+      this.chain = state.chain.map(b => Block.fromJSON(b));
+      this.pendingTransactions = (state.pending || []).map(tx => Transaction.fromJSON(tx));
+      this.difficulty = state.difficulty || C.BLOCKCHAIN.DIFFICULTY;
+      console.log(`  ⛓  Chain loaded: ${this.chain.length} blocks, difficulty ${this.difficulty}`);
+    } else {
       this.createGenesisBlock();
     }
   }
@@ -43,7 +59,7 @@ class Blockchain extends EventEmitter {
     genesis.transactions[0].blockIndex = 0;
 
     this.chain.push(genesis);
-    this.save();
+    this.save(); // fire-and-forget (async, saves to MongoDB)
     console.log('  ⛓  Genesis block created: ' + genesis.hash.substring(0, 16) + '...');
   }
 
@@ -63,16 +79,15 @@ class Blockchain extends EventEmitter {
     }
   }
 
-  save() {
+  // Old synchronous load() removed — now handled by async init() above.
+  // Keeping a stub for backwards compat (no-op, doesn't throw).
+  load() {
+    // No-op — chain is loaded via init() in server.js
+  }
+
+  async save() {
     try {
-      const data = {
-        version: C.PLATFORM_VERSION,
-        difficulty: this.difficulty,
-        chain: this.chain.map(b => b.toJSON()),
-        pending: this.pendingTransactions.map(tx => tx.toJSON()),
-        savedAt: Date.now(),
-      };
-      fs.writeFileSync(this.chainPath, JSON.stringify(data));
+      await saveChainState(this.nodeId, this.chain, this.pendingTransactions, this.difficulty);
     } catch (e) {
       console.error('Chain save error:', e.message);
     }

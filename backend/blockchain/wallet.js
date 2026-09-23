@@ -6,6 +6,7 @@
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const { loadWallets, saveAllWallets } = require('../services/walletStore');
 
 class Wallet {
   constructor(userId) {
@@ -59,29 +60,33 @@ class WalletManager {
     this.dataDir = dataDir;
     this.walletsPath = path.join(dataDir, 'wallets.json');
     this.wallets = {};
-    this.load();
+    this._loaded = false;
+  }
+
+  /**
+   * Async initialization — loads wallets from MongoDB (or filesystem fallback).
+   * Must be called after construction, before wallets are used.
+   */
+  async init() {
+    this.wallets = await loadWallets();
+    // Reconstruct Wallet objects from stored keys
+    for (const [userId, w] of Object.entries(this.wallets)) {
+      this.wallets[userId] = Wallet.fromKeys(userId, w.publicKey, w.privateKey);
+    }
+    this._loaded = true;
   }
 
   load() {
-    try {
-      if (fs.existsSync(this.walletsPath)) {
-        const data = JSON.parse(fs.readFileSync(this.walletsPath, 'utf8'));
-        for (const [userId, w] of Object.entries(data)) {
-          this.wallets[userId] = Wallet.fromKeys(userId, w.publicKey, w.privateKey);
-        }
-      }
-    } catch (e) {
-      console.error('Wallet load error:', e.message);
-      this.wallets = {};
-    }
+    // No-op — wallets are loaded via init() in server.js
   }
 
   save() {
+    // Fire-and-forget async save to MongoDB + filesystem
     const data = {};
     for (const [userId, wallet] of Object.entries(this.wallets)) {
       data[userId] = wallet.toJSON();
     }
-    fs.writeFileSync(this.walletsPath, JSON.stringify(data, null, 2));
+    saveAllWallets(data); // async, fire-and-forget
   }
 
   createWallet(userId) {
