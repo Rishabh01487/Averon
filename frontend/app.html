@@ -6,7 +6,9 @@
   <meta name="description" content="Averon — Enterprise blockchain platform for tokenizing real-world assets with AI-powered valuation and decentralized trading.">
   <title>Averon — Asset Tokenization Platform</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;450;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -15,14 +17,14 @@
   <div id="authOverlay" class="auth-overlay">
     <div class="auth-container">
       <div class="auth-header">
-        <div class="logo-large">Aver<span style="color:var(--cyan)">on</span></div>
-        <p class="auth-subtitle">Transforming Idle Assets into Productive Capital</p>
-        <p class="auth-tagline">SHA-256 Blockchain · ECDSA Wallets · AI Verification · Escrow</p>
+        <div class="logo-large">Aver<span>on</span></div>
+        <p class="auth-subtitle">Transforming idle assets into productive capital</p>
+        <p class="auth-tagline">SHA-256 Blockchain · ECDSA · AI Verification · Escrow</p>
       </div>
 
       <div class="auth-tabs">
-        <button class="auth-tab active" data-tab="login">Sign In</button>
-        <button class="auth-tab" data-tab="register">Register</button>
+        <button class="auth-tab active" data-tab="login"><i class="ph ph-sign-in"></i> Sign in</button>
+        <button class="auth-tab" data-tab="register"><i class="ph ph-user-plus"></i> Register</button>
       </div>
 
       <form id="loginForm" class="auth-form">
@@ -34,12 +36,12 @@
           <label>Password</label>
           <input type="password" id="loginPassword" placeholder="••••••••" required>
         </div>
-        <button type="submit" class="btn-primary btn-full">Sign In →</button>
+        <button type="submit" class="btn-primary btn-full">Sign in <i class="ph ph-arrow-right"></i></button>
       </form>
 
       <form id="registerForm" class="auth-form hidden">
         <div class="field">
-          <label>Full Name</label>
+          <label>Full name</label>
           <input type="text" id="regName" placeholder="Your name" required>
         </div>
         <div class="field">
@@ -55,7 +57,7 @@
           <input type="password" id="regPassword" placeholder="••••••••" required minlength="8">
         </div>
         <div class="auth-note">A blockchain wallet (ECDSA secp256k1) will be generated. All transactions are signed and immutable.</div>
-        <button type="submit" class="btn-primary btn-full">Create Wallet & Account →</button>
+        <button type="submit" class="btn-primary btn-full">Create wallet & account <i class="ph ph-arrow-right"></i></button>
       </form>
 
       <div id="authError" class="auth-error hidden"></div>
@@ -67,25 +69,25 @@
     <!-- ── Navbar ── -->
     <nav class="navbar">
       <div class="nav-left">
-        <span class="logo">Aver<span style="color:var(--cyan)">on</span></span>
+        <span class="logo">Aver<span>on</span></span>
         <span class="version-badge">v4</span>
       </div>
       <div class="nav-links">
-        <button class="nav-link active" data-page="home">Dashboard</button>
-        <button class="nav-link" data-page="assets">Assets</button>
-        <button class="nav-link" data-page="buy">Buy AC</button>
-        <button class="nav-link" data-page="tokenize">Tokenize</button>
-        <button class="nav-link" data-page="market">Market</button>
-        <button class="nav-link" data-page="explorer">Explorer</button>
-        <button class="nav-link" data-page="network">Network</button>
-        <button class="nav-link" data-page="portfolio">Portfolio</button>
+        <button class="nav-link active" data-page="home"><i class="ph ph-house"></i> Dashboard</button>
+        <button class="nav-link" data-page="assets"><i class="ph ph-stack"></i> Assets</button>
+        <button class="nav-link" data-page="buy"><i class="ph ph-currency-inr"></i> Buy AC</button>
+        <button class="nav-link" data-page="tokenize"><i class="ph ph-stack-plus"></i> Tokenize</button>
+        <button class="nav-link" data-page="market"><i class="ph ph-storefront"></i> Market</button>
+        <button class="nav-link" data-page="explorer"><i class="ph ph-magnifying-glass"></i> Explorer</button>
+        <button class="nav-link" data-page="network"><i class="ph ph-network"></i> Network</button>
+        <button class="nav-link" data-page="portfolio"><i class="ph ph-wallet"></i> Portfolio</button>
       </div>
       <div class="nav-right">
         <div class="price-ticker" id="priceTicker">AC: ₹<span id="livePrice">1.00</span></div>
-        <div class="notif-bell" id="notifBell" title="Notifications">🔔<span id="notifCount" class="notif-badge hidden">0</span></div>
+        <div class="notif-bell" id="notifBell" title="Notifications"><i class="ph ph-bell"></i><span id="notifCount" class="notif-badge hidden">0</span></div>
         <div class="user-menu" id="userMenu">
           <span id="userName"></span>
-          <button id="logoutBtn" class="btn-ghost btn-sm">Logout</button>
+          <button id="logoutBtn" class="btn-ghost btn-sm"><i class="ph ph-sign-out"></i> Logout</button>
         </div>
       </div>
     </nav>
@@ -97,18 +99,18 @@
       <section id="page-home" class="page active">
         <div class="dashboard-grid">
           <div class="stat-card hero-stat">
-            <div class="stat-icon">💰</div>
+            <div class="stat-icon"><i class="ph ph-currency-inr"></i></div>
             <div class="stat-value" id="statPrice">₹1.00</div>
             <div class="stat-label">Averon Coin Price</div>
             <canvas id="priceChart" width="300" height="80"></canvas>
           </div>
-          <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-value" id="statSupply">0</div><div class="stat-label">Total Supply</div></div>
-          <div class="stat-card"><div class="stat-icon">🏢</div><div class="stat-value" id="statAssets">0</div><div class="stat-label">Total Assets</div></div>
-          <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value" id="statFunded">0</div><div class="stat-label">Assets Funded</div></div>
-          <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-value" id="statUsers">0</div><div class="stat-label">Registered Users</div></div>
-          <div class="stat-card"><div class="stat-icon">📈</div><div class="stat-value" id="statTrades">0</div><div class="stat-label">Total Trades</div></div>
-          <div class="stat-card"><div class="stat-icon">⛓</div><div class="stat-value" id="statBlocks">0</div><div class="stat-label">Blocks Mined</div></div>
-          <div class="stat-card"><div class="stat-icon">🔒</div><div class="stat-value" id="statTVL">₹0</div><div class="stat-label">Total Value Locked</div></div>
+          <div class="stat-card"><div class="stat-icon"><i class="ph ph-chart-bar"></i></div><div class="stat-value" id="statSupply">0</div><div class="stat-label">Total Supply</div></div>
+          <div class="stat-card"><div class="stat-icon"><i class="ph ph-buildings"></i></div><div class="stat-value" id="statAssets">0</div><div class="stat-label">Total Assets</div></div>
+          <div class="stat-card"><div class="stat-icon"><i class="ph ph-check-circle"></i></div><div class="stat-value" id="statFunded">0</div><div class="stat-label">Assets Funded</div></div>
+          <div class="stat-card"><div class="stat-icon"><i class="ph ph-users"></i></div><div class="stat-value" id="statUsers">0</div><div class="stat-label">Registered Users</div></div>
+          <div class="stat-card"><div class="stat-icon"><i class="ph ph-trend-up"></i></div><div class="stat-value" id="statTrades">0</div><div class="stat-label">Total Trades</div></div>
+          <div class="stat-card"><div class="stat-icon"><i class="ph ph-link"></i></div><div class="stat-value" id="statBlocks">0</div><div class="stat-label">Blocks Mined</div></div>
+          <div class="stat-card"><div class="stat-icon"><i class="ph ph-lock"></i></div><div class="stat-value" id="statTVL">₹0</div><div class="stat-label">Total Value Locked</div></div>
         </div>
         <div class="section-header"><h2>Recent Activity</h2></div>
         <div id="activityFeed" class="activity-feed"></div>
@@ -241,7 +243,7 @@
             <h2>Upload Documents</h2>
             <p class="subtitle">Upload ownership proof, certificates, invoices, or images of the asset.</p>
             <div id="dropZone" class="drop-zone">
-              <div class="drop-icon">📁</div>
+              <div class="drop-icon"><i class="ph ph-folder-open"></i></div>
               <p>Drag & drop files here or click to browse</p>
               <small>Images, PDFs — Max 10MB each, up to 10 files</small>
               <input type="file" id="fileInput" multiple accept="image/*,.pdf" style="display:none">
