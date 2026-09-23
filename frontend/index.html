@@ -5,57 +5,43 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Averon — Transforming Idle Assets into Productive Capital</title>
 
-<!-- Fonts: Inter (display) + JetBrains Mono (numbers) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-<!-- Phosphor Icons (real icon library, used by Linear/Vercel/Notion) -->
+<!-- Phosphor Icons (regular weight = refined, not heavy) -->
 <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
-
-<!-- Tailwind for utility classes -->
-<script src="https://cdn.tailwindcss.com"></script>
 
 <style>
   :root {
-    /* Color palette — premium fintech */
-    --bg: #0A0E1A;
-    --bg-1: #0F1424;
-    --bg-2: #161D33;
-    --bg-3: #1F2740;
-    --bg-card: rgba(22, 29, 51, 0.6);
-    --bg-glass: rgba(15, 20, 36, 0.7);
+    /* Restrained palette: one accent (emerald), neutral grays, no rainbow */
+    --bg: #08090D;
+    --bg-soft: #0E1015;
+    --bg-card: #12141B;
+    --bg-elevated: #181B24;
 
-    --border: rgba(255, 255, 255, 0.06);
-    --border-2: rgba(255, 255, 255, 0.1);
-    --border-3: rgba(255, 255, 255, 0.16);
+    --border: rgba(255, 255, 255, 0.05);
+    --border-strong: rgba(255, 255, 255, 0.1);
 
-    --text: #E5E7EB;
-    --text-2: #9CA3AF;
-    --text-3: #6B7280;
-    --text-4: #4B5563;
+    --text: #F4F5F7;
+    --text-muted: #9BA1AE;
+    --text-dim: #5C6373;
+    --text-faint: #3A3F4C;
 
-    /* Accents */
-    --emerald: #10B981;          /* finance/growth */
-    --emerald-soft: rgba(16, 185, 129, 0.12);
-    --emerald-glow: rgba(16, 185, 129, 0.25);
-    --violet: #8B5CF6;           /* AI/tech */
-    --violet-soft: rgba(139, 92, 246, 0.12);
-    --violet-glow: rgba(139, 92, 246, 0.25);
-    --amber: #F59E0B;            /* highlight/warning */
-    --amber-soft: rgba(245, 158, 11, 0.12);
-    --sky: #0EA5E9;              /* info */
-    --sky-soft: rgba(14, 165, 233, 0.12);
-    --rose: #F43F5E;             /* danger */
-    --rose-soft: rgba(244, 63, 94, 0.12);
+    --accent: #34D399;             /* emerald 400 — money, growth */
+    --accent-dim: #10B981;          /* emerald 500 */
+    --accent-soft: rgba(52, 211, 153, 0.08);
+    --accent-glow: rgba(52, 211, 153, 0.2);
 
-    --font: 'Inter', system-ui, -apple-system, sans-serif;
-    --mono: 'JetBrains Mono', 'SF Mono', monospace;
+    --warn: #FBBF24;
+    --danger: #F87171;
 
-    --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
-    --shadow: 0 4px 12px rgba(0,0,0,0.4);
-    --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
-    --shadow-glow: 0 0 32px rgba(16, 185, 129, 0.15);
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+
+    --radius: 10px;
+    --radius-lg: 16px;
+    --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -64,38 +50,38 @@
     font-family: var(--font);
     background: var(--bg);
     color: var(--text);
-    overflow-x: hidden;
-    line-height: 1.6;
-    font-weight: 400;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.011em;
+    overflow-x: hidden;
   }
 
-  /* Ambient background glow */
+  /* Subtle grain texture overlay for depth */
   body::before {
     content: '';
     position: fixed;
-    top: -20%;
-    left: 30%;
-    width: 60%;
-    height: 60%;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    opacity: 0.025;
     pointer-events: none;
-    z-index: 0;
+    z-index: 1;
   }
+
+  /* Single ambient glow, top-right */
   body::after {
     content: '';
     position: fixed;
-    bottom: -20%;
+    top: -30%;
     right: -10%;
     width: 50%;
-    height: 50%;
-    background: radial-gradient(circle, rgba(16, 185, 129, 0.06) 0%, transparent 60%);
+    height: 70%;
+    background: radial-gradient(circle at center, rgba(52, 211, 153, 0.06) 0%, transparent 60%);
     pointer-events: none;
     z-index: 0;
   }
 
-  /* ── Navigation ─────────────────────────────────────────────────── */
+  /* ─── NAV ─────────────────────────────────────────────────────── */
   nav {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -103,761 +89,643 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 40px;
-    background: rgba(10, 14, 26, 0.7);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    padding: 16px 40px;
+    background: rgba(8, 9, 13, 0.7);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
     border-bottom: 1px solid var(--border);
   }
-  nav .logo {
+  .nav-brand {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
     color: var(--text);
   }
-  nav .logo .logo-mark {
+  .nav-mark {
     width: 28px;
     height: 28px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, var(--emerald) 0%, var(--violet) 100%);
+    border-radius: 7px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-size: 16px;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.2),
+                0 4px 12px rgba(16, 185, 129, 0.25);
   }
-  nav .logo span { color: var(--text-2); font-weight: 400; }
+  .nav-mark i {
+    font-size: 16px;
+    color: var(--bg);
+  }
+  .nav-brand .dim { color: var(--text-dim); font-weight: 400; }
 
-  nav .nav-links {
+  .nav-links {
     display: flex;
-    gap: 28px;
+    gap: 32px;
     align-items: center;
   }
-  nav .nav-links a {
-    color: var(--text-2);
+  .nav-links a {
+    color: var(--text-muted);
     text-decoration: none;
     font-size: 14px;
-    font-weight: 500;
-    transition: color 0.15s ease;
+    font-weight: 450;
+    transition: color var(--transition);
     display: flex;
     align-items: center;
     gap: 6px;
   }
-  nav .nav-links a:hover { color: var(--text); }
-  nav .nav-links a i { font-size: 16px; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-links a i { font-size: 15px; opacity: 0.7; }
 
   .btn {
-    padding: 10px 20px;
-    border-radius: 10px;
+    padding: 9px 18px;
+    border-radius: 8px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     border: none;
     font-family: var(--font);
-    transition: all 0.15s ease;
+    transition: all var(--transition);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
+    letter-spacing: -0.01em;
   }
   .btn-ghost {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border-2);
-    color: var(--text);
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border-strong);
   }
   .btn-ghost:hover {
-    background: rgba(255,255,255,0.08);
-    border-color: var(--border-3);
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.02);
   }
   .btn-primary {
-    background: linear-gradient(135deg, var(--emerald) 0%, #059669 100%);
-    color: white;
-    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+    background: var(--accent);
+    color: var(--bg);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15) inset,
+                0 0 0 1px rgba(52, 211, 153, 0.3),
+                0 4px 14px rgba(16, 185, 129, 0.25);
   }
   .btn-primary:hover {
+    background: var(--accent-dim);
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15) inset,
+                0 0 0 1px rgba(52, 211, 153, 0.4),
+                0 6px 18px rgba(16, 185, 129, 0.35);
+  }
+  .btn-large {
+    padding: 12px 24px;
+    font-size: 15px;
   }
 
-  /* ── Hero ────────────────────────────────────────────────────────── */
+  /* ─── HERO ─────────────────────────────────────────────────────── */
   .hero {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding: 140px 32px 80px;
     text-align: center;
-    padding: 120px 24px 80px;
   }
-  .hero .kicker {
+  .hero-eyebrow {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 1.5px;
-    color: var(--emerald);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--accent);
     text-transform: uppercase;
     font-weight: 500;
-    padding: 6px 14px;
-    background: var(--emerald-soft);
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    padding: 5px 12px;
+    background: var(--accent-soft);
+    border: 1px solid rgba(52, 211, 153, 0.15);
     border-radius: 100px;
-    margin-bottom: 28px;
+    margin-bottom: 32px;
     opacity: 0;
-    animation: fadeUp 0.8s 0.2s forwards;
+    animation: fadeUp 700ms 100ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
-  .hero .kicker i { font-size: 14px; }
+  .hero-eyebrow i { font-size: 13px; }
+  .hero-eyebrow .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
 
   .hero h1 {
-    font-size: clamp(40px, 6vw, 72px);
-    font-weight: 700;
-    letter-spacing: -2px;
+    font-size: clamp(38px, 5.5vw, 64px);
+    font-weight: 600;
+    letter-spacing: -0.03em;
     line-height: 1.05;
     margin-bottom: 24px;
+    max-width: 880px;
     opacity: 0;
-    animation: fadeUp 0.8s 0.4s forwards;
-    background: linear-gradient(180deg, #FFFFFF 0%, #9CA3AF 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    animation: fadeUp 700ms 250ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    color: var(--text);
   }
-  .hero h1 .gradient {
-    background: linear-gradient(135deg, var(--emerald) 0%, var(--violet) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+  .hero h1 .accent {
+    color: var(--accent);
+    font-weight: 500;
   }
-  .hero p.sub {
-    font-size: clamp(15px, 1.5vw, 18px);
-    color: var(--text-2);
-    max-width: 620px;
-    margin: 0 auto 36px;
+
+  .hero p.lead {
+    font-size: clamp(16px, 1.4vw, 19px);
+    color: var(--text-muted);
+    max-width: 580px;
+    margin: 0 auto 40px;
     font-weight: 400;
-    line-height: 1.65;
+    line-height: 1.55;
     opacity: 0;
-    animation: fadeUp 0.8s 0.6s forwards;
+    animation: fadeUp 700ms 400ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
-  .hero .ctas {
+
+  .hero-cta {
     display: flex;
     gap: 12px;
     opacity: 0;
-    animation: fadeUp 0.8s 0.8s forwards;
+    animation: fadeUp 700ms 550ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
-  .hero .ctas .btn { padding: 14px 28px; font-size: 15px; }
 
-  /* ── Hero Stats ─────────────────────────────────────────────────── */
+  /* Hero stats — subtle, not the focus */
   .hero-stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1px;
-    margin-top: 64px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
-    max-width: 720px;
-    width: 100%;
+    display: flex;
+    gap: 48px;
+    margin-top: 96px;
     opacity: 0;
-    animation: fadeUp 0.8s 1s forwards;
+    animation: fadeUp 700ms 700ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
   .hero-stat {
-    background: var(--bg-1);
-    padding: 20px 24px;
-    text-align: left;
-    transition: background 0.15s;
+    text-align: center;
   }
-  .hero-stat:hover { background: var(--bg-2); }
-  .hero-stat .stat-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 12px;
-    font-size: 16px;
-  }
-  .hero-stat .stat-icon.emerald { background: var(--emerald-soft); color: var(--emerald); }
-  .hero-stat .stat-icon.violet { background: var(--violet-soft); color: var(--violet); }
-  .hero-stat .stat-icon.sky { background: var(--sky-soft); color: var(--sky); }
-  .hero-stat .stat-icon.amber { background: var(--amber-soft); color: var(--amber); }
   .hero-stat .val {
-    font-size: 24px;
-    font-weight: 600;
     font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 500;
     color: var(--text);
-    letter-spacing: -0.5px;
+    letter-spacing: -0.02em;
   }
   .hero-stat .lbl {
-    font-size: 11px;
-    color: var(--text-3);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-size: 12px;
+    color: var(--text-dim);
     margin-top: 4px;
-    font-weight: 500;
+    font-weight: 450;
+  }
+  .hero-stat-divider {
+    width: 1px;
+    background: var(--border);
   }
 
-  /* ── Sections ────────────────────────────────────────────────────── */
-  .section {
+  /* ─── SECTIONS ────────────────────────────────────────────────── */
+  section.content {
     position: relative;
-    z-index: 1;
-    padding: 100px 40px;
+    z-index: 2;
+    padding: 120px 40px;
     max-width: 1200px;
     margin: 0 auto;
   }
-  .section h2 {
-    font-size: 36px;
-    font-weight: 700;
-    letter-spacing: -1px;
-    margin-bottom: 12px;
+
+  .section-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+    margin-bottom: 16px;
     text-align: center;
   }
-  .section .sub {
+  .section-title {
+    font-size: clamp(28px, 3.5vw, 40px);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    margin-bottom: 16px;
     text-align: center;
-    color: var(--text-2);
-    font-size: 16px;
-    margin-bottom: 56px;
-    max-width: 600px;
+    max-width: 680px;
     margin-left: auto;
     margin-right: auto;
   }
-  .section .eyebrow {
+  .section-sub {
+    color: var(--text-muted);
+    font-size: 16px;
+    line-height: 1.6;
     text-align: center;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--emerald);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: 500;
-    margin-bottom: 16px;
+    max-width: 580px;
+    margin: 0 auto 72px;
   }
 
-  /* ── Feature Grid ───────────────────────────────────────────────── */
+  /* ─── FEATURE GRID (3 columns, more breathing room) ───────────── */
   .feature-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 16px;
-  }
-  .feature-card {
-    position: relative;
-    background: var(--bg-card);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--border-2);
-    border-radius: 16px;
-    padding: 28px;
-    transition: all 0.2s ease;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
     overflow: hidden;
   }
-  .feature-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border-3), transparent);
-    opacity: 0;
-    transition: opacity 0.2s;
+  .feature-card {
+    background: var(--bg-card);
+    padding: 36px 32px;
+    transition: background var(--transition);
+    position: relative;
   }
   .feature-card:hover {
-    border-color: var(--border-3);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+    background: var(--bg-elevated);
   }
-  .feature-card:hover::before { opacity: 1; }
-
-  .feature-card .icon-wrap {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+  .feature-card .icon {
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 20px;
-    font-size: 22px;
+    color: var(--accent);
+    margin-bottom: 24px;
   }
-  .feature-card .icon-wrap.emerald { background: var(--emerald-soft); color: var(--emerald); }
-  .feature-card .icon-wrap.violet { background: var(--violet-soft); color: var(--violet); }
-  .feature-card .icon-wrap.amber { background: var(--amber-soft); color: var(--amber); }
-  .feature-card .icon-wrap.sky { background: var(--sky-soft); color: var(--sky); }
-  .feature-card .icon-wrap.rose { background: var(--rose-soft); color: var(--rose); }
-
+  .feature-card .icon i {
+    font-size: 24px;
+  }
   .feature-card h3 {
     font-size: 17px;
     font-weight: 600;
-    margin-bottom: 8px;
     color: var(--text);
-    letter-spacing: -0.3px;
+    margin-bottom: 10px;
+    letter-spacing: -0.015em;
   }
   .feature-card p {
-    color: var(--text-2);
+    color: var(--text-muted);
     font-size: 14px;
-    line-height: 1.65;
+    line-height: 1.6;
   }
-  .feature-card .tag {
-    display: inline-block;
-    margin-top: 16px;
+  .feature-card .meta {
+    margin-top: 18px;
     font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text-3);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding: 3px 8px;
-    background: rgba(255,255,255,0.04);
-    border-radius: 4px;
+    font-size: 11px;
+    color: var(--text-faint);
+    letter-spacing: 0.02em;
   }
 
-  /* ── How It Works ────────────────────────────────────────────────── */
-  .steps {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 24px;
-    position: relative;
+  /* ─── HOW IT WORKS (vertical narrative, not generic timeline) ──── */
+  .how-section {
+    background: var(--bg-soft);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
   }
-  .steps::before {
-    content: '';
-    position: absolute;
-    top: 24px;
-    left: 10%;
-    right: 10%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border-2), var(--border-2), transparent);
-    z-index: 0;
-  }
-  .step {
-    text-align: center;
-    position: relative;
-    z-index: 1;
-  }
-  .step-num {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    background: var(--bg-2);
-    border: 1px solid var(--border-2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 16px;
-    color: var(--emerald);
-    font-size: 22px;
-    transition: all 0.2s;
-  }
-  .step:hover .step-num {
-    background: var(--emerald-soft);
-    border-color: var(--emerald);
-    box-shadow: 0 0 24px var(--emerald-glow);
-  }
-  .step h4 {
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 6px;
-    color: var(--text);
-  }
-  .step p {
-    color: var(--text-2);
-    font-size: 13px;
-    line-height: 1.5;
-  }
-
-  /* ── Algorithm Badges ───────────────────────────────────────────── */
-  .algo-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 12px;
-    margin-top: 40px;
-  }
-  .algo-card {
-    background: var(--bg-1);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px;
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    transition: all 0.15s;
-  }
-  .algo-card:hover {
-    border-color: var(--border-2);
-    background: var(--bg-2);
-  }
-  .algo-card .num {
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    background: var(--bg-3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-2);
-    flex-shrink: 0;
-  }
-  .algo-card .name {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 2px;
-  }
-  .algo-card .desc {
-    font-size: 12px;
-    color: var(--text-3);
-    line-height: 1.4;
-  }
-
-  /* ── CTA Box ────────────────────────────────────────────────────── */
-  .cta-box {
+  .how-steps {
     max-width: 720px;
     margin: 0 auto;
-    padding: 64px 48px;
-    background: var(--bg-card);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--border-2);
-    border-radius: 24px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
   }
-  .cta-box::before {
-    content: '';
-    position: absolute;
-    top: -50%; left: -20%;
-    width: 60%; height: 200%;
-    background: radial-gradient(circle, var(--emerald-glow) 0%, transparent 50%);
-    pointer-events: none;
-  }
-  .cta-box::after {
-    content: '';
-    position: absolute;
-    bottom: -50%; right: -20%;
-    width: 60%; height: 200%;
-    background: radial-gradient(circle, var(--violet-glow) 0%, transparent 50%);
-    pointer-events: none;
-  }
-  .cta-box > * { position: relative; z-index: 1; }
-  .cta-box h2 {
-    font-size: 32px;
-    font-weight: 700;
-    letter-spacing: -1px;
-    margin-bottom: 16px;
-  }
-  .cta-box p {
-    color: var(--text-2);
-    font-size: 16px;
-    margin-bottom: 32px;
-  }
-
-  /* ── Footer ─────────────────────────────────────────────────────── */
-  footer {
-    position: relative;
-    z-index: 1;
-    padding: 48px 40px;
-    border-top: 1px solid var(--border);
-    text-align: center;
-    color: var(--text-3);
-    font-size: 13px;
-  }
-  footer .footer-links {
-    display: flex;
-    justify-content: center;
+  .how-step {
+    display: grid;
+    grid-template-columns: 56px 1fr;
     gap: 24px;
+    padding: 32px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .how-step:last-child { border-bottom: none; }
+  .how-step-num {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text-dim);
+    font-weight: 500;
+    padding-top: 4px;
+  }
+  .how-step-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
     margin-bottom: 16px;
   }
-  footer .footer-links a {
-    color: var(--text-2);
-    text-decoration: none;
-    font-size: 13px;
-    transition: color 0.15s;
+  .how-step-icon i { font-size: 18px; }
+  .how-step h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+    letter-spacing: -0.015em;
   }
-  footer .footer-links a:hover { color: var(--text); }
+  .how-step p {
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 540px;
+  }
 
-  /* ── Animations ─────────────────────────────────────────────────── */
+  /* ─── CTA ─────────────────────────────────────────────────────── */
+  .cta {
+    text-align: center;
+    padding: 120px 40px 80px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .cta h2 {
+    font-size: clamp(28px, 3.5vw, 40px);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    margin-bottom: 20px;
+  }
+  .cta p {
+    color: var(--text-muted);
+    font-size: 17px;
+    line-height: 1.55;
+    margin-bottom: 36px;
+  }
+
+  /* ─── FOOTER ───────────────────────────────────────────────────── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 40px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 13px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ─── ANIMATIONS ───────────────────────────────────────────────── */
   @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
+    from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
 
-  /* ── Responsive ──────────────────────────────────────────────────── */
+  /* Reveal on scroll */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 700ms cubic-bezier(0.4, 0, 0.2, 1),
+                transform 700ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ─── RESPONSIVE ───────────────────────────────────────────────── */
   @media (max-width: 900px) {
-    nav { padding: 12px 20px; }
-    nav .nav-links { display: none; }
+    nav { padding: 14px 20px; }
+    .nav-links { display: none; }
     .hero { padding: 100px 20px 60px; }
-    .hero-stats { grid-template-columns: repeat(2, 1fr); }
-    .section { padding: 60px 20px; }
-    .steps { grid-template-columns: repeat(2, 1fr); gap: 16px; }
-    .steps::before { display: none; }
-    .hero .ctas { flex-direction: column; align-items: center; width: 100%; }
-    .hero .ctas .btn { width: 100%; justify-content: center; }
+    .hero-stats { gap: 24px; flex-wrap: wrap; justify-content: center; }
+    .hero-stat-divider { display: none; }
+    .feature-grid { grid-template-columns: 1fr; }
+    section.content { padding: 80px 20px; }
+    .how-step { grid-template-columns: 48px 1fr; gap: 16px; padding: 24px 0; }
+    .hero-cta { flex-direction: column; align-items: stretch; width: 100%; }
+    .hero-cta .btn { justify-content: center; }
   }
 </style>
 </head>
 <body>
 
 <nav>
-  <div class="logo">
-    <div class="logo-mark"><i class="ph-fill ph-cube"></i></div>
-    Aver<span>on</span>
-  </div>
+  <a href="/" class="nav-brand">
+    <div class="nav-mark"><i class="ph-fill ph-cube"></i></div>
+    Averon<span class="dim">.</span>
+  </a>
   <div class="nav-links">
     <a href="#features"><i class="ph ph-squares-four"></i> Features</a>
-    <a href="#how"><i class="ph ph-flow-arrow"></i> How It Works</a>
-    <a href="#algorithms"><i class="ph ph-cpu"></i> Algorithms</a>
-    <a href="https://github.com/Rishabh01487/Averon" target="_blank"><i class="ph ph-github-logo"></i> GitHub</a>
+    <a href="#how"><i class="ph ph-path"></i> How it works</a>
+    <a href="#algorithms"><i class="ph ph-cpu"></i> Architecture</a>
   </div>
   <div style="display:flex;gap:8px">
-    <a href="/app.html"><button class="btn btn-ghost"><i class="ph ph-sign-in"></i> Sign In</button></a>
-    <a href="/app.html"><button class="btn btn-primary"><i class="ph ph-rocket-launch"></i> Enter Platform</button></a>
+    <a href="/app.html"><button class="btn btn-ghost"><i class="ph ph-sign-in"></i> Sign in</button></a>
+    <a href="/app.html"><button class="btn btn-primary">Get started<i class="ph ph-arrow-right"></i></button></a>
   </div>
 </nav>
 
 <section class="hero">
-  <div class="kicker"><i class="ph-fill ph-circles-three"></i> Universal Asset Infrastructure Protocol</div>
-  <h1>Transforming idle assets<br>into <span class="gradient">productive capital</span></h1>
-  <p class="sub">A programmable financial ecosystem where real-world assets, AI, and blockchain converge — enabling liquidity without permanent sale, and capital that flows continuously through verified opportunities.</p>
-  <div class="ctas">
-    <a href="/app.html"><button class="btn btn-primary"><i class="ph-fill ph-rocket-launch"></i> Launch Platform</button></a>
-    <a href="#how"><button class="btn btn-ghost"><i class="ph ph-play-circle"></i> How It Works</button></a>
+  <div class="hero-eyebrow">
+    <span class="dot"></span>
+    Asset Infrastructure Protocol
+  </div>
+  <h1>Transform idle assets<br>into <span class="accent">productive capital.</span></h1>
+  <p class="lead">A programmable financial ecosystem where real-world assets, AI verification, and a custom blockchain converge — enabling liquidity without permanent sale.</p>
+  <div class="hero-cta">
+    <a href="/app.html"><button class="btn btn-primary btn-large">Launch platform<i class="ph ph-arrow-right"></i></button></a>
+    <a href="#how"><button class="btn btn-ghost btn-large"><i class="ph ph-play"></i> See how it works</button></a>
   </div>
 
   <div class="hero-stats">
     <div class="hero-stat">
-      <div class="stat-icon emerald"><i class="ph-fill ph-currency-inr"></i></div>
       <div class="val" id="hsPrice">₹1.00</div>
-      <div class="lbl">AC Price</div>
+      <div class="lbl">AC spot price</div>
     </div>
+    <div class="hero-stat-divider"></div>
     <div class="hero-stat">
-      <div class="stat-icon violet"><i class="ph-fill ph-stack"></i></div>
       <div class="val" id="hsAssets">0</div>
-      <div class="lbl">Tokenized Assets</div>
+      <div class="lbl">Tokenized assets</div>
     </div>
+    <div class="hero-stat-divider"></div>
     <div class="hero-stat">
-      <div class="stat-icon sky"><i class="ph-fill ph-users"></i></div>
       <div class="val" id="hsUsers">0</div>
       <div class="lbl">Holders</div>
     </div>
+    <div class="hero-stat-divider"></div>
     <div class="hero-stat">
-      <div class="stat-icon amber"><i class="ph-fill ph-cube-transparent"></i></div>
       <div class="val" id="hsBlocks">1</div>
-      <div class="lbl">Blocks Mined</div>
+      <div class="lbl">Blocks mined</div>
     </div>
   </div>
 </section>
 
-<section class="section" id="features">
-  <div class="eyebrow">Platform Capabilities</div>
-  <h2>Built for the Asset Economy</h2>
-  <p class="sub">Three integrated layers — tokenization, financing, and capital mobility — in one protocol. Powered by 11 algorithms working in concert.</p>
+<section class="content" id="features">
+  <div class="section-eyebrow reveal">Capabilities</div>
+  <h2 class="section-title reveal">Built for the asset economy.</h2>
+  <p class="section-sub reveal">Three integrated layers — tokenization, financing, and capital mobility — in one protocol.</p>
 
-  <div class="feature-grid">
+  <div class="feature-grid reveal">
     <div class="feature-card">
-      <div class="icon-wrap emerald"><i class="ph-fill ph-stack"></i></div>
-      <h3>Asset Tokenization</h3>
+      <div class="icon"><i class="ph ph-stack"></i></div>
+      <h3>Asset tokenization</h3>
       <p>Transform any verified real-world asset into programmable fractional tokens on a custom PoW blockchain with SHA-256 mining and ECDSA wallets.</p>
-      <span class="tag">SHA-256 · secp256k1</span>
+      <div class="meta">SHA-256 · secp256k1</div>
     </div>
-
     <div class="feature-card">
-      <div class="icon-wrap violet"><i class="ph-fill ph-brain"></i></div>
-      <h3>AI-Powered Verification</h3>
-      <p>A five-stage AI pipeline using Gemini 2.0 Flash analyzes your documents for legitimacy, valuation, and risk — reducing onboarding from days to minutes.</p>
-      <span class="tag">Gemini 2.0 · 5-stage</span>
+      <div class="icon"><i class="ph ph-brain"></i></div>
+      <h3>AI verification</h3>
+      <p>A five-stage AI pipeline using Gemini 2.0 Flash analyzes your documents for legitimacy, valuation, and risk — onboarding in minutes, not days.</p>
+      <div class="meta">Gemini 2.0 · 5-stage</div>
     </div>
-
     <div class="feature-card">
-      <div class="icon-wrap emerald"><i class="ph-fill ph-bank"></i></div>
-      <h3>Asset-Backed Financing</h3>
-      <p>Unlock liquidity without selling your assets. Borrowers receive fiat (INR); investors participate through Averon Coin. Event-driven repayment, no lock-in.</p>
-      <span class="tag">Razorpay · UPI · Wire</span>
+      <div class="icon"><i class="ph ph-bank"></i></div>
+      <h3>Asset-backed financing</h3>
+      <p>Unlock liquidity without selling your assets. Borrowers receive fiat INR; investors participate through Averon Coin. Event-driven repayment, no lock-in.</p>
+      <div class="meta">Razorpay · UPI · Wire</div>
     </div>
-
     <div class="feature-card">
-      <div class="icon-wrap amber"><i class="ph-fill ph-hourglass"></i></div>
-      <h3>Vesting & Token Lockup</h3>
+      <div class="icon"><i class="ph ph-hourglass"></i></div>
+      <h3>Vesting & lockup</h3>
       <p>Investor tokens follow a hybrid vesting schedule — 30-day cliff, then linear unlock over 365 days. Prevents flippers, protects long-term alignment.</p>
-      <span class="tag">Algorithm #9</span>
+      <div class="meta">Algorithm #9</div>
     </div>
-
     <div class="feature-card">
-      <div class="icon-wrap sky"><i class="ph-fill ph-arrows-clockwise"></i></div>
-      <h3>Capital Mobility Network</h3>
-      <p>Returned capital is automatically redeployed to new verified opportunities through risk-tiered liquidity pools — a continuously compounding economy.</p>
-      <span class="tag">Risk-tiered pools</span>
-    </div>
-
-    <div class="feature-card">
-      <div class="icon-wrap rose"><i class="ph-fill ph-shield-check"></i></div>
-      <h3>Escrow & Compliance</h3>
+      <div class="icon"><i class="ph ph-shield-check"></i></div>
+      <h3>Escrow & compliance</h3>
       <p>On-chain escrow with atomic token claiming, four-tier KYC, eight-flag AML screening, and tamper-proof hash-chained audit logging.</p>
-      <span class="tag">KYC Tier 1-4 · AML 8-flag</span>
+      <div class="meta">KYC Tier 1–4 · AML 8-flag</div>
     </div>
-
     <div class="feature-card">
-      <div class="icon-wrap violet"><i class="ph-fill ph-chart-line-up"></i></div>
-      <h3>Trading & Price Discovery</h3>
-      <p>A centralized order-book exchange with price-time priority matching, circuit breaker protection, and a dual-factor algorithmic pricing model.</p>
-      <span class="tag">VWAP · Circuit breaker</span>
-    </div>
-
-    <div class="feature-card">
-      <div class="icon-wrap emerald"><i class="ph-fill ph-network"></i></div>
-      <h3>P2P Decentralization</h3>
-      <p>Multiple Averon server instances sync chain state via WebSocket gossip + longest-chain-wins consensus. Inbuilt chain, decentralized across nodes.</p>
-      <span class="tag">Algorithm #10</span>
-    </div>
-
-    <div class="feature-card">
-      <div class="icon-wrap amber"><i class="ph-fill ph-database"></i></div>
-      <h3>Persistent Authentication</h3>
-      <p>User accounts and sessions are stored in MongoDB Atlas, surviving server restarts. Wallets remain on the inbuilt chain via secp256k1 keys.</p>
-      <span class="tag">MongoDB Atlas</span>
+      <div class="icon"><i class="ph ph-network"></i></div>
+      <h3>P2P decentralization</h3>
+      <p>Multiple Averon nodes sync chain state via WebSocket gossip with longest-chain-wins consensus. Inbuilt chain, decentralized across nodes.</p>
+      <div class="meta">Algorithm #10</div>
     </div>
   </div>
 </section>
 
-<section class="section" id="how">
-  <div class="eyebrow">End-to-End Flow</div>
-  <h2>How It Works</h2>
-  <p class="sub">From asset submission to capital receipt — a five-step journey that transforms ownership documents into liquid capital.</p>
+<section class="how-section" id="how">
+  <div class="content">
+    <div class="section-eyebrow reveal">End-to-end flow</div>
+    <h2 class="section-title reveal">From asset submission to capital receipt.</h2>
+    <p class="section-sub reveal">A five-step journey that transforms ownership documents into liquid capital.</p>
 
-  <div class="steps">
-    <div class="step">
-      <div class="step-num"><i class="ph-fill ph-upload-simple"></i></div>
-      <h4>Submit Asset</h4>
-      <p>Upload your asset details and ownership documents.</p>
-    </div>
-    <div class="step">
-      <div class="step-num"><i class="ph-fill ph-brain"></i></div>
-      <h4>AI Verification</h4>
-      <p>AI verifies documents, values the asset, assigns risk.</p>
-    </div>
-    <div class="step">
-      <div class="step-num"><i class="ph-fill ph-stack"></i></div>
-      <h4>Tokenize & Raise</h4>
-      <p>Asset tokenized into fractional tokens, listed for funding.</p>
-    </div>
-    <div class="step">
-      <div class="step-num"><i class="ph-fill ph-currency-inr"></i></div>
-      <h4>Receive Capital</h4>
-      <p>Fully funded → receive INR. Repay on your schedule.</p>
-    </div>
-    <div class="step">
-      <div class="step-num"><i class="ph-fill ph-arrows-clockwise"></i></div>
-      <h4>Capital Recycles</h4>
-      <p>Repaid capital flows to new verified opportunities.</p>
-    </div>
-  </div>
-</section>
-
-<section class="section" id="algorithms">
-  <div class="eyebrow">The Engine Room</div>
-  <h2>Eleven Algorithms, One Protocol</h2>
-  <p class="sub">Every layer of Averon is powered by a purpose-built algorithm — from cryptographic consensus to AI verification to token vesting.</p>
-
-  <div class="algo-grid">
-    <div class="algo-card">
-      <div class="num">01</div>
-      <div>
-        <div class="name">SHA-256 Proof of Work</div>
-        <div class="desc">Mining with dynamic difficulty adjustment every 10 blocks.</div>
+    <div class="how-steps">
+      <div class="how-step reveal">
+        <div class="how-step-num">01</div>
+        <div>
+          <div class="how-step-icon"><i class="ph ph-upload-simple"></i></div>
+          <h3>Submit your asset</h3>
+          <p>Upload asset details — title, category, raise amount, listing duration — along with ownership documents (PDFs, images). SHA-256 hashes computed for duplicate detection.</p>
+        </div>
       </div>
-    </div>
-    <div class="algo-card">
-      <div class="num">02</div>
-      <div>
-        <div class="name">5-Stage AI Pipeline</div>
-        <div class="desc">Gemini 2.0 Flash + fallback engine for asset verification.</div>
+      <div class="how-step reveal">
+        <div class="how-step-num">02</div>
+        <div>
+          <div class="how-step-icon"><i class="ph ph-brain"></i></div>
+          <h3>AI verification & valuation</h3>
+          <p>Gemini 2.0 Flash analyzes your documents across five stages — ingestion, duplicate check, multimodal analysis, fraud detection, and tokenization recommendation. Confidence-scored, with fallback engine.</p>
+        </div>
       </div>
-    </div>
-    <div class="algo-card">
-      <div class="num">03</div>
-      <div>
-        <div class="name">Asset State Machine</div>
-        <div class="desc">16-state FSM governing the asset lifecycle.</div>
+      <div class="how-step reveal">
+        <div class="how-step-num">03</div>
+        <div>
+          <div class="how-step-icon"><i class="ph ph-stack"></i></div>
+          <h3>Tokenize & list for funding</h3>
+          <p>Verified asset is split into fractional tokens on the blockchain. Escrow account created, compliance checks run, vesting schedule applied. Asset goes live for funding.</p>
+        </div>
       </div>
-    </div>
-    <div class="algo-card">
-      <div class="num">04</div>
-      <div>
-        <div class="name">Atomic Token Claiming</div>
-        <div class="desc">Race-condition-safe UPDATE WHERE owner_id IS NULL.</div>
+      <div class="how-step reveal">
+        <div class="how-step-num">04</div>
+        <div>
+          <div class="how-step-icon"><i class="ph ph-currency-inr"></i></div>
+          <h3>Receive capital</h3>
+          <p>Once fully funded, escrow releases 99% to your wallet and 1% platform fee. AC price boosts 2–5%. Payout recorded immutably on-chain. Repay on your schedule.</p>
+        </div>
       </div>
-    </div>
-    <div class="algo-card">
-      <div class="num">05</div>
-      <div>
-        <div class="name">Price-Time Matching</div>
-        <div class="desc">Order book with maker-price-wins semantics.</div>
-      </div>
-    </div>
-    <div class="algo-card">
-      <div class="num">06</div>
-      <div>
-        <div class="name">Circuit Breaker</div>
-        <div class="desc">Halts trading if price moves &gt;10% in 1 hour.</div>
-      </div>
-    </div>
-    <div class="algo-card">
-      <div class="num">07</div>
-      <div>
-        <div class="name">Hash-Chained Audit Log</div>
-        <div class="desc">Tamper-detectable SHA-256 chain over every action.</div>
-      </div>
-    </div>
-    <div class="algo-card">
-      <div class="num">08</div>
-      <div>
-        <div class="name">Token-Bucket Rate Limiter</div>
-        <div class="desc">4 tiers: 100/10/5/10 requests per window.</div>
-      </div>
-    </div>
-    <div class="algo-card">
-      <div class="num">09</div>
-      <div>
-        <div class="name">Vesting & Token Lockup</div>
-        <div class="desc">Hybrid cliff + linear unlock for investor tokens.</div>
-      </div>
-    </div>
-    <div class="algo-card">
-      <div class="num">10</div>
-      <div>
-        <div class="name">P2P Decentralization</div>
-        <div class="desc">WebSocket gossip + longest-chain-wins consensus.</div>
-      </div>
-    </div>
-    <div class="algo-card">
-      <div class="num">11</div>
-      <div>
-        <div class="name">MongoDB Auth Persistence</div>
-        <div class="desc">Survives server restarts via MongoDB Atlas.</div>
+      <div class="how-step reveal">
+        <div class="how-step-num">05</div>
+        <div>
+          <div class="how-step-icon"><i class="ph ph-arrows-clockwise"></i></div>
+          <h3>Capital recycles</h3>
+          <p>Repaid capital flows back into the network, automatically redeployed to new verified opportunities through risk-tiered liquidity pools — a continuously compounding economy.</p>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="section" style="padding-top:0">
-  <div class="cta-box">
-    <h2>Ready to unlock your assets?</h2>
-    <p>Join the Averon protocol — transform idle wealth into productive capital. Built on a custom blockchain with AI verification, escrow-backed funding, and decentralized consensus.</p>
-    <a href="/app.html"><button class="btn btn-primary" style="padding:14px 32px;font-size:15px"><i class="ph-fill ph-rocket-launch"></i> Launch Platform</button></a>
+<section class="content" id="algorithms">
+  <div class="section-eyebrow reveal">The engine room</div>
+  <h2 class="section-title reveal">Eleven algorithms, one protocol.</h2>
+  <p class="section-sub reveal">Every layer of Averon is powered by a purpose-built algorithm — from cryptographic consensus to AI verification to token vesting.</p>
+
+  <div class="feature-grid reveal" style="grid-template-columns: repeat(4, 1fr); gap: 1px;">
+    <div class="feature-card" style="padding: 24px;">
+      <div class="meta" style="margin-bottom:12px">01</div>
+      <h3 style="font-size:15px">SHA-256 PoW</h3>
+      <p style="font-size:13px">Dynamic difficulty adjustment every 10 blocks.</p>
+    </div>
+    <div class="feature-card" style="padding: 24px;">
+      <div class="meta" style="margin-bottom:12px">02</div>
+      <h3 style="font-size:15px">5-stage AI pipeline</h3>
+      <p style="font-size:13px">Gemini 2.0 Flash + fallback engine.</p>
+    </div>
+    <div class="feature-card" style="padding: 24px;">
+      <div class="meta" style="margin-bottom:12px">03</div>
+      <h3 style="font-size:15px">Asset state machine</h3>
+      <p style="font-size:13px">16-state FSM governing lifecycle.</p>
+    </div>
+    <div class="feature-card" style="padding: 24px;">
+      <div class="meta" style="margin-bottom:12px">04</div>
+      <h3 style="font-size:15px">Atomic claiming</h3>
+      <p style="font-size:13px">Race-condition-safe token purchases.</p>
+    </div>
+    <div class="feature-card" style="padding: 24px;">
+      <div class="meta" style="margin-bottom:12px">05</div>
+      <h3 style="font-size:15px">Price-time matching</h3>
+      <p style="font-size:13px">Maker-price-wins order book.</p>
+    </div>
+    <div class="feature-card" style="padding: 24px;">
+      <div class="meta" style="margin-bottom:12px">06</div>
+      <h3 style="font-size:15px">Circuit breaker</h3>
+      <p style="font-size:13px">Halts on 10% price moves in 1h.</p>
+    </div>
+    <div class="feature-card" style="padding: 24px;">
+      <div class="meta" style="margin-bottom:12px">07</div>
+      <h3 style="font-size:15px">Hash-chained audit</h3>
+      <p style="font-size:13px">Tamper-detectable SHA-256 log.</p>
+    </div>
+    <div class="feature-card" style="padding: 24px;">
+      <div class="meta" style="margin-bottom:12px">08</div>
+      <h3 style="font-size:15px">Token-bucket limiter</h3>
+      <p style="font-size:13px">4-tier rate limiting across routes.</p>
+    </div>
+    <div class="feature-card" style="padding: 24px;">
+      <div class="meta" style="margin-bottom:12px">09</div>
+      <h3 style="font-size:15px">Vesting & lockup</h3>
+      <p style="font-size:13px">Hybrid cliff + linear token unlock.</p>
+    </div>
+    <div class="feature-card" style="padding: 24px;">
+      <div class="meta" style="margin-bottom:12px">10</div>
+      <h3 style="font-size:15px">P2P decentralization</h3>
+      <p style="font-size:13px">Longest-chain-wins consensus.</p>
+    </div>
+    <div class="feature-card" style="padding: 24px;">
+      <div class="meta" style="margin-bottom:12px">11</div>
+      <h3 style="font-size:15px">MongoDB auth</h3>
+      <p style="font-size:13px">Persistent across server restarts.</p>
+    </div>
+    <div class="feature-card" style="padding: 24px; background: var(--bg-elevated);">
+      <div class="meta" style="margin-bottom:12px">+</div>
+      <h3 style="font-size:15px">12 transaction types</h3>
+      <p style="font-size:13px">MINT, INVEST, PAYOUT, REFUND, TRADE…</p>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <h2 class="reveal">Ready to unlock your assets?</h2>
+  <p class="reveal">Join the Averon protocol — transform idle wealth into productive capital. Built on a custom blockchain with AI verification, escrow-backed funding, and decentralized consensus.</p>
+  <div class="reveal" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+    <a href="/app.html"><button class="btn btn-primary btn-large">Launch platform<i class="ph ph-arrow-right"></i></button></a>
+    <a href="#features"><button class="btn btn-ghost btn-large">Explore features</button></a>
   </div>
 </section>
 
 <footer>
-  <div class="footer-links">
-    <a href="https://github.com/Rishabh01487/Averon" target="_blank"><i class="ph ph-github-logo"></i> GitHub</a>
-    <a href="/app.html">Platform</a>
-    <a href="#features">Features</a>
-    <a href="#algorithms">Algorithms</a>
-    <a href="https://averon-veew.onrender.com/api/blockchain/info">Blockchain Explorer</a>
-  </div>
-  <div>Averon Protocol · Built by Rishabh Gupta · © 2026 Averon Technologies Pvt. Ltd.</div>
+  Averon Protocol · Built by Rishabh Gupta · © 2026 Averon Technologies Pvt. Ltd.
 </footer>
 
 <script>
@@ -874,6 +742,18 @@ async function loadStats() {
 }
 loadStats();
 setInterval(loadStats, 15000);
+
+// Reveal on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 </script>
 </body>
 </html>
