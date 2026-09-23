@@ -1,0 +1,28 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend/index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "frontend/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    { "src": "/app.html", "dest": "/frontend/app.html" },
+    { "src": "/admin.html", "dest": "/frontend/admin.html" },
+    { "src": "/style.css", "dest": "/frontend/style.css" },
+    { "src": "/app.js", "dest": "/frontend/app.js" },
+    { "src": "/admin.js", "dest": "/frontend/admin.js" },
+    { "src": "/admin.css", "dest": "/frontend/admin.css" },
+    { "src": "/ws.js", "dest": "/frontend/ws.js" },
+    { "src": "/", "dest": "/frontend/index.html" },
+    {
+      "src": "/api/(.*)",
+      "dest": "https://averon-veew.onrender.com/api/$1"
+    }
+  ]
+}

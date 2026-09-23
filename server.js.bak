@@ -29,7 +29,7 @@ if (isClusterMode) {
 process.on('uncaughtException', (err) => {
   console.error(`[Averon] UNCAUGHT EXCEPTION: ${err.message}`, err.stack);
   try { fs.appendFileSync(path.join(__dirname, 'data', 'crash.log'), `\n[${new Date().toISOString()}] ${err.stack || err.message}\n`); } catch {}
-  console.log('Would have exited but continuing...');
+  process.exit(1);
 });
 
 process.on('unhandledRejection', (reason) => {
@@ -64,7 +64,6 @@ const { TradingEngine } = require('./backend/services/tradingEngine');
 const { P2PNode } = require('./backend/blockchain/p2p');
 const { connectMongo, closeMongo, isMongoEnabled, getDb } = require('./backend/config/mongo');
 const userStore = require('./backend/services/userStore');
-const polygonAnchor = require('./backend/services/polygonAnchor');
 const { FeeService } = require('./backend/services/feeService');
 const { PriceService } = require('./backend/services/priceService');
 const { ComplianceService } = require('./backend/services/complianceService');
@@ -721,78 +720,6 @@ app.get('/api/admin/network', authenticate, requireRole(C.ROLES.ADMIN), (req, re
   });
 });
 
-// ═══ Polygon Anchor API (public chain verifiability) ═════════════════════════
-
-// Get Polygon anchor status (is it enabled? what's the latest anchored block?)
-app.get('/api/anchor/status', async (req, res) => {
-  try {
-    if (!polygonAnchor.isAnchorEnabled()) {
-      return res.json({
-        enabled: false,
-        message: 'Polygon anchor not configured. Set ALCHEMY_API_KEY, POLYGON_PRIVATE_KEY, and POLYGON_ANCHOR_CONTRACT to enable.',
-      });
-    }
-    const latest = await polygonAnchor.getLatestAnchor();
-    res.json({
-      enabled: true,
-      contractAddress: process.env.POLYGON_ANCHOR_CONTRACT,
-      polygonscanUrl: `https://polygonscan.com/address/${process.env.POLYGON_ANCHOR_CONTRACT}`,
-      latestAnchor: latest,
-    });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-});
-
-// Verify a specific Averon block against Polygon
-app.get('/api/anchor/verify/:blockIndex', async (req, res) => {
-  try {
-    const blockIndex = parseInt(req.params.blockIndex);
-    const block = blockchain.chain[blockIndex];
-    if (!block) return res.status(404).json({ error: 'Block not found' });
-
-    const result = await polygonAnchor.verifyBlock(block);
-    res.json({
-      blockIndex,
-      ...result,
-      polygonscanUrl: `https://polygonscan.com/address/${process.env.POLYGON_ANCHOR_CONTRACT}`,
-    });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-});
-
-// ═══ IPFS (decentralized frontend) status ═════════════════════════════════════
-
-// Get IPFS frontend info (if deployed)
-app.get('/api/ipfs/status', (req, res) => {
-  try {
-    const fs = require('fs');
-    const path = require('path');
-    const cidMapPath = path.join(__dirname, 'ipfs-cids.json');
-    if (fs.existsSync(cidMapPath)) {
-      const cids = JSON.parse(fs.readFileSync(cidMapPath, 'utf8'));
-      const indexCid = cids['index.html'];
-      res.json({
-        deployed: true,
-        cids,
-        gateways: {
-          pinata: indexCid ? `https://gateway.pinata.cloud/ipfs/${indexCid}` : null,
-          ipfs: indexCid ? `https://ipfs.io/ipfs/${indexCid}` : null,
-          cloudflare: indexCid ? `https://cloudflare-ipfs.com/ipfs/${indexCid}` : null,
-        },
-      });
-    } else {
-      res.json({
-        deployed: false,
-        message: 'Frontend not deployed to IPFS. Run: node scripts/upload-to-ipfs.js',
-      });
-    }
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-});
-
 app.post('/api/admin/freeze/:userId', authenticate, requireRole(C.ROLES.ADMIN), (req, res) => {
   DB.run('UPDATE users SET is_frozen = 1 WHERE id = ?', [req.params.userId]);
   logAudit('ACCOUNT_FROZEN', { targetUser: req.params.userId }, { userId: req.user.userId });
@@ -898,15 +825,8 @@ const timerRefs = [];
     console.error('  ⚠ User sync failed:', e.message);
   }
 
-  // ── Initialize blockchain + wallets (async — loads from MongoDB) ────────
-  const { NodeIdentity } = require('./backend/blockchain/nodeIdentity');
-  const tempIdentity = new NodeIdentity();  // load or create node identity
-
-  blockchain = new Blockchain(DATA_DIR, tempIdentity.nodeId);
-  await blockchain.init();  // load chain from MongoDB (or filesystem fallback)
-
+  blockchain = new Blockchain(DATA_DIR);
   walletManager = new WalletManager(DATA_DIR);
-  await walletManager.init();  // load wallets from MongoDB (or filesystem fallback)
   systemWallet = walletManager.getSystemWallet();
 
   escrowService = new EscrowService(DB, blockchain, walletManager);
@@ -921,58 +841,18 @@ const timerRefs = [];
   paymentService = new PaymentService(DB, blockchain, walletManager, kycService);
   settlementService = new SettlementService(DB, blockchain, walletManager);
 
-  // (P2P initialization moved below — needs the shared WebSocket server
-  //  which requires the HTTP server to exist first. See further down.)
-
-  // Wire blockchain events to P2P gossip (will be set up after p2pNode is created)
-  // The actual p2pNode is created after the HTTP server, since it needs the shared WSS.
-
-  startTimers();
-
-  const http = require('http');
-  const { WebSocketServer: WSS } = require('ws');
-  const httpServer = http.createServer(app);
-  const wsServer = new WebSocketServer(httpServer);
-
-  // ── Path-based WebSocket routing (multiplex P2P + UI on same port) ─────
-  // This solves Problem 2: Render free tier only exposes one port.
-  // By routing /p2p upgrades to the P2P WebSocket server, both the UI
-  // real-time updates and P2P gossip share port 4200.
-  const p2pWss = new WSS({ noServer: true });
-
-  httpServer.on('upgrade', (request, socket, head) => {
-    const url = new URL(request.url, `http://${request.headers.host}`);
-    if (url.pathname === '/p2p' || url.pathname.startsWith('/p2p')) {
-      p2pWss.handleUpgrade(request, socket, head, (ws) => {
-        p2pWss.emit('connection', ws, request);
-      });
-    } else {
-      // Route to UI WebSocket server
-      wsServer.wss.handleUpgrade(request, socket, head, (ws) => {
-        wsServer.wss.emit('connection', ws, request);
-      });
-    }
-  });
-
   // ── Algorithm #10: Initialize P2P node (decentralization) ───────────────
-  // Pass the shared P2P WebSocket server so P2P runs on the same port as the API.
-  // This is the key fix for Problem 2: P2P now works on Render free tier.
-  p2pNode = new P2PNode(blockchain, null, p2pWss);
+  // The blockchain is inbuilt (custom code), but it's now synchronized across
+  // multiple Averon server instances via WebSocket gossip + longest-chain-wins.
+  p2pNode = new P2PNode(blockchain);
   p2pNode.start();
 
   // Wire blockchain events to P2P gossip
   blockchain.on('transaction-added', (tx) => {
     p2pNode.broadcastTransaction(tx);
   });
-  blockchain.on('block-mined', async (block) => {
+  blockchain.on('block-mined', (block) => {
     p2pNode.broadcastBlock(block);
-    // Anchor every block to Polygon (if enabled)
-    // This makes Averon's chain publicly verifiable on a public blockchain
-    try {
-      await polygonAnchor.anchorBlock(block);
-    } catch (e) {
-      console.error('  ⚠ Polygon anchor failed for block', block.index, ':', e.message);
-    }
   });
   p2pNode.on('tx-received', (tx) => {
     eventBus.emit(EVENTS.TX_RECEIVED, tx);
@@ -984,11 +864,11 @@ const timerRefs = [];
     eventBus.emit(EVENTS.CHAIN_SYNCED, { oldHeight, newHeight });
   });
 
-  // ── Polygon Anchor (public chain verifiability) ──────────────────────
-  // Anchors Averon's block Merkle roots to Polygon via Alchemy RPC.
-  // Makes the chain publicly auditable — anyone can verify Averon's state
-  // hasn't been tampered with by checking against Polygon.
-  polygonAnchor.initAnchor();
+  startTimers();
+
+  const http = require('http');
+  const httpServer = http.createServer(app);
+  const wsServer = new WebSocketServer(httpServer);
 
   const PORT = process.env.PORT || 4200;
   httpServer.listen(PORT, () => {
@@ -1025,7 +905,7 @@ const timerRefs = [];
 
     setTimeout(() => {
       console.error('  ⚠ Force shutdown after 10s timeout');
-      console.log('Would have exited but continuing...');
+      process.exit(1);
     }, 10000);
   }
 

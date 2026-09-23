@@ -1,0 +1,37 @@
+# ─── Fly.io Configuration (Node 3) ──────────────────────────────────────────
+# Fly.io config for Averon Node 3.
+# Deploy: fly launch (or fly deploy if already configured)
+# ─────────────────────────────────────────────────────────────────────────────
+
+app = "averon-node-3"
+primary_region = "sin"  # Singapore — closest to India
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 4200
+  force_https = true
+  auto_stop_machines = false  # keep running for P2P
+  auto_start_machines = false
+  min_machines_running = 1
+
+[checks]
+  [checks.health]
+    port = 4200
+    type = "http"
+    interval = "15s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "GET"
+    path = "/health"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512
+
+[env]
+  NODE_ENV = "production"
+  PORT = "4200"
+  # Set these via `fly secrets set MONGODB_URI=... JWT_SECRET=...` after deploy

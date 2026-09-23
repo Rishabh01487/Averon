@@ -1,0 +1,29 @@
+# ─── Render Service Configuration ────────────────────────────────────────────
+# This file configures the existing Averon deployment on Render.
+# Deploy: connect your GitHub repo at https://dashboard.render.com
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  - type: web
+    name: averon-node-1
+    env: node
+    region: singapore  # closest to India
+    plan: free
+    branch: main
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4200
+      - key: MONGODB_URI
+        sync: false  # set manually in Render dashboard
+      - key: JWT_SECRET
+        sync: false  # set manually (openssl rand -hex 32)
+      - key: JWT_REFRESH_SECRET
+        sync: false  # set manually (openssl rand -hex 32)
+      - key: PEERS
+        sync: false  # set to wss://node2.railway.app/p2p,wss://node3.fly.dev/p2p after Node 2+3 deploy
+      - key: TRUSTED_NODES
+        sync: false  # set to all 3 node IDs after first deploy (comma-separated)
