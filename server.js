@@ -62,6 +62,8 @@ const { AssetService } = require('./backend/services/assetService');
 const { VestingService } = require('./backend/services/vestingService');
 const { TradingEngine } = require('./backend/services/tradingEngine');
 const { P2PNode } = require('./backend/blockchain/p2p');
+const { connectMongo, closeMongo, isMongoEnabled, getDb } = require('./backend/config/mongo');
+const userStore = require('./backend/services/userStore');
 const { FeeService } = require('./backend/services/feeService');
 const { PriceService } = require('./backend/services/priceService');
 const { ComplianceService } = require('./backend/services/complianceService');
@@ -137,33 +139,49 @@ app.get('/api/dashboard', (req, res) => {
 app.post('/api/auth/register', authLimiter, validate('register'), async (req, res) => {
   const { email, password, name, organization } = req.body;
 
-  const existing = DB.queryOne('SELECT id FROM users WHERE email = ?', [email]);
+  // Check if user already exists (MongoDB primary, SQLite fallback)
+  const existing = await userStore.findUserByEmail(email, DB);
   if (existing) return res.status(409).json({ error: 'Email already registered', code: 'EMAIL_EXISTS' });
 
   const userId = 'usr_' + crypto.randomBytes(8).toString('hex');
   const passwordHash = await hashPassword(password);
 
-  // Create wallet
+  // Create wallet (kept in SQLite wallets.json — tightly coupled to blockchain)
   const wallet = walletManager.createWallet(userId);
 
   // Determine role (first user = admin)
-  const userCount = DB.queryOne('SELECT COUNT(*) as c FROM users')?.c || 0;
+  let userCount = 0;
+  if (isMongoEnabled()) {
+    userCount = await getDb?.()?.collection('users')?.countDocuments?.() || 0;
+  }
+  if (userCount === 0) {
+    // Fallback to SQLite count
+    userCount = DB.queryOne('SELECT COUNT(*) as c FROM users')?.c || 0;
+  }
   const role = userCount === 0 ? C.ROLES.ADMIN : C.ROLES.USER;
 
   const now = Date.now();
-  DB.run(
-    'INSERT INTO users (id, email, password_hash, name, organization, role, wallet_address, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?)',
-    [userId, email, passwordHash, name, organization || '', role, wallet.address, now, now]
-  );
+  // Create user in MongoDB (primary source of truth) + mirror to SQLite
+  await userStore.createUser({
+    id: userId, email, passwordHash, name, organization: organization || '',
+    role, walletAddress: wallet.address, createdAt: now,
+  }, DB);
+
+  // Wallet stays in SQLite (tightly coupled to blockchain wallets.json)
   DB.run('INSERT INTO wallets (user_id, public_key, private_key, address, created_at) VALUES (?,?,?,?,?)',
     [userId, wallet.publicKey, wallet.privateKey, wallet.address, now]);
 
   // Update holder count
-  const count = DB.queryOne('SELECT COUNT(*) as c FROM users')?.c || 0;
+  const count = (isMongoEnabled() ? await getDb()?.collection('users')?.countDocuments?.() : 0) ||
+                DB.queryOne('SELECT COUNT(*) as c FROM users')?.c || 0;
   DB.updateEconomy('holder_count', count);
 
-  const user = DB.queryOne('SELECT * FROM users WHERE id = ?', [userId]);
+  const user = await userStore.findUserById(userId, DB);
   const tokens = generateTokens(user);
+
+  // Create session in MongoDB + mirror
+  await userStore.createSession(userId, tokens.refreshToken,
+    Date.now() + 7 * 24 * 60 * 60 * 1000, DB);
 
   logAudit('REGISTER', { email, role }, { userId, ip: req.ip });
   eventBus.emit(EVENTS.USER_REGISTERED, { userId, name, wallet: wallet.address });
@@ -180,7 +198,8 @@ app.post('/api/auth/register', authLimiter, validate('register'), async (req, re
 app.post('/api/auth/login', authLimiter, validate('login'), async (req, res) => {
   const { email, password } = req.body;
 
-  const user = DB.queryOne('SELECT * FROM users WHERE email = ?', [email]);
+  // Primary: MongoDB; Fallback: SQLite
+  const user = await userStore.findUserByEmail(email, DB);
   if (!user) return res.status(401).json({ error: 'Invalid credentials', code: 'AUTH_FAILED' });
 
   // Check lockout
@@ -193,22 +212,28 @@ app.post('/api/auth/login', authLimiter, validate('login'), async (req, res) => 
 
   const valid = await verifyPassword(password, user.password_hash);
   if (!valid) {
-    const attempts = (user.login_attempts || 0) + 1;
-    if (attempts >= C.AUTH.MAX_LOGIN_ATTEMPTS) {
-      DB.run('UPDATE users SET login_attempts = ?, locked_until = ? WHERE id = ?',
-        [attempts, Date.now() + C.AUTH.LOCKOUT_DURATION_MS, user.id]);
-    } else {
-      DB.run('UPDATE users SET login_attempts = ? WHERE id = ?', [attempts, user.id]);
+    const result = await userStore.incrementLoginAttempts(
+      user.id, C.AUTH.MAX_LOGIN_ATTEMPTS, C.AUTH.LOCKOUT_DURATION_MS, DB
+    );
+    if (result.locked) {
+      return res.status(423).json({
+        error: `Account locked. Try again in ${Math.ceil(C.AUTH.LOCKOUT_DURATION_MS / 60000)} minutes.`,
+        code: 'ACCOUNT_LOCKED'
+      });
     }
     return res.status(401).json({ error: 'Invalid credentials', code: 'AUTH_FAILED' });
   }
 
   // Reset attempts on success
-  DB.run('UPDATE users SET login_attempts = 0, locked_until = 0, last_login = ? WHERE id = ?', [Date.now(), user.id]);
+  await userStore.resetLoginAttempts(user.id, DB);
 
   const tokens = generateTokens(user);
   const wallet = DB.queryOne('SELECT address FROM wallets WHERE user_id = ?', [user.id]);
   const balance = wallet ? blockchain.getBalance(wallet.address) : 0;
+
+  // Create new session in MongoDB + SQLite
+  await userStore.createSession(user.id, tokens.refreshToken,
+    Date.now() + 7 * 24 * 60 * 60 * 1000, DB);
 
   logAudit('LOGIN', { email }, { userId: user.id, ip: req.ip });
 
@@ -218,34 +243,58 @@ app.post('/api/auth/login', authLimiter, validate('login'), async (req, res) => 
   });
 });
 
-app.post('/api/auth/refresh', (req, res) => {
+app.post('/api/auth/refresh', async (req, res) => {
   const { refreshToken } = req.body;
   if (!refreshToken) return res.status(400).json({ error: 'Refresh token required' });
 
   const payload = verifyRefreshToken(refreshToken);
   if (!payload) return res.status(401).json({ error: 'Invalid refresh token' });
 
-  const user = DB.queryOne('SELECT * FROM users WHERE id = ?', [payload.userId]);
+  // Check if session exists + is not revoked
+  const session = await userStore.findSession(refreshToken, DB);
+  if (session && session.is_revoked) {
+    return res.status(401).json({ error: 'Session revoked' });
+  }
+
+  const user = await userStore.findUserById(payload.userId, DB);
   if (!user) return res.status(401).json({ error: 'User not found' });
 
   const tokens = generateTokens(user);
+  // Rotate: revoke old refresh token, create new session
+  if (session) {
+    await userStore.revokeSession(refreshToken, DB);
+  }
+  await userStore.createSession(user.id, tokens.refreshToken,
+    Date.now() + 7 * 24 * 60 * 60 * 1000, DB);
+
   res.json(tokens);
 });
 
 // ── Account ──────────────────────────────────────────────────────────────────
 
-app.get('/api/account', authenticate, (req, res) => {
-  const user = DB.queryOne('SELECT * FROM users WHERE id = ?', [req.user.userId]);
+app.get('/api/account', authenticate, async (req, res) => {
+  const user = await userStore.findUserById(req.user.userId, DB);
   if (!user) return res.status(404).json({ error: 'User not found' });
   const wallet = DB.queryOne('SELECT address FROM wallets WHERE user_id = ?', [user.id]);
   const balance = wallet ? blockchain.getBalance(wallet.address) : 0;
-  DB.run('UPDATE users SET averon_balance = ? WHERE id = ?', [balance, user.id]);
+  // Mirror balance back to Mongo + SQLite
+  await userStore.updateUser(user.id, { averon_balance: balance }, DB);
 
   res.json({
     id: user.id, name: user.name, email: user.email, role: user.role,
     walletAddress: wallet?.address, balance, inrSpent: user.inr_spent,
     createdAt: user.created_at,
   });
+});
+
+// Logout: revoke the user's session
+app.post('/api/auth/logout', authenticate, async (req, res) => {
+  const refreshToken = req.body?.refreshToken;
+  if (refreshToken) {
+    await userStore.revokeSession(refreshToken, DB);
+  }
+  logAudit('LOGOUT', {}, { userId: req.user.userId, ip: req.ip });
+  res.json({ success: true });
 });
 
 app.get('/api/notifications', authenticate, (req, res) => {
@@ -743,7 +792,11 @@ function startTimers() {
     }
   }, C.VESTING.SWEEP_INTERVAL_MS));
 
-  timerRefs.push(setInterval(() => DB.run('DELETE FROM sessions WHERE expires_at < ?', [Date.now()]), C.AUTH.SESSION_CLEANUP_INTERVAL_MS));
+  timerRefs.push(setInterval(async () => {
+    try { await userStore.cleanupExpiredSessions(DB); }
+    catch (e) { /* fall back to SQLite-only cleanup below */ }
+    DB.run('DELETE FROM sessions WHERE expires_at < ?', [Date.now()]);
+  }, C.AUTH.SESSION_CLEANUP_INTERVAL_MS));
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -755,6 +808,22 @@ const timerRefs = [];
 (async () => {
   await DB.initDatabase();
   initAudit(DB);
+
+  // ── Connect to MongoDB (for persistent auth) ─────────────────────────────
+  // If MONGODB_URI is not set, falls back to SQLite-only mode (with warning).
+  await connectMongo();
+
+  // Sync users from MongoDB → SQLite (rebuilds SQLite after Render restart)
+  // This ensures existing services that query SQLite `users` table continue
+  // to work even after the ephemeral filesystem was wiped.
+  try {
+    const syncResult = await userStore.syncUsersFromMongoToSQLite(DB);
+    if (syncResult.synced > 0) {
+      console.log(`  🔄 Synced ${syncResult.synced} user(s) from MongoDB → SQLite`);
+    }
+  } catch (e) {
+    console.error('  ⚠ User sync failed:', e.message);
+  }
 
   blockchain = new Blockchain(DATA_DIR);
   walletManager = new WalletManager(DATA_DIR);
@@ -824,6 +893,9 @@ const timerRefs = [];
 
     // Stop P2P node (closes all peer connections)
     if (p2pNode) p2pNode.stop();
+
+    // Close MongoDB connection
+    await closeMongo();
 
     httpServer.close(() => {
       DB.persist();
